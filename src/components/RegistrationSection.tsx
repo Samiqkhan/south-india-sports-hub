@@ -2,11 +2,15 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { CheckCircle, Upload } from "lucide-react";
 
-const RegistrationSection = () => {
+interface RegistrationSectionProps {
+  categories?: string[];
+}
+
+const RegistrationSection = ({ categories = ["singles", "doubles"] }: RegistrationSectionProps) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [submitted, setSubmitted] = useState(false);
-  const [category, setCategory] = useState("singles");
+  const [category, setCategory] = useState(categories[0]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,27 +82,29 @@ const RegistrationSection = () => {
             </div>
           ))}
 
-          <div>
-            <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-              Category
-            </label>
-            <div className="flex gap-4">
-              {["singles", "doubles"].map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setCategory(cat)}
-                  className={`flex-1 py-3 rounded-lg font-semibold uppercase tracking-wider text-sm transition-all ${
-                    category === cat
-                      ? "bg-primary text-primary-foreground glow-primary"
-                      : "bg-secondary/50 text-muted-foreground border border-border hover:border-primary/50"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+          {categories.length > 1 && (
+            <div>
+              <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Category
+              </label>
+              <div className="flex gap-4">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(cat)}
+                    className={`flex-1 py-3 rounded-lg font-semibold uppercase tracking-wider text-sm transition-all ${
+                      category === cat
+                        ? "bg-primary text-primary-foreground glow-primary"
+                        : "bg-secondary/50 text-muted-foreground border border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {category === "doubles" && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}>
