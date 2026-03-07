@@ -7,7 +7,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const rules = [
+interface Rule {
+  title: string;
+  content: string;
+}
+
+const defaultRules: Rule[] = [
   {
     title: "1. Match Format",
     content: "All matches will be played in a best-of-3 games format. Each game is played to 21 points with a 2-point lead required. At 29-all, the side scoring the 30th point wins. Rally point scoring system applies throughout.",
@@ -30,7 +35,11 @@ const rules = [
   },
 ];
 
-const RulesSection = () => {
+interface RulesSectionProps {
+  rules?: Rule[];
+}
+
+const RulesSection = ({ rules = defaultRules }: RulesSectionProps) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
