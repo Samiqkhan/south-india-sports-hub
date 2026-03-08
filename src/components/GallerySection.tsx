@@ -77,6 +77,7 @@ const GallerySection = () => {
         )}
       </div>
     </section>
+    
   );
 };
 

@@ -16,12 +16,18 @@ const Footer = () => {
               {["About", "Tournament", "Rules", "Register", "Gallery", "Contact"].map((link) => (
                 <a
                   key={link}
-                  href={`#${link.toLowerCase()}`}
+                  href={`/#${link.toLowerCase()}`}
                   className="block text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link}
                 </a>
               ))}
+              <a href="/sponsor" className="block text-sm text-accent hover:text-accent-foreground transition-colors font-semibold pt-2">
+                Become a Sponsor
+              </a>
+              <a href="/apply" className="block text-sm text-primary hover:text-primary-foreground transition-colors font-semibold">
+                Host a Tournament
+              </a>
             </div>
           </div>
 

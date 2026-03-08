@@ -1,15 +1,24 @@
 import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, MapPin, Trophy, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RulesSection from "@/components/RulesSection";
 import RegistrationSection from "@/components/RegistrationSection";
+import RewardsSection from "@/components/RewardsSection";
+import VenueModal from "@/components/VenueModal";
 import { tournaments } from "@/data/tournaments";
 
 const TournamentDetail = () => {
   const { slug } = useParams();
+  const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
   const tournament = tournaments.find((t) => t.slug === slug);
+
+  // Scroll to top when this page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (!tournament) {
     return (
@@ -65,23 +74,66 @@ const TournamentDetail = () => {
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {details.map((item) => (
-                <div key={item.label} className="glass-card p-5 text-center hover-lift">
-                  <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
-                  <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
-                  <p className="font-semibold text-foreground">{item.value}</p>
-                </div>
-              ))}
+              {details.map((item) => {
+                const isVenue = item.label === "Venue" && tournament.venueDetails && tournament.venueDetails.length > 0;
+                return (
+                  <div
+                    key={item.label}
+                    onClick={isVenue ? () => setIsVenueModalOpen(true) : undefined}
+                    className={`glass-card p-5 text-center ${isVenue ? "cursor-pointer hover:border-primary/50 transition-colors group relative" : "hover-lift"}`}
+                  >
+                    <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
+                    <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
+                    <p className="font-semibold text-foreground">{item.value}</p>
+                    {isVenue && (
+                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span className="text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 rounded backdrop-blur">
+                          View All
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
       </section>
 
+      {/* Sponsor CTA */}
+      <section className="pb-16 px-4 md:px-8">
+        <div className="container mx-auto max-w-5xl">
+           <div className="glass-card p-8 border-accent/30 text-center">
+             <h3 className="font-display text-2xl font-bold uppercase mb-4">Want to Sponsor {tournament.title}?</h3>
+             <p className="text-muted-foreground mb-6">Gain exclusive brand visibility and partner with us for this amazing event.</p>
+             <Link to="/sponsor" className="px-8 py-3 bg-accent text-accent-foreground font-bold rounded-lg text-sm uppercase tracking-wider glow-accent hover:brightness-110 transition-all inline-block">
+               Become a Sponsor
+             </Link>
+           </div>
+        </div>
+      </section>
+
+      
+      {/* Rewards & Fees */}
+      <RewardsSection rewards={tournament.rewards} fees={tournament.fees} />
+
       {/* Rules */}
       <RulesSection rules={tournament.rules} />
-
+              
       {/* Registration */}
-      <RegistrationSection categories={tournament.registrationCategories} />
+      <RegistrationSection 
+        categories={tournament.registrationCategories} 
+        ageCategories={tournament.ageCategories}
+        playerFees={tournament.playerFees} 
+      />
+
+      {tournament.venueDetails && (
+        <VenueModal
+          isOpen={isVenueModalOpen}
+          onClose={() => setIsVenueModalOpen(false)}
+          venues={tournament.venueDetails}
+        />
+      )}
 
       <Footer />
     </div>

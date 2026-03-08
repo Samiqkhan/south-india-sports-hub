@@ -42,7 +42,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground uppercase tracking-wider">Email</p>
-                <p className="text-foreground font-semibold">info@sisa-sports.com</p>
+                <p className="text-foreground font-semibold">southindiasportsassociation.com</p>
               </div>
             </div>
 

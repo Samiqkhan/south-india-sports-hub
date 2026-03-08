@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { label: "About", href: "#about" },
   { label: "Tournament", href: "#tournament" },
-  { label: "Rules", href: "#rules" },
-  { label: "Register", href: "#register" },
-  { label: "Gallery", href: "#gallery" },
-  { label: "Contact", href: "#contact" },
+  { label: "Gallery", href: "/#gallery" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const Navbar = () => {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -39,18 +40,27 @@ const Navbar = () => {
           {navLinks.map((link) => (
             <a
               key={link.href}
-              href={link.href}
+              href={isHome ? link.href.replace("/", "") : link.href}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 uppercase tracking-wider"
             >
               {link.label}
             </a>
           ))}
-          <a
-            href="#register"
-            className="px-5 py-2 bg-primary text-primary-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-primary hover:brightness-110 transition-all"
-          >
-            Register
-          </a>
+          <div className="flex items-center gap-3">
+            
+            <Link
+              to="/apply"
+              className="px-5 py-2 bg-primary text-primary-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-primary hover:brightness-110 transition-all"
+            >
+              Host Game
+            </Link>
+            <Link
+              to="/sponsor"
+              className="px-5 py-2 bg-accent text-accent-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-accent hover:brightness-110 transition-all"
+            >
+              Sponsor
+            </Link>
+          </div>
         </div>
 
         {/* Mobile toggle */}
@@ -69,13 +79,29 @@ const Navbar = () => {
           {navLinks.map((link) => (
             <a
               key={link.href}
-              href={link.href}
+              href={isHome ? link.href.replace("/", "") : link.href}
               onClick={() => setMobileOpen(false)}
               className="block py-3 text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider text-sm"
             >
               {link.label}
             </a>
           ))}
+          <div className="pt-4 flex flex-col gap-3">
+            <Link
+              to="/apply"
+              onClick={() => setMobileOpen(false)}
+              className="w-full text-center px-5 py-3 bg-primary text-primary-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-primary hover:brightness-110 transition-all"
+            >
+              Host a Game
+            </Link>
+            <Link
+              to="/sponsor"
+              onClick={() => setMobileOpen(false)}
+              className="w-full text-center px-5 py-3 bg-accent text-accent-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-accent hover:brightness-110 transition-all"
+            >
+              Become a Sponsor
+            </Link>
+          </div>
         </motion.div>
       )}
     </motion.nav>

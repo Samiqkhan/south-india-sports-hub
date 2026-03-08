@@ -45,16 +45,16 @@ const HeroSection = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
-            href="#register"
+            href="#tournament"
             className="px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all hover:scale-105"
           >
             Register for Tournament
           </a>
           <a
-            href="#rules"
+            href="/apply"
             className="px-8 py-4 border border-border text-foreground font-bold rounded-lg text-lg uppercase tracking-wider hover:bg-secondary transition-all hover:scale-105"
           >
-            View Rules
+            Host a Game
           </a>
         </motion.div>
       </div>
