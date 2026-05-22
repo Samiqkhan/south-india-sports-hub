@@ -51,108 +51,97 @@ export interface Tournament {
 
 export const tournaments: Tournament[] = [
   {
-    slug: "south-india-open-badminton-2026",
-    title: "South India Open",
-    subtitle: "Badminton Tournament",
-    sport: "Badminton",
+    slug: "chess-tournament-2026",
+    title: "Chess Tournament 2026",
+    subtitle: "Strategize. Think. Win.",
+    sport: "Chess",
     status: "Upcoming",
-    date: "April 25-30, 2026",
-    venue: "Multiple Locations",
-    prize: "₹1,00,00,000",
-    categories: "Singles & Doubles",
+    date: "June 27-28, 2026",
+    venue: "SISA Sports Hub, Chennai",
+    prize: "Over ₹13,000 in Prizes",
+    categories: "U9, U12, U15 & Open (Mixed)",
     description:
-      "The premier badminton championship of South India, bringing together top players from across the region to compete for glory and prize money.",
-    registrationCategories: ["Singles", "Doubles"],
-    ageCategories: ["U9", "U11", "U13", "U15", "U17", "U19"],
+      "🏆 A Game of Mind, A Lifetime of Success! Strategize, think, and win at the premier South India Chess Championship 2026. Join top minds from across the region to compete for glory and cash prizes.",
+    registrationCategories: ["Girls & Boys Mixed"],
+    ageCategories: ["U-9", "U-12", "U-15", "Open"],
     rules: [
       {
         title: "1. Match Format",
         content:
-          "All matches will be played in a best-of-3 games format. Each game is played to 21 points with a 2-point lead required. At 29-all, the side scoring the 30th point wins. Rally point scoring system applies throughout.",
+          "All matches will be conducted as per latest FIDE rules of Chess. Time control will be 15 minutes + 10 seconds increment per move from move 1 (Rapid format) or as decided by the Chief Arbiter.",
       },
       {
-        title: "2. Entry Rules",
+        title: "2. Age Verification",
         content:
-          "Players must register at least 7 days before the tournament. Valid ID proof and age verification are mandatory. Registration fees are non-refundable. A maximum of 256 entries per category will be accepted on a first-come, first-served basis.",
+          "Strict age verification will be conducted. Players must produce a valid Govt. ID proof (Aadhaar or Birth Certificate) showing birth dates corresponding to their category: U-9, U-12, or U-15. Open category has no age limit.",
       },
       {
-        title: "3. Court Regulations",
+        title: "3. Equipment",
         content:
-          "All matches will be played on BWF-approved synthetic courts. Players must wear proper non-marking sports shoes. Only BWF-approved feather shuttlecocks will be used. Players are allowed a 60-second rest between games.",
+          "Chess boards, chess pieces, and tournament chess clocks will be provided by SISA. Players are not permitted to use their own boards unless explicitly permitted by the Chief Arbiter in special cases.",
       },
       {
-        title: "4. Referee Decisions",
+        title: "4. Tie-breaks & Pairings",
         content:
-          "The referee's decision is final and binding. Video review may be used for semi-finals and finals. Players can request one challenge per game. Misconduct or unsportsmanlike behavior may result in immediate disqualification.",
+          "Swiss-system pairings will be handled via certified software. Tie-breaks will follow standard FIDE-approved criteria: Buchholz Cut 1, Buchholz, Sonneborn-Berger, and Direct Encounter.",
       },
       {
-        title: "5. Player Conduct",
+        title: "5. Arbiter Decisions",
         content:
-          "Players must report to the venue 30 minutes before their scheduled match. Failure to report on time will result in a walkover. Players must adhere to the dress code and display their registration ID at all times. No coaching is allowed during live play.",
+          "The decision of the Chief Arbiter is final and binding on all participants. Any appeal must be made in writing within 15 minutes of the end of the round with an appeal fee.",
       },
     ],
     rewards: [
       {
-        level: "District Level",
-        prizes: [{ reward: "Trophy + Medal + Certificate" }],
-      },
-      {
-        level: "State Level",
+        level: "Girls & Boys Mixed U-9",
         prizes: [
-          { position: "Winner", reward: "₹10,000" },
-          { position: "Runner", reward: "₹5,000" },
-          { position: "Semi-Final", reward: "₹2,500 + Certificate" },
+          { position: "First Prize", reward: "₹1,526" },
+          { position: "Second Prize", reward: "₹1,026" },
+          { position: "Third & Consolation", reward: "₹526" },
         ],
       },
       {
-        level: "South Zone Level",
+        level: "Girls & Boys Mixed U-12",
         prizes: [
-          { position: "Winner", reward: "₹50,000 + Cycle + Medal" },
-          { position: "Runner", reward: "₹25,000 + Racquet" },
-          { position: "Third", reward: "₹15,000 + Kit Bag" },
+          { position: "First Prize", reward: "₹1,526" },
+          { position: "Second Prize", reward: "₹1,026" },
+          { position: "Third & Consolation", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Girls & Boys Mixed U-15",
+        prizes: [
+          { position: "First Prize", reward: "₹1,526" },
+          { position: "Second Prize", reward: "₹1,026" },
+          { position: "Third & Consolation", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Open Chess – Girls & Boys Mixed",
+        prizes: [
+          { position: "First Prize", reward: "₹2,526" },
+          { position: "Second Prize", reward: "₹1,026" },
+          { position: "Third & Consolation", reward: "₹526" },
         ],
       },
     ],
     fees: [
-      { item: "Court Fees", amount: "₹10,000" },
-      { item: "Umpire Fees", amount: "₹10,000" },
-      { item: "Shuttle Cocks", amount: "₹5,000" },
-      { item: "Tournament Management", amount: "₹15,000" },
+      { item: "Entry Fee", amount: "₹400" },
+      { item: "Arbiter & Venue Fees", amount: "Included" },
+      { item: "Refreshments", amount: "Complimentary" },
     ],
     playerFees: [
-      { ageCategory: "U9", category: "Singles", fee: "₹500" },
-      { ageCategory: "U9", category: "Doubles", fee: "₹800" },
-      { ageCategory: "U11", category: "Singles", fee: "₹500" },
-      { ageCategory: "U11", category: "Doubles", fee: "₹800" },
-      { ageCategory: "U13", category: "Singles", fee: "₹600" },
-      { ageCategory: "U13", category: "Doubles", fee: "₹1000" },
-      { ageCategory: "U15", category: "Singles", fee: "₹600" },
-      { ageCategory: "U15", category: "Doubles", fee: "₹1000" },
-      { ageCategory: "U17", category: "Singles", fee: "₹750" },
-      { ageCategory: "U17", category: "Doubles", fee: "₹1200" },
-      { ageCategory: "U19", category: "Singles", fee: "₹750" },
-      { ageCategory: "U19", category: "Doubles", fee: "₹1200" },
+      { ageCategory: "U-9", category: "Girls & Boys Mixed", fee: "₹400" },
+      { ageCategory: "U-12", category: "Girls & Boys Mixed", fee: "₹400" },
+      { ageCategory: "U-15", category: "Girls & Boys Mixed", fee: "₹400" },
+      { ageCategory: "Open", category: "Girls & Boys Mixed", fee: "₹400" },
     ],
     venueDetails: [
       {
         district: "Chennai",
         locations: [
-          "Chennai Indoor Stadium, Periamet",
-          "Fireball Badminton Academy, Anna Nagar",
-          "Smash Bounce, Velachery",
-        ],
-      },
-      {
-        district: "Coimbatore",
-        locations: [
-          "Avinashilingam Indoor Stadium",
-          "Prozone Sports Club",
-        ],
-      },
-      {
-        district: "Madurai",
-        locations: [
-          "Race Course Stadium",
+          "SISA Sports Hub, T. Nagar, Chennai",
+          "Hall of Chess, YMCA, Nandanam, Chennai",
         ],
       },
     ],

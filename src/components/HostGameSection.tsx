@@ -19,7 +19,7 @@ const HostGameSection = () => {
     },
     {
       title: "Complete Management",
-      description: "Professional umpires, top-tier venues, shuttlecocks, and end-to-end event execution.",
+      description: "Professional arbiters & umpires, top-tier venues, official equipment, and end-to-end event execution.",
       icon: <Trophy className="w-8 h-8 text-primary" />,
     },
   ];
@@ -47,7 +47,7 @@ const HostGameSection = () => {
               </span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-xl">
-              Want to organize an unforgettable badminton tournament? We provide the digital infrastructure and operational expertise to make your event a massive success.
+              Want to organize an unforgettable sports tournament? We provide the digital infrastructure and operational expertise to make your event a massive success.
             </p>
 
             <a

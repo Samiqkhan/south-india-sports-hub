@@ -5,6 +5,7 @@ import { ArrowLeft, Send, Briefcase, Award } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
+import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
 
 const SponsorRegistration = () => {
   const { toast } = useToast();
@@ -14,6 +15,8 @@ const SponsorRegistration = () => {
     contactPerson: "",
     email: "",
     phone: "",
+    state: "" as SouthIndiaState | "",
+    city: "",
     sponsorshipLevel: "",
     interestedTournaments: "",
     message: "",
@@ -21,7 +24,12 @@ const SponsorRegistration = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    if (name === "state") {
+      setFormData((prev) => ({ ...prev, state: value as SouthIndiaState, city: "" }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,12 +48,16 @@ const SponsorRegistration = () => {
         contactPerson: "",
         email: "",
         phone: "",
+        state: "",
+        city: "",
         sponsorshipLevel: "",
         interestedTournaments: "",
         message: "",
       });
     }, 1500);
   };
+
+  const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -171,6 +183,46 @@ const SponsorRegistration = () => {
                       className="w-full bg-background/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body"
                       placeholder="+91 98765 43210"
                     />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="state" className="text-sm font-medium text-foreground uppercase tracking-wider">
+                      State <span className="text-primary">*</span>
+                    </label>
+                    <select
+                      id="state"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-background/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none"
+                    >
+                      <option value="" disabled>Select state</option>
+                      {Object.keys(SOUTH_INDIA_LOCATIONS).map((state) => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="city" className="text-sm font-medium text-foreground uppercase tracking-wider">
+                      City <span className="text-primary">*</span>
+                    </label>
+                    <select
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      required
+                      disabled={!formData.state}
+                      className="w-full bg-background/50 border border-border/50 rounded-lg px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <option value="" disabled>Select city</option>
+                      {cities.map((city) => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

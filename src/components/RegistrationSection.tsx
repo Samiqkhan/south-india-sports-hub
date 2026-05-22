@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { CheckCircle, Upload } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
+import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
 
 interface RegistrationSectionProps {
   categories?: string[];
@@ -17,11 +18,30 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
   const [category, setCategory] = useState(categories[0] || "");
   const [partnerName, setPartnerName] = useState("");
   const [step, setStep] = useState(1);
+  
+  const [formData, setFormData] = useState({
+    playerName: "",
+    phone: "",
+    email: "",
+    state: "" as SouthIndiaState | "",
+    city: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === "state") {
+      setFormData(prev => ({ ...prev, state: value as SouthIndiaState, city: "" }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2);
   };
+
+  const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
   if (submitted) {
     return (
@@ -38,7 +58,18 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
               Thank you for registering. We'll send a confirmation to your email shortly.
             </p>
             <button
-              onClick={() => setSubmitted(false)}
+              onClick={() => {
+                setSubmitted(false);
+                setFormData({
+                  playerName: "",
+                  phone: "",
+                  email: "",
+                  state: "",
+                  city: "",
+                });
+                setPartnerName("");
+                setStep(1);
+              }}
               className="px-6 py-3 border border-border text-foreground font-semibold rounded-lg uppercase tracking-wider hover:bg-secondary transition-all"
             >
               Register Another Player
@@ -130,22 +161,31 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
                    <thead>
                      <tr className="bg-primary/5">
                        <th className="p-3 border-b sm:border-r border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground w-1/3">Age Group</th>
-                       <th className="p-3 border-b sm:border-r border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground w-1/3">Singles</th>
-                       <th className="p-3 border-b border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground w-1/3">Doubles</th>
+                       {categories.map((cat) => (
+                         <th key={cat} className="p-3 border-b sm:border-r last:border-r-0 border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground">
+                           {cat}
+                         </th>
+                       ))}
                      </tr>
                    </thead>
                    <tbody>
                      {ageCategories.map((ageGroup, idx) => {
-                        const singlesFee = playerFees.find(f => f.ageCategory === ageGroup && f.category.toLowerCase() === "singles")?.fee || "-";
-                        const doublesFee = playerFees.find(f => f.ageCategory === ageGroup && f.category.toLowerCase() === "doubles")?.fee || "-";
-                        
-                        if (singlesFee === "-" && doublesFee === "-") return null;
+                        const hasAnyFee = categories.some(cat => 
+                          playerFees.some(f => f.ageCategory === ageGroup && f.category.toLowerCase() === cat.toLowerCase())
+                        );
+                        if (!hasAnyFee) return null;
 
                         return (
                           <tr key={idx} className="hover:bg-secondary/30 transition-colors border-b border-border/30 last:border-b-0">
                             <td className="p-3 sm:border-r border-border/30 text-foreground font-semibold uppercase tracking-widest">{ageGroup}</td>
-                            <td className="p-3 sm:border-r border-border/30 text-electric font-bold">{singlesFee}</td>
-                            <td className="p-3 text-electric font-bold">{doublesFee}</td>
+                            {categories.map((cat, cIdx) => {
+                              const fee = playerFees.find(f => f.ageCategory === ageGroup && f.category.toLowerCase() === cat.toLowerCase())?.fee || "-";
+                              return (
+                                <td key={cat} className={`p-3 ${cIdx < categories.length - 1 ? "sm:border-r border-border/30" : ""} text-electric font-bold`}>
+                                  {fee}
+                                </td>
+                              );
+                            })}
                           </tr>
                         );
                      })}
@@ -163,24 +203,91 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
           transition={{ duration: 0.6, delay: 0.2 }}
           className="glass-card p-8 md:p-10 space-y-6"
         >
-          {[
-            { name: "playerName", label: "Player Name", type: "text", placeholder: "Enter your full name" },
-            { name: "phone", label: "Phone Number", type: "tel", placeholder: "+91 XXXXX XXXXX" },
-            { name: "email", label: "Email Address", type: "email", placeholder: "you@example.com" },
-            { name: "city", label: "City", type: "text", placeholder: "Your city" },
-          ].map((field) => (
-            <div key={field.name}>
+          <div className="space-y-6">
+            <div>
               <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {field.label}
+                Player Name
               </label>
               <input
-                type={field.type}
-                placeholder={field.placeholder}
+                type="text"
+                name="playerName"
+                value={formData.playerName}
+                onChange={handleInputChange}
+                placeholder="Enter your full name"
                 required
-                className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body"
               />
             </div>
-          ))}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="+91 XXXXX XXXXX"
+                  required
+                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="you@example.com"
+                  required
+                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  State
+                </label>
+                <select
+                  name="state"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm appearance-none cursor-pointer font-body"
+                >
+                  <option value="" disabled>Select State</option>
+                  {Object.keys(SOUTH_INDIA_LOCATIONS).map((state) => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  City
+                </label>
+                <select
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  required
+                  disabled={!formData.state}
+                  className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm appearance-none cursor-pointer font-body disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="" disabled>Select City</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
 
           {ageCategories.length > 0 && categories.length > 0 && (
             <div className="space-y-6 pt-4 border-t border-border/50">
@@ -248,7 +355,7 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
 
           <button
             type="submit"
-            className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all"
+            className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all font-display"
           >
             Next: Payment
           </button>

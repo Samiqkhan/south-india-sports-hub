@@ -1,4 +1,8 @@
+import { tournaments } from "@/data/tournaments";
+
 const Footer = () => {
+  const activeTournament = tournaments[0];
+
   return (
     <footer className="border-t border-border/50 py-12 px-4">
       <div className="container mx-auto">
@@ -33,9 +37,15 @@ const Footer = () => {
 
           <div>
             <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground mb-4">Tournament</h4>
-            <p className="text-sm text-muted-foreground">South India Open Badminton Tournament</p>
-            <p className="text-sm text-primary font-semibold mt-1">July 15-20, 2026</p>
-            <p className="text-sm text-muted-foreground mt-1">Chennai Indoor Stadium</p>
+            {activeTournament ? (
+              <>
+                <p className="text-sm text-muted-foreground">{activeTournament.title}</p>
+                <p className="text-sm text-primary font-semibold mt-1">{activeTournament.date}</p>
+                <p className="text-sm text-muted-foreground mt-1">{activeTournament.venue}</p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">No upcoming tournaments</p>
+            )}
           </div>
         </div>
 
