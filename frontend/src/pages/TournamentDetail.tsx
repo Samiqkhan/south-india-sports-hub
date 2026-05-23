@@ -9,15 +9,30 @@ import RegistrationSection from "@/components/RegistrationSection";
 import RewardsSection from "@/components/RewardsSection";
 import VenueModal from "@/components/VenueModal";
 import { tournaments } from "@/data/tournaments";
+import { getGameFees, GameFee } from "@/lib/storage";
 
 const TournamentDetail = () => {
   const { slug } = useParams();
   const [isVenueModalOpen, setIsVenueModalOpen] = useState(false);
+  const [gameFees, setGameFees] = useState<GameFee[]>([]);
   const tournament = tournaments.find((t) => t.slug === slug);
 
   // Scroll to top when this page loads
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [slug]);
+
+  // Load database game fees
+  useEffect(() => {
+    const fetchFees = async () => {
+      try {
+        const fees = await getGameFees();
+        setGameFees(fees);
+      } catch (err) {
+        console.error("Failed to load fees from database:", err);
+      }
+    };
+    fetchFees();
   }, [slug]);
 
   if (!tournament) {
@@ -115,7 +130,19 @@ const TournamentDetail = () => {
 
       
       {/* Rewards & Fees */}
-      <RewardsSection rewards={tournament.rewards} fees={tournament.fees} />
+      <RewardsSection 
+        rewards={tournament.rewards} 
+        fees={(tournament.fees || []).map(f => {
+          if (f.item === "Entry Fee") {
+            const dbFees = gameFees.filter(gf => gf.tournamentSlug === slug);
+            if (dbFees.length > 0) {
+              const distinctFees = Array.from(new Set(dbFees.map(x => x.fee)));
+              return { ...f, amount: distinctFees.length === 1 ? distinctFees[0] : distinctFees.join(" - ") };
+            }
+          }
+          return f;
+        })} 
+      />
 
       {/* Rules */}
       <RulesSection rules={tournament.rules} />
@@ -125,7 +152,14 @@ const TournamentDetail = () => {
         tournamentTitle={tournament.title}
         categories={tournament.registrationCategories} 
         ageCategories={tournament.ageCategories}
-        playerFees={tournament.playerFees} 
+        playerFees={(tournament.playerFees || []).map(pf => {
+          const match = gameFees.find(gf => 
+            gf.tournamentSlug === slug &&
+            gf.ageCategory.toLowerCase() === pf.ageCategory.toLowerCase() &&
+            gf.category.toLowerCase() === pf.category.toLowerCase()
+          );
+          return match ? { ...pf, fee: match.fee } : pf;
+        })} 
       />
 
       {tournament.venueDetails && (

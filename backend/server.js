@@ -143,6 +143,17 @@ const initDb = async () => {
       )
     `);
 
+    // Create Game Fees table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS game_fees (
+        id VARCHAR(50) PRIMARY KEY,
+        tournamentSlug VARCHAR(150) NOT NULL,
+        ageCategory VARCHAR(50) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        fee VARCHAR(50) NOT NULL
+      )
+    `);
+
     console.log("Database tables checked/created successfully.");
 
     // Seed mock data if tables are empty
@@ -193,6 +204,24 @@ const initDb = async () => {
           (id, companyName, contactPerson, email, phone, state, city, sponsorshipLevel, interestedTournaments, message, status, date) 
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, s);
+      }
+    }
+
+    const [feesCount] = await pool.query('SELECT COUNT(*) as count FROM game_fees');
+    if (feesCount[0].count === 0) {
+      console.log("Seeding initial mock game fees...");
+      const seedFees = [
+        ['gf-1', 'chess-tournament-2026', 'U-9', 'Girls & Boys Mixed', '₹400'],
+        ['gf-2', 'chess-tournament-2026', 'U-12', 'Girls & Boys Mixed', '₹400'],
+        ['gf-3', 'chess-tournament-2026', 'U-15', 'Girls & Boys Mixed', '₹400'],
+        ['gf-4', 'chess-tournament-2026', 'Open', 'Girls & Boys Mixed', '₹400']
+      ];
+      for (const f of seedFees) {
+        await pool.query(`
+          INSERT INTO game_fees 
+          (id, tournamentSlug, ageCategory, category, fee) 
+          VALUES (?, ?, ?, ?, ?)
+        `, f);
       }
     }
   } catch (error) {
@@ -413,12 +442,34 @@ app.post('/api/payments/verify', requireDb, async (req, res) => {
   }
 });
 
+// 5. Game Fees Endpoints
+app.get('/api/game-fees', requireDb, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM game_fees ORDER BY tournamentSlug, id');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/game-fees/:id', requireDb, async (req, res) => {
+  const { id } = req.params;
+  const { fee } = req.body;
+  try {
+    await pool.query('UPDATE game_fees SET fee = ? WHERE id = ?', [fee, id]);
+    res.json({ success: true, id, fee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 4. Debug Database Operations
 app.post('/api/db/reset', requireDb, async (req, res) => {
   try {
     await pool.query('DROP TABLE IF EXISTS player_registrations');
     await pool.query('DROP TABLE IF EXISTS tournament_applications');
     await pool.query('DROP TABLE IF EXISTS sponsor_registrations');
+    await pool.query('DROP TABLE IF EXISTS game_fees');
     await initDb();
     res.json({ success: true, message: "Database reinitialized and seeded." });
   } catch (error) {
@@ -431,6 +482,7 @@ app.post('/api/db/clear', requireDb, async (req, res) => {
     await pool.query('TRUNCATE TABLE player_registrations');
     await pool.query('TRUNCATE TABLE tournament_applications');
     await pool.query('TRUNCATE TABLE sponsor_registrations');
+    await pool.query('TRUNCATE TABLE game_fees');
     res.json({ success: true, message: "Database cleared." });
   } catch (error) {
     res.status(500).json({ error: error.message });

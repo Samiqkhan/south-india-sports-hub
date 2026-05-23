@@ -36,12 +36,15 @@ import {
   clearAllData,
   PlayerRegistration,
   TournamentApplication,
-  SponsorRegistration
+  SponsorRegistration,
+  getGameFees,
+  updateGameFee,
+  GameFee
 } from "@/lib/storage";
 
 const AdminPanel = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"players" | "tournaments" | "sponsors">("players");
+  const [activeTab, setActiveTab] = useState<"players" | "tournaments" | "sponsors" | "pricing">("players");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   
@@ -49,6 +52,10 @@ const AdminPanel = () => {
   const [players, setPlayers] = useState<PlayerRegistration[]>([]);
   const [tournaments, setTournaments] = useState<TournamentApplication[]>([]);
   const [sponsors, setSponsors] = useState<SponsorRegistration[]>([]);
+  const [gameFees, setGameFees] = useState<GameFee[]>([]);
+  const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
+  const [editFeeValue, setEditFeeValue] = useState("");
+  const [isSavingFee, setIsSavingFee] = useState(false);
 
   // Load all data
   const loadData = async () => {
@@ -56,9 +63,11 @@ const AdminPanel = () => {
       const pData = await getPlayerRegistrations();
       const tData = await getTournamentApplications();
       const sData = await getSponsorRegistrations();
+      const fData = await getGameFees();
       setPlayers(pData);
       setTournaments(tData);
       setSponsors(sData);
+      setGameFees(fData);
     } catch (error) {
       console.error("Error loading data from TiDB:", error);
     }
@@ -181,6 +190,32 @@ const AdminPanel = () => {
         description: "Could not update status in database.",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleUpdateFee = async (id: string) => {
+    setIsSavingFee(true);
+    try {
+      let formattedFee = editFeeValue.trim();
+      if (!formattedFee.startsWith("₹")) {
+        formattedFee = "₹" + formattedFee;
+      }
+      const updated = await updateGameFee(id, formattedFee);
+      setGameFees(updated);
+      setEditingFeeId(null);
+      toast({
+        title: "Pricing Updated",
+        description: `Game registration fee successfully updated to ${formattedFee}.`,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Update Failed",
+        description: "Could not save the updated pricing to database.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingFee(false);
     }
   };
 
@@ -544,6 +579,23 @@ const AdminPanel = () => {
                 />
               )}
             </button>
+            <button
+              onClick={() => {
+                setActiveTab("pricing");
+                setStatusFilter("All");
+              }}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+                activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Game Pricing ({gameFees.length})
+              {activeTab === "pricing" && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                />
+              )}
+            </button>
           </div>
 
           {/* Data Tables */}
@@ -815,6 +867,85 @@ const AdminPanel = () => {
                       <tr>
                         <td colSpan={8} className="p-12 text-center text-muted-foreground">
                           No sponsor registrations found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
+
+              {activeTab === "pricing" && (
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-secondary/40 border-b border-border/50">
+                      <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Tournament</th>
+                      <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Age Group</th>
+                      <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Event Type / Category</th>
+                      <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground text-center">Amount (INR)</th>
+                      <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/20">
+                    {gameFees.length > 0 ? (
+                      gameFees.map((fee) => (
+                        <tr key={fee.id} className="hover:bg-secondary/10 transition-colors">
+                          <td className="p-4 font-semibold text-foreground uppercase tracking-wider text-xs">
+                            {fee.tournamentSlug.replace(/-/g, " ")}
+                          </td>
+                          <td className="p-4 text-foreground font-medium uppercase tracking-widest text-xs">
+                            {fee.ageCategory}
+                          </td>
+                          <td className="p-4 text-xs text-muted-foreground">
+                            {fee.category}
+                          </td>
+                          <td className="p-4 text-center font-bold text-electric">
+                            {editingFeeId === fee.id ? (
+                              <input
+                                type="text"
+                                value={editFeeValue}
+                                onChange={(e) => setEditFeeValue(e.target.value)}
+                                className="w-24 px-2 py-1 bg-background border border-primary/50 rounded text-foreground font-semibold focus:outline-none text-center"
+                                placeholder="₹400"
+                              />
+                            ) : (
+                              fee.fee
+                            )}
+                          </td>
+                          <td className="p-4 text-center">
+                            {editingFeeId === fee.id ? (
+                              <div className="flex justify-center gap-2">
+                                <button
+                                  onClick={() => handleUpdateFee(fee.id)}
+                                  disabled={isSavingFee}
+                                  className="px-3 py-1 bg-primary text-primary-foreground font-bold text-xs rounded hover:brightness-110 disabled:opacity-50"
+                                >
+                                  {isSavingFee ? "Saving..." : "Save"}
+                                </button>
+                                <button
+                                  onClick={() => setEditingFeeId(null)}
+                                  className="px-3 py-1 bg-secondary/30 text-foreground font-semibold text-xs rounded hover:bg-secondary/50"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setEditingFeeId(fee.id);
+                                  setEditFeeValue(fee.fee);
+                                }}
+                                className="px-3 py-1.5 border border-primary/20 hover:border-primary text-primary hover:bg-primary/10 rounded font-semibold text-xs uppercase tracking-wider transition-all"
+                              >
+                                Edit Fee
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="p-12 text-center text-muted-foreground">
+                          No game pricing entries found in database.
                         </td>
                       </tr>
                     )}

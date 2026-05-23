@@ -197,3 +197,29 @@ export const verifyRazorpayPayment = async (verificationData: {
   return await res.json();
 };
 
+export interface GameFee {
+  id: string;
+  tournamentSlug: string;
+  ageCategory: string;
+  category: string;
+  fee: string;
+}
+
+// 6. Game Fees API Helpers
+export const getGameFees = async (): Promise<GameFee[]> => {
+  const res = await fetch(`${API_BASE}/game-fees`);
+  if (!res.ok) throw new Error("Failed to fetch game fees from database");
+  return await res.json();
+};
+
+export const updateGameFee = async (id: string, fee: string): Promise<GameFee[]> => {
+  const res = await fetch(`${API_BASE}/game-fees/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fee })
+  });
+  if (!res.ok) throw new Error("Failed to update game fee in database");
+  return await getGameFees();
+};
+
+
