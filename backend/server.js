@@ -380,7 +380,7 @@ app.post('/api/db/clear', requireDb, async (req, res) => {
 });
 
 // Serve frontend build in production
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(distPath));
 
 app.get('/*splat', (req, res) => {
