@@ -413,7 +413,7 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar />
 
-      <section className="pt-28 pb-16 px-4 md:px-8">
+      <section className="pt-36 md:pt-28 pb-16 px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -567,13 +567,13 @@ const AdminPanel = () => {
           )}
 
           {/* Navigation Tabs */}
-          <div className="flex border-b border-border/50 mb-6 gap-2">
+          <div className="flex border-b border-border/50 mb-6 overflow-x-auto whitespace-nowrap pb-2 gap-2 scrollbar-none">
             <button
               onClick={() => {
                 setActiveTab("players");
                 setStatusFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "players" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -590,7 +590,7 @@ const AdminPanel = () => {
                 setActiveTab("tournaments");
                 setStatusFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "tournaments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -607,7 +607,7 @@ const AdminPanel = () => {
                 setActiveTab("sponsors");
                 setStatusFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "sponsors" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -624,7 +624,7 @@ const AdminPanel = () => {
                 setActiveTab("pricing");
                 setStatusFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -641,7 +641,7 @@ const AdminPanel = () => {
                 setActiveTab("payments");
                 setStatusFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "payments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -659,7 +659,7 @@ const AdminPanel = () => {
           <div className="glass-card overflow-hidden border border-border/30">
             <div className="overflow-x-auto w-full">
               {activeTab === "players" && (
-                <table className="w-full text-left border-collapse text-sm">
+                <table className="w-full min-w-[1000px] text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-secondary/40 border-b border-border/50">
                       <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Player</th>
@@ -758,7 +758,7 @@ const AdminPanel = () => {
               )}
 
               {activeTab === "tournaments" && (
-                <table className="w-full text-left border-collapse text-sm">
+                <table className="w-full min-w-[1000px] text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-secondary/40 border-b border-border/50">
                       <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Organizer</th>
@@ -850,7 +850,7 @@ const AdminPanel = () => {
               )}
 
               {activeTab === "sponsors" && (
-                <table className="w-full text-left border-collapse text-sm">
+                <table className="w-full min-w-[1000px] text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-secondary/40 border-b border-border/50">
                       <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Company</th>
@@ -940,7 +940,7 @@ const AdminPanel = () => {
               )}
 
               {activeTab === "pricing" && (
-                <table className="w-full text-left border-collapse text-sm">
+                <table className="w-full min-w-[800px] text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-secondary/40 border-b border-border/50">
                       <th className="p-4 font-bold uppercase tracking-wider text-xs text-muted-foreground">Tournament</th>
