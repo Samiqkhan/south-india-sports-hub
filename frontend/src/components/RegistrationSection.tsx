@@ -442,56 +442,18 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           <h2 className="font-display text-4xl md:text-5xl font-bold uppercase">Register Now</h2>
         </motion.div>
 
-        {playerFees.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-8 max-w-xl mx-auto"
-          >
-            <div className="glass-card overflow-hidden border border-primary/20">
-               <div className="bg-primary/10 p-3 border-b border-primary/20 text-center">
-                  <h3 className="font-display font-bold uppercase tracking-widest text-primary text-xs">Pricing Table</h3>
-               </div>
-               <div className="overflow-x-auto w-full">
-                 <table className="w-full text-center border-collapse text-sm">
-                   <thead>
-                     <tr className="bg-primary/5">
-                       <th className="p-3 border-b sm:border-r border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground w-1/3">Age Group</th>
-                       {categories.map((cat) => (
-                         <th key={cat} className="p-3 border-b sm:border-r last:border-r-0 border-primary/10 font-bold uppercase tracking-wider text-xs text-muted-foreground">
-                           {cat}
-                         </th>
-                       ))}
-                     </tr>
-                   </thead>
-                   <tbody>
-                     {ageCategories.map((ageGroup, idx) => {
-                        const hasAnyFee = categories.some(cat => 
-                          playerFees.some(f => f.ageCategory === ageGroup && f.category.toLowerCase() === cat.toLowerCase())
-                        );
-                        if (!hasAnyFee) return null;
-
-                        return (
-                          <tr key={idx} className="hover:bg-secondary/30 transition-colors border-b border-border/30 last:border-b-0">
-                            <td className="p-3 sm:border-r border-border/30 text-foreground font-semibold uppercase tracking-widest">{ageGroup}</td>
-                            {categories.map((cat, cIdx) => {
-                              const fee = playerFees.find(f => f.ageCategory === ageGroup && f.category.toLowerCase() === cat.toLowerCase())?.fee || "-";
-                              return (
-                                <td key={cat} className={`p-3 ${cIdx < categories.length - 1 ? "sm:border-r border-border/30" : ""} text-electric font-bold`}>
-                                  {fee}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        );
-                     })}
-                   </tbody>
-                 </table>
-               </div>
-            </div>
-          </motion.div>
-        )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-8 max-w-xl mx-auto text-center"
+        >
+          <div className="glass-card p-6 border border-primary/20 bg-primary/5 rounded-xl glow-primary">
+            <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-semibold mb-2">Tournament Entry Fee</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-display mb-2">₹400</p>
+            <p className="text-[11px] sm:text-xs text-foreground font-semibold uppercase tracking-wider">For All Categories & Age Groups</p>
+          </div>
+        </motion.div>
 
         <motion.form
           onSubmit={handleSubmit}

@@ -4,10 +4,10 @@ import { useRef, useState, useEffect } from "react";
 import { Trophy, Users, MapPin, Target } from "lucide-react";
 
 const stats = [
-  { icon: Users, value: 5000, suffix: "+", label: "Players Registered" },
-  { icon: Trophy, value: 120, suffix: "+", label: "Tournaments Held" },
-  { icon: MapPin, value: 45, suffix: "+", label: "Cities Covered" },
-  { icon: Target, value: 15, suffix: "", label: "Sports Disciplines" },
+  { icon: Users, value: 500, suffix: "+", label: "Players Registered" },
+  { icon: Trophy, value: 25, suffix: "+", label: "Tournaments Held" },
+  { icon: MapPin, value: 10, suffix: "+", label: "Cities Covered" },
+  { icon: Target, value: 5, suffix: "+", label: "Sports Disciplines" },
 ];
 
 const AnimatedCounter = ({ value, suffix }: { value: number; suffix: string }) => {
