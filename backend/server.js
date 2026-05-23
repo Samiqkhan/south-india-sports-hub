@@ -192,56 +192,10 @@ const initDb = async () => {
 
     console.log("Database tables checked/created successfully.");
 
-    // Seed mock data if tables are empty
-    const [players] = await pool.query('SELECT COUNT(*) as count FROM player_registrations');
-    if (players[0].count === 0) {
-      console.log("Seeding initial mock players...");
-      const seedPlayers = [
-        ['pr-1', 'Karthik Raja', '+91 94432 10987', 'karthik.raja@gmail.com', 'Tamil Nadu', 'Chennai', 'U-15', 'Girls & Boys Mixed', null, 'Chess Tournament 2026', '₹400', 'Paid', '2026-05-20T10:30:00Z'],
-        ['pr-2', 'Anjali Sharma', '+91 98450 12345', 'anjali.sharma@hotmail.com', 'Karnataka', 'Bengaluru', 'U-12', 'Girls & Boys Mixed', null, 'Chess Tournament 2026', '₹400', 'Paid', '2026-05-21T14:45:00Z'],
-        ['pr-3', 'Devendra Rao', '+91 87654 32109', 'dev.rao@yahoo.com', 'Andhra Pradesh', 'Vijayawada', 'Open', 'Girls & Boys Mixed', null, 'Chess Tournament 2026', '₹400', 'Paid', '2026-05-22T09:15:00Z'],
-        ['pr-4', 'Nithin Reddy', '+91 99887 76655', 'nithin.r@outlook.com', 'Telangana', 'Hyderabad', 'U-9', 'Girls & Boys Mixed', null, 'Chess Tournament 2026', '₹400', 'Pending', '2026-05-23T11:00:00Z']
-      ];
-      for (const p of seedPlayers) {
-        await pool.query(`
-          INSERT INTO player_registrations 
-          (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, p);
-      }
-    }
-
-    const [tournaments] = await pool.query('SELECT COUNT(*) as count FROM tournament_applications');
-    if (tournaments[0].count === 0) {
-      console.log("Seeding initial mock tournaments...");
-      const seedTournaments = [
-        ['ta-1', 'Smashers Badminton Club', 'Madurai Badminton Championship 2026', 'Badminton', 'Tamil Nadu', 'Madurai', 'July 15-18, 2026', '150 - 300', 'events@smashersclub.com', '+91 91234 56789', 'We want to organize an inter-club badminton tournament with singles and doubles categories for U-17 and Adults. We need platform registration support and scheduling tools.', 'Approved', '2026-05-18T08:00:00Z'],
-        ['ta-2', 'Net Raiders Academy', 'Deccan Volleyball Cup 2026', 'Other', 'Telangana', 'Hyderabad', 'August 12-14, 2026', '50 - 150', 'info@netraiders.org', '+91 88776 65544', 'Looking to organize a state-wide volleyball tournament. SISA is a key venue partner we want to collaborate with.', 'Pending', '2026-05-22T16:20:00Z']
-      ];
-      for (const t of seedTournaments) {
-        await pool.query(`
-          INSERT INTO tournament_applications 
-          (id, organizerName, tournamentTitle, sport, state, city, expectedDates, expectedTeams, email, phone, details, status, date) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, t);
-      }
-    }
-
-    const [sponsors] = await pool.query('SELECT COUNT(*) as count FROM sponsor_registrations');
-    if (sponsors[0].count === 0) {
-      console.log("Seeding initial mock sponsors...");
-      const seedSponsors = [
-        ['sr-1', 'Decathlon Sports India', 'Priya Patel', 'priya.patel@decathlon.in', '+91 99001 12233', 'Karnataka', 'Bengaluru', 'Title Sponsor', 'Chess Tournament 2026, All Upcoming Events', 'We are interested in being the official equipment and title partner. We can offer ₹50,000 cash sponsorship plus gift vouchers worth ₹20,000 for top category winners.', 'Partnership Active', '2026-05-19T11:40:00Z'],
-        ['sr-2', 'Boost Energy Drinks', 'Rahul Nair', 'rahul.nair@boost.co.in', '+91 97788 88999', 'Kerala', 'Kochi', 'Equipment Partner', 'All Sports Hub Tournaments', 'We want to set up boost refreshment booths at tournament venues and provide free energy drinks to participants.', 'Contacted', '2026-05-21T10:10:00Z']
-      ];
-      for (const s of seedSponsors) {
-        await pool.query(`
-          INSERT INTO sponsor_registrations 
-          (id, companyName, contactPerson, email, phone, state, city, sponsorshipLevel, interestedTournaments, message, status, date) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, s);
-      }
-    }
+    // Clean up initial mock data if they exist, so the user starts fresh
+    await pool.query("DELETE FROM player_registrations WHERE id IN ('pr-1', 'pr-2', 'pr-3', 'pr-4')");
+    await pool.query("DELETE FROM tournament_applications WHERE id IN ('ta-1', 'ta-2')");
+    await pool.query("DELETE FROM sponsor_registrations WHERE id IN ('sr-1', 'sr-2')");
 
     const [feesCount] = await pool.query('SELECT COUNT(*) as count FROM game_fees');
     if (feesCount[0].count === 0) {
