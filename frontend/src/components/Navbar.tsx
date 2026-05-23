@@ -31,19 +31,21 @@ const Navbar = () => {
       }`}
     >
       {/* Announcement Banner */}
-      <div className="bg-gradient-to-r from-primary via-electric to-accent text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wider relative flex items-center justify-center gap-1 group overflow-hidden">
-        <span className="relative z-10 flex items-center gap-1 flex-wrap justify-center">
-          🏆 SISA Chess Tournament 2026 registration is live!
-          <Link
-            to="/tournament/chess-tournament-2026"
-            className="underline hover:text-white/80 transition-colors uppercase tracking-widest font-bold flex items-center gap-1 ml-1"
-          >
-            Click here to redirect →
-          </Link>
-        </span>
-        {/* Sliding glass reflection overlay */}
-        <div className="absolute inset-0 w-1/2 h-full bg-white/10 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out" />
-      </div>
+      {isHome && (
+        <div className="bg-gradient-to-r from-primary via-electric to-accent text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wider relative flex items-center justify-center gap-1 group overflow-hidden">
+          <span className="relative z-10 flex items-center gap-1 flex-wrap justify-center">
+            🏆 SISA Chess Tournament 2026 registration is live!
+            <Link
+              to="/tournament/chess-tournament-2026"
+              className="underline hover:text-white/80 transition-colors uppercase tracking-widest font-bold flex items-center gap-1 ml-1"
+            >
+              Click here to redirect →
+            </Link>
+          </span>
+          {/* Sliding glass reflection overlay */}
+          <div className="absolute inset-0 w-1/2 h-full bg-white/10 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out" />
+        </div>
+      )}
 
       <div className="container mx-auto flex items-center justify-between py-4">
         <Link to="/" className="font-display text-xl md:text-2xl font-bold tracking-wider uppercase">
