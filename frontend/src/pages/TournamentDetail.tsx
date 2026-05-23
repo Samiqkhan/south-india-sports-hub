@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, MapPin, Trophy, Users } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Trophy, Users, Phone, Clock, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RulesSection from "@/components/RulesSection";
@@ -53,6 +53,14 @@ const TournamentDetail = () => {
     { icon: Users, label: "Categories", value: tournament.categories },
   ];
 
+  if (tournament.lastDateToRegister) {
+    details.push({ icon: Clock, label: "Last Date to Register", value: tournament.lastDateToRegister });
+  }
+
+  if (tournament.contactNumbers && tournament.contactNumbers.length > 0) {
+    details.push({ icon: Phone, label: "Contact Numbers", value: tournament.contactNumbers.join(", ") });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -88,25 +96,39 @@ const TournamentDetail = () => {
               {tournament.description}
             </p>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {details.map((item) => {
-                const isVenue = item.label === "Venue" && tournament.venueDetails && tournament.venueDetails.length > 0;
+                const isVenue = item.label === "Venue" && tournament.mapUrl;
+                
+                if (isVenue) {
+                  return (
+                    <a
+                      key={item.label}
+                      href={tournament.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass-card p-5 text-center cursor-pointer hover:border-primary/50 transition-colors group relative hover-lift block"
+                    >
+                      <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
+                      <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
+                      <p className="font-semibold text-foreground">{item.value}</p>
+                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span className="text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 rounded backdrop-blur flex items-center gap-1">
+                          View on Maps <ExternalLink className="w-3 h-3" />
+                        </span>
+                      </div>
+                    </a>
+                  );
+                }
+
                 return (
                   <div
                     key={item.label}
-                    onClick={isVenue ? () => setIsVenueModalOpen(true) : undefined}
-                    className={`glass-card p-5 text-center ${isVenue ? "cursor-pointer hover:border-primary/50 transition-colors group relative" : "hover-lift"}`}
+                    className="glass-card p-5 text-center hover-lift"
                   >
                     <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
                     <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
                     <p className="font-semibold text-foreground">{item.value}</p>
-                    {isVenue && (
-                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <span className="text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 rounded backdrop-blur">
-                          View All
-                        </span>
-                      </div>
-                    )}
                   </div>
                 );
               })}

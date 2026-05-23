@@ -38,6 +38,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const [age, setAge] = useState(ageCategories[0] || "");
   const [category, setCategory] = useState(categories[0] || "");
   const [partnerName, setPartnerName] = useState("");
+  const [verificationDoc, setVerificationDoc] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -299,6 +300,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                   city: "",
                 });
                 setPartnerName("");
+                setVerificationDoc(null);
                 setStep(1);
               }}
               className="px-6 py-3 border border-border text-foreground font-semibold rounded-lg uppercase tracking-wider hover:bg-secondary transition-all"
@@ -644,6 +646,48 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                     />
                   </motion.div>
                 )}
+              </div>
+
+              {/* Age Verification Document Upload */}
+              <div className="bg-secondary/20 p-5 rounded-xl border border-border/50 relative">
+                <h4 className="font-bold text-foreground mb-4 tracking-wider uppercase text-primary border-b border-border/50 pb-2">
+                  Age Verification
+                </h4>
+                <div className="space-y-3">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                    Upload Age Proof (Aadhaar Card, Passport, or Birth Certificate) <span className="text-primary">*</span>
+                  </label>
+                  <div className="relative group border border-dashed border-border hover:border-primary/50 rounded-lg p-5 bg-background/30 transition-all text-center cursor-pointer flex flex-col items-center justify-center gap-2 min-h-[140px]">
+                    <input
+                      type="file"
+                      accept=".pdf, image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          setVerificationDoc(e.target.files[0]);
+                        }
+                      }}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      required
+                    />
+                    {verificationDoc ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <CheckCircle className="w-8 h-8 text-primary" />
+                        <p className="text-foreground font-semibold text-sm truncate max-w-[280px]">
+                          {verificationDoc.name}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          {(verificationDoc.size / (1024 * 1024)).toFixed(2)} MB - Click to change
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <p className="text-foreground font-semibold text-sm">Choose file or drag here</p>
+                        <p className="text-muted-foreground text-xs">PDF, PNG, JPG, or JPEG (Max 5MB)</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}

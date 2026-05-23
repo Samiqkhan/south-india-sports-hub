@@ -47,6 +47,9 @@ export interface Tournament {
   fees?: TournamentFee[];
   playerFees?: PlayerFee[];
   venueDetails?: TournamentVenue[];
+  lastDateToRegister?: string;
+  contactNumbers?: string[];
+  mapUrl?: string;
 }
 
 export const tournaments: Tournament[] = [
@@ -56,8 +59,11 @@ export const tournaments: Tournament[] = [
     subtitle: "Strategize. Think. Win.",
     sport: "Chess",
     status: "Upcoming",
-    date: "June 27-28, 2026",
-    venue: "SISA Sports Hub, Chennai",
+    date: "June 26, 2026",
+    venue: "Sankagiri, Salem",
+    lastDateToRegister: "25.06.2026",
+    contactNumbers: ["90800 60483", "9092385001"],
+    mapUrl: "https://maps.app.goo.gl/or4cBwn3ir3sEKJq5",
     prize: "Over ₹13,000 in Prizes",
     categories: "U9, U12, U15 & Open (Mixed)",
     description:
@@ -135,15 +141,6 @@ export const tournaments: Tournament[] = [
       { ageCategory: "U-12", category: "Girls & Boys Mixed", fee: "₹400" },
       { ageCategory: "U-15", category: "Girls & Boys Mixed", fee: "₹400" },
       { ageCategory: "Open", category: "Girls & Boys Mixed", fee: "₹400" },
-    ],
-    venueDetails: [
-      {
-        district: "Chennai",
-        locations: [
-          "SISA Sports Hub, T. Nagar, Chennai",
-          "Hall of Chess, YMCA, Nandanam, Chennai",
-        ],
-      },
     ],
   },
 ];
