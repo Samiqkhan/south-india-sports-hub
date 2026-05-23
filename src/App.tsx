@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import TournamentDetail from "./pages/TournamentDetail";
 import ApplyTournament from "./pages/ApplyTournament";
 import SponsorRegistration from "./pages/SponsorRegistration";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 import ChatBot from "./components/ChatBot";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/tournament/:slug" element={<TournamentDetail />} />
           <Route path="/apply" element={<ApplyTournament />} />
           <Route path="/sponsor" element={<SponsorRegistration />} />
+          <Route path="/admin" element={<AdminPanel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

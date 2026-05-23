@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Tournament", href: "#tournament" },
+  { label: "About", href: "/#about" },
+  { label: "Tournament", href: "/#tournament" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Contact", href: "/#contact" },
 ];
@@ -31,9 +31,9 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between py-4">
-        <a href="#" className="font-display text-xl md:text-2xl font-bold tracking-wider uppercase">
+        <Link to="/" className="font-display text-xl md:text-2xl font-bold tracking-wider uppercase">
           <span className="gradient-text">SISA</span>
-        </a>
+        </Link>
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">

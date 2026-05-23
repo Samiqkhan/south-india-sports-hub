@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
+import { addTournamentApplication } from "@/lib/storage";
 
 const ApplyTournament = () => {
   const { toast } = useToast();
@@ -33,17 +34,30 @@ const ApplyTournament = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Mock API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Save to TiDB Cloud database via Express proxy
+      await addTournamentApplication({
+        organizerName: formData.organizerName,
+        tournamentTitle: formData.tournamentTitle,
+        sport: formData.sport,
+        state: formData.state,
+        city: formData.city,
+        expectedDates: formData.expectedDates,
+        expectedTeams: formData.expectedTeams,
+        email: formData.email,
+        phone: formData.phone,
+        details: formData.details,
+      });
+
       toast({
         title: "Application Submitted Successfully",
         description: "We've received your application and will get back to you shortly.",
       });
+
       setFormData({
         organizerName: "",
         tournamentTitle: "",
@@ -56,7 +70,16 @@ const ApplyTournament = () => {
         phone: "",
         details: "",
       });
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Submission Failed",
+        description: "Could not connect to database. Please check connection parameters.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];

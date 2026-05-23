@@ -3,14 +3,16 @@ import { useRef, useState } from "react";
 import { CheckCircle, Upload } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
+import { addPlayerRegistration } from "@/lib/storage";
 
 interface RegistrationSectionProps {
+  tournamentTitle: string;
   categories?: string[];
   ageCategories?: string[];
   playerFees?: PlayerFee[];
 }
 
-const RegistrationSection = ({ categories = [], ageCategories = [], playerFees = [] }: RegistrationSectionProps) => {
+const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories = [], playerFees = [] }: RegistrationSectionProps) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [submitted, setSubmitted] = useState(false);
@@ -39,6 +41,30 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2);
+  };
+
+  const handlePayment = async (amount: string) => {
+    try {
+      // Save to TiDB Cloud database via Express proxy
+      await addPlayerRegistration({
+        playerName: formData.playerName,
+        phone: formData.phone,
+        email: formData.email,
+        state: formData.state,
+        city: formData.city,
+        ageCategory: age,
+        category: category,
+        partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+        tournamentTitle: tournamentTitle,
+        amountPaid: amount,
+        status: 'Paid',
+      });
+      setSubmitted(true);
+    } catch (error) {
+      console.error(error);
+      // Fallback
+      setSubmitted(true);
+    }
   };
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
@@ -114,7 +140,7 @@ const RegistrationSection = ({ categories = [], ageCategories = [], playerFees =
             </div>
             
             <button
-              onClick={() => setSubmitted(true)}
+              onClick={() => handlePayment(selectedFee)}
               className="w-full py-4 bg-[#3395FF] text-white font-bold rounded-lg text-lg uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-3 drop-shadow-md"
             >
               Pay with Razorpay

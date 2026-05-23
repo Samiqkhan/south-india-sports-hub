@@ -122,6 +122,7 @@ const TournamentDetail = () => {
               
       {/* Registration */}
       <RegistrationSection 
+        tournamentTitle={tournament.title}
         categories={tournament.registrationCategories} 
         ageCategories={tournament.ageCategories}
         playerFees={tournament.playerFees} 

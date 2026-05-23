@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
+import { addSponsorRegistration } from "@/lib/storage";
 
 const SponsorRegistration = () => {
   const { toast } = useToast();
@@ -32,17 +33,29 @@ const SponsorRegistration = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Mock API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Save to TiDB Cloud database via Express proxy
+      await addSponsorRegistration({
+        companyName: formData.companyName,
+        contactPerson: formData.contactPerson,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state,
+        city: formData.city,
+        sponsorshipLevel: formData.sponsorshipLevel,
+        interestedTournaments: formData.interestedTournaments,
+        message: formData.message,
+      });
+
       toast({
         title: "Registration Submitted Successfully",
         description: "Thank you for your interest! Our team will contact you soon.",
       });
+
       setFormData({
         companyName: "",
         contactPerson: "",
@@ -54,7 +67,16 @@ const SponsorRegistration = () => {
         interestedTournaments: "",
         message: "",
       });
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Registration Failed",
+        description: "Could not connect to database. Please check connection parameters.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
