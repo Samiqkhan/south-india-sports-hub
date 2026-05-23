@@ -3,7 +3,26 @@ import { useRef, useState } from "react";
 import { CheckCircle, Upload } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
-import { addPlayerRegistration } from "@/lib/storage";
+import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment } from "@/lib/storage";
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if ((window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
 
 interface RegistrationSectionProps {
   tournamentTitle: string;
@@ -20,6 +39,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const [category, setCategory] = useState(categories[0] || "");
   const [partnerName, setPartnerName] = useState("");
   const [step, setStep] = useState(1);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const [formData, setFormData] = useState({
     playerName: "",
@@ -38,33 +58,121 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep(2);
+  const handlePayment = async (amount: string) => {
+    setIsProcessing(true);
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert("Failed to load Razorpay SDK. Please check your internet connection.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const amountVal = parseInt(amount.replace(/[^\d]/g, ""), 10);
+      const amountInPaise = isNaN(amountVal) ? 0 : amountVal * 100;
+
+      if (amountInPaise === 0) {
+        // Free registration, skip payment verification and save directly
+        await addPlayerRegistration({
+          playerName: formData.playerName,
+          phone: formData.phone,
+          email: formData.email,
+          state: formData.state,
+          city: formData.city,
+          ageCategory: age,
+          category: category,
+          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+          tournamentTitle: tournamentTitle,
+          amountPaid: amount,
+          status: 'Paid',
+        });
+        setSubmitted(true);
+        setIsProcessing(false);
+        return;
+      }
+
+      // 1. Create order on the backend
+      const order = await createRazorpayOrder(amountInPaise);
+
+      // 2. Setup checkout options
+      const options = {
+        key: "rzp_test_Ssqkj7T7DivUDd",
+        amount: order.amount,
+        currency: order.currency,
+        name: "South India Sports Hub",
+        description: `Tournament Registration - ${tournamentTitle}`,
+        order_id: order.id,
+        prefill: {
+          name: formData.playerName,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#05ffd5", // electric neon
+        },
+        handler: async function (response: any) {
+          try {
+            // 3. Verify payment signature on backend, which saves the record if verified
+            const verificationResult = await verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              registrationData: {
+                playerName: formData.playerName,
+                phone: formData.phone,
+                email: formData.email,
+                state: formData.state,
+                city: formData.city,
+                ageCategory: age,
+                category: category,
+                partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+                tournamentTitle: tournamentTitle,
+                amountPaid: amount,
+              }
+            });
+
+            if (verificationResult.success) {
+              setSubmitted(true);
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
+          } catch (verifyErr: any) {
+            console.error("Payment verification failed:", verifyErr);
+            alert("Error verifying payment: " + verifyErr.message);
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            console.log("Razorpay checkout dismissed");
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (error: any) {
+      console.error("Payment flow failed:", error);
+      alert("An error occurred during payment processing: " + error.message);
+      setIsProcessing(false);
+    }
   };
 
-  const handlePayment = async (amount: string) => {
-    try {
-      // Save to TiDB Cloud database via Express proxy
-      await addPlayerRegistration({
-        playerName: formData.playerName,
-        phone: formData.phone,
-        email: formData.email,
-        state: formData.state,
-        city: formData.city,
-        ageCategory: age,
-        category: category,
-        partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
-        tournamentTitle: tournamentTitle,
-        amountPaid: amount,
-        status: 'Paid',
-      });
-      setSubmitted(true);
-    } catch (error) {
-      console.error(error);
-      // Fallback
-      setSubmitted(true);
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Find amount
+    const feeObj = playerFees.find(
+      (f) =>
+        f.category.toLowerCase() === category.toLowerCase() &&
+        f.ageCategory.toLowerCase() === age.toLowerCase()
+    );
+    const selectedFee = feeObj ? feeObj.fee : "₹0";
+
+    await handlePayment(selectedFee);
   };
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
@@ -381,9 +489,10 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
 
           <button
             type="submit"
-            className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all font-display"
+            disabled={isProcessing}
+            className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all font-display disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Next: Payment
+            {isProcessing ? "Processing Payment..." : "Next: Payment"}
           </button>
         </motion.form>
       </div>

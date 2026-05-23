@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import mysql from 'mysql2/promise';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -351,6 +353,62 @@ app.delete('/api/sponsors/:id', requireDb, async (req, res) => {
     await pool.query('DELETE FROM sponsor_registrations WHERE id = ?', [id]);
     res.json({ success: true, id });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- RAZORPAY PAYMENT ENDPOINTS ---
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
+});
+
+app.post('/api/payments/create-order', async (req, res) => {
+  const { amount } = req.body; // in paise
+  try {
+    const options = {
+      amount: parseInt(amount, 10),
+      currency: 'INR',
+      receipt: `receipt_${Date.now()}`
+    };
+    const order = await razorpay.orders.create(options);
+    res.json(order);
+  } catch (error) {
+    console.error("Failed to create Razorpay order:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/payments/verify', requireDb, async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationData } = req.body;
+
+  try {
+    // Generate signature
+    const sign = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSign = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7')
+      .update(sign.toString())
+      .digest("hex");
+
+    if (razorpay_signature !== expectedSign) {
+      return res.status(400).json({ error: "Invalid payment signature verification failed." });
+    }
+
+    // Save registration to database
+    const { playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid } = registrationData;
+    const id = `pr-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const date = new Date().toISOString();
+
+    await pool.query(`
+      INSERT INTO player_registrations 
+      (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, playerName, phone, email, state, city, ageCategory, category, partnerName || null, tournamentTitle, amountPaid, 'Paid', date]);
+
+    res.json({ success: true, message: "Payment verified and registration recorded successfully.", id });
+  } catch (error) {
+    console.error("Payment verification or DB insertion failed:", error);
     res.status(500).json({ error: error.message });
   }
 });

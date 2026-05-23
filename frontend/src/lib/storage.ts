@@ -167,3 +167,30 @@ export const clearAllData = async (): Promise<boolean> => {
   const res = await fetch(`${API_BASE}/db/clear`, { method: 'POST' });
   return res.ok;
 };
+
+// 5. Razorpay Payment APIs
+export const createRazorpayOrder = async (amount: number): Promise<any> => {
+  const res = await fetch(`${API_BASE}/payments/create-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount })
+  });
+  if (!res.ok) throw new Error("Failed to create Razorpay order");
+  return await res.json();
+};
+
+export const verifyRazorpayPayment = async (verificationData: {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+  registrationData: Omit<PlayerRegistration, 'id' | 'date' | 'status'> & { amountPaid: string };
+}): Promise<any> => {
+  const res = await fetch(`${API_BASE}/payments/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(verificationData)
+  });
+  if (!res.ok) throw new Error("Failed to verify Razorpay payment");
+  return await res.json();
+};
+
