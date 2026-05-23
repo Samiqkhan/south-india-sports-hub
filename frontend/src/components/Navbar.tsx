@@ -32,7 +32,7 @@ const Navbar = () => {
     >
       {/* Announcement Banner */}
       {isHome && (
-        <div className="bg-gradient-to-r from-primary via-electric to-accent text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wider relative flex items-center justify-center gap-1 group overflow-hidden">
+        <div className="bg-gradient-to-r from-primary via-electric to-accent text-white text-center py-1.5 md:py-2 px-3 md:px-4 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider relative flex items-center justify-center gap-1 group overflow-hidden">
           <span className="relative z-10 flex items-center gap-1 flex-wrap justify-center">
             🏆 SISA Chess Tournament 2026 registration is live!
             <Link

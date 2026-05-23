@@ -79,7 +79,7 @@ const SponsorSection = () => {
                <img
                   src="/sponsorship_cover.png"
                   alt="Athletes celebrating on court"
-                  className="rounded-lg object-cover w-full h-[500px] shadow-2xl relative z-10 filter brightness-90 group-hover:brightness-100 transition-all duration-500"
+                  className="rounded-lg object-cover w-full h-[260px] sm:h-[400px] md:h-[500px] shadow-2xl relative z-10 filter brightness-90 group-hover:brightness-100 transition-all duration-500"
                />
                <div className="absolute bottom-6 left-6 right-6 p-6 bg-background/80 backdrop-blur-md border border-border/50 rounded-xl z-20 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                     <p className="font-display font-bold text-lg uppercase tracking-wider text-foreground mb-1">Impact Driven</p>

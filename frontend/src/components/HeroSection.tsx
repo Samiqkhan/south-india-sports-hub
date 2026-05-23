@@ -27,12 +27,12 @@ const HeroSection = () => {
           <p className="text-primary font-semibold uppercase tracking-[0.3em] text-sm md:text-base mb-4">
             Official Tournament Platform
           </p>
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold uppercase leading-[0.95] mb-6">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold uppercase leading-[0.95] mb-6">
             South India
             <br />
             <span className="gradient-text">Sports Association</span>
           </h1>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10">
+          <p className="text-muted-foreground text-sm sm:text-lg md:text-xl max-w-2xl mx-auto mb-10">
             Empowering athletes across South India through world-class tournaments, 
             professional organization, and a passion for sporting excellence.
           </p>
@@ -42,17 +42,17 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 max-w-md mx-auto sm:max-w-none"
         >
           <a
             href="#tournament"
-            className="px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all hover:scale-105"
+            className="px-6 py-3 sm:px-8 sm:py-4 bg-primary text-primary-foreground font-bold rounded-lg text-sm sm:text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all hover:scale-105"
           >
             Register for Tournament
           </a>
           <a
             href="/apply"
-            className="px-8 py-4 border border-border text-foreground font-bold rounded-lg text-lg uppercase tracking-wider hover:bg-secondary transition-all hover:scale-105"
+            className="px-6 py-3 sm:px-8 sm:py-4 border border-border text-foreground font-bold rounded-lg text-sm sm:text-lg uppercase tracking-wider hover:bg-secondary transition-all hover:scale-105"
           >
             Host a Game
           </a>

@@ -86,17 +86,17 @@ const TournamentDetail = () => {
               </span>
             </div>
 
-            <h1 className="font-display text-4xl md:text-6xl font-bold uppercase mb-4">
+            <h1 className="font-display text-2xl sm:text-4xl md:text-6xl font-bold uppercase mb-4 leading-tight">
               {tournament.title}
               <br />
               <span className="gradient-text">{tournament.subtitle}</span>
             </h1>
 
-            <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed mb-10">
+            <p className="text-muted-foreground max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed mb-10">
               {tournament.description}
             </p>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {details.map((item) => {
                 const isVenue = item.label === "Venue" && tournament.mapUrl;
                 
@@ -107,13 +107,13 @@ const TournamentDetail = () => {
                       href={tournament.mapUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="glass-card p-5 text-center cursor-pointer hover:border-primary/50 transition-colors group relative hover-lift block"
+                      className="glass-card p-3.5 sm:p-5 text-center cursor-pointer hover:border-primary/50 transition-colors group relative hover-lift block"
                     >
-                      <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
-                      <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
-                      <p className="font-semibold text-foreground">{item.value}</p>
+                      <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-electric mx-auto mb-1.5 sm:mb-2" />
+                      <p className="text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider mb-1">{item.label}</p>
+                      <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground truncate">{item.value}</p>
                       <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <span className="text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 rounded backdrop-blur flex items-center gap-1">
+                        <span className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 py-0.5 rounded backdrop-blur flex items-center gap-1">
                           View on Maps <ExternalLink className="w-3 h-3" />
                         </span>
                       </div>
@@ -124,11 +124,11 @@ const TournamentDetail = () => {
                 return (
                   <div
                     key={item.label}
-                    className="glass-card p-5 text-center hover-lift"
+                    className="glass-card p-3.5 sm:p-5 text-center hover-lift flex flex-col justify-center"
                   >
-                    <item.icon className="w-6 h-6 text-electric mx-auto mb-2" />
-                    <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">{item.label}</p>
-                    <p className="font-semibold text-foreground">{item.value}</p>
+                    <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-electric mx-auto mb-1.5 sm:mb-2" />
+                    <p className="text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider mb-1">{item.label}</p>
+                    <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground break-words">{item.value}</p>
                   </div>
                 );
               })}
