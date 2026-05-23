@@ -47,6 +47,9 @@ export interface SponsorRegistration {
 
 // Dynamically determine the backend base URL
 const getApiBase = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   if (typeof window !== 'undefined') {
     // If the frontend is loaded on localhost (any port), use port 3001 directly to avoid proxy issues.
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
