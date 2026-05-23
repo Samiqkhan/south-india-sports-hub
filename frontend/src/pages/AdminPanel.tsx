@@ -341,6 +341,15 @@ const AdminPanel = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const filteredGameFees = gameFees.filter(fee => {
+    const matchesSearch = 
+      fee.tournamentSlug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fee.ageCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fee.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fee.fee.includes(searchQuery);
+    return matchesSearch;
+  });
+
   // Export to CSV Functionality
   const handleExportCSV = () => {
     let headers: string[] = [];
@@ -494,62 +503,68 @@ const AdminPanel = () => {
           </div>
 
           {/* Controls Bar */}
-          <div className="glass-card p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-1">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder={`Search ${activeTab}...`}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-background border border-border/50 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body"
-                />
+          {activeTab !== "payments" && (
+            <div className="glass-card p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-1">
+                {/* Search */}
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder={`Search ${activeTab === 'pricing' ? 'pricing' : activeTab}...`}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-background border border-border/50 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                {activeTab !== "pricing" && (
+                  <div>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
+                    >
+                      <option value="All">All Statuses</option>
+                      {activeTab === "players" && (
+                        <>
+                          <option value="Paid">Paid</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Refunded">Refunded</option>
+                        </>
+                      )}
+                      {activeTab === "tournaments" && (
+                        <>
+                          <option value="Pending">Pending</option>
+                          <option value="Approved">Approved</option>
+                          <option value="Rejected">Rejected</option>
+                        </>
+                      )}
+                      {activeTab === "sponsors" && (
+                        <>
+                          <option value="New">New</option>
+                          <option value="Contacted">Contacted</option>
+                          <option value="Partnership Active">Partnership Active</option>
+                          <option value="Closed">Closed</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                )}
               </div>
 
-              {/* Status Filter */}
-              <div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
+              {/* Export */}
+              {activeTab !== "pricing" && (
+                <button
+                  onClick={handleExportCSV}
+                  className="px-5 py-2.5 bg-primary text-primary-foreground font-bold uppercase tracking-wider rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2 text-xs"
                 >
-                  <option value="All">All Statuses</option>
-                  {activeTab === "players" && (
-                    <>
-                      <option value="Paid">Paid</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Refunded">Refunded</option>
-                    </>
-                  )}
-                  {activeTab === "tournaments" && (
-                    <>
-                      <option value="Pending">Pending</option>
-                      <option value="Approved">Approved</option>
-                      <option value="Rejected">Rejected</option>
-                    </>
-                  )}
-                  {activeTab === "sponsors" && (
-                    <>
-                      <option value="New">New</option>
-                      <option value="Contacted">Contacted</option>
-                      <option value="Partnership Active">Partnership Active</option>
-                      <option value="Closed">Closed</option>
-                    </>
-                  )}
-                </select>
-              </div>
+                  <Download className="w-4 h-4" /> Export CSV
+                </button>
+              )}
             </div>
-
-            {/* Export */}
-            <button
-              onClick={handleExportCSV}
-              className="px-5 py-2.5 bg-primary text-primary-foreground font-bold uppercase tracking-wider rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2 text-xs"
-            >
-              <Download className="w-4 h-4" /> Export CSV
-            </button>
-          </div>
+          )}
 
           {/* Navigation Tabs */}
           <div className="flex border-b border-border/50 mb-6 gap-2">
@@ -613,7 +628,7 @@ const AdminPanel = () => {
                 activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Game Pricing ({gameFees.length})
+              Game Pricing ({filteredGameFees.length})
               {activeTab === "pricing" && (
                 <motion.div
                   layoutId="activeTabUnderline"
@@ -936,8 +951,8 @@ const AdminPanel = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/20">
-                    {gameFees.length > 0 ? (
-                      gameFees.map((fee) => (
+                    {filteredGameFees.length > 0 ? (
+                      filteredGameFees.map((fee) => (
                         <tr key={fee.id} className="hover:bg-secondary/10 transition-colors">
                           <td className="p-4 font-semibold text-foreground uppercase tracking-wider text-xs">
                             {fee.tournamentSlug.replace(/-/g, " ")}
@@ -995,7 +1010,7 @@ const AdminPanel = () => {
                     ) : (
                       <tr>
                         <td colSpan={5} className="p-12 text-center text-muted-foreground">
-                          No game pricing entries found in database.
+                          No game pricing entries found matching search.
                         </td>
                       </tr>
                     )}
