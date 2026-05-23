@@ -56,7 +56,7 @@ const getApiBase = (): string => {
       return 'http://localhost:3001/api';
     }
   }
-  return '/api';
+  return 'https://south-india-sports-hub.onrender.com/api';
 };
 
 const API_BASE = getApiBase();
