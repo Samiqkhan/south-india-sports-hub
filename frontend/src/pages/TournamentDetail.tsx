@@ -137,20 +137,6 @@ const TournamentDetail = () => {
         </div>
       </section>
 
-      {/* Sponsor CTA */}
-      <section className="pb-16 px-4 md:px-8">
-        <div className="container mx-auto max-w-5xl">
-           <div className="glass-card p-8 border-accent/30 text-center">
-             <h3 className="font-display text-2xl font-bold uppercase mb-4">Want to Sponsor {tournament.title}?</h3>
-             <p className="text-muted-foreground mb-6">Gain exclusive brand visibility and partner with us for this amazing event.</p>
-             <Link to="/sponsor" className="px-8 py-3 bg-accent text-accent-foreground font-bold rounded-lg text-sm uppercase tracking-wider glow-accent hover:brightness-110 transition-all inline-block">
-               Become a Sponsor
-             </Link>
-           </div>
-        </div>
-      </section>
-
-      
       {/* Rewards & Fees */}
       <RewardsSection 
         rewards={tournament.rewards} 
@@ -183,6 +169,19 @@ const TournamentDetail = () => {
           return match ? { ...pf, fee: match.fee } : pf;
         })} 
       />
+
+      {/* Sponsor CTA */}
+      <section className="pb-16 px-4 md:px-8">
+        <div className="container mx-auto max-w-5xl">
+           <div className="glass-card p-8 border-accent/30 text-center">
+             <h3 className="font-display text-2xl font-bold uppercase mb-4">Want to Sponsor {tournament.title}?</h3>
+             <p className="text-muted-foreground mb-6">Gain exclusive brand visibility and partner with us for this amazing event.</p>
+             <Link to="/sponsor" className="px-8 py-3 bg-accent text-accent-foreground font-bold rounded-lg text-sm uppercase tracking-wider glow-accent hover:brightness-110 transition-all inline-block">
+               Become a Sponsor
+             </Link>
+           </div>
+        </div>
+      </section>
 
       {tournament.venueDetails && (
         <VenueModal
