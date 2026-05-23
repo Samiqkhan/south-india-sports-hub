@@ -136,6 +136,20 @@ const TournamentDetail = () => {
           </motion.div>
         </div>
       </section>
+      {/* Registration */}
+      <RegistrationSection 
+        tournamentTitle={tournament.title}
+        categories={tournament.registrationCategories} 
+        ageCategories={tournament.ageCategories}
+        playerFees={(tournament.playerFees || []).map(pf => {
+          const match = gameFees.find(gf => 
+            gf.tournamentSlug === slug &&
+            gf.ageCategory.toLowerCase() === pf.ageCategory.toLowerCase() &&
+            gf.category.toLowerCase() === pf.category.toLowerCase()
+          );
+          return match ? { ...pf, fee: match.fee } : pf;
+        })} 
+      />
 
       {/* Rewards & Fees */}
       <RewardsSection 
@@ -154,21 +168,6 @@ const TournamentDetail = () => {
 
       {/* Rules */}
       <RulesSection rules={tournament.rules} />
-              
-      {/* Registration */}
-      <RegistrationSection 
-        tournamentTitle={tournament.title}
-        categories={tournament.registrationCategories} 
-        ageCategories={tournament.ageCategories}
-        playerFees={(tournament.playerFees || []).map(pf => {
-          const match = gameFees.find(gf => 
-            gf.tournamentSlug === slug &&
-            gf.ageCategory.toLowerCase() === pf.ageCategory.toLowerCase() &&
-            gf.category.toLowerCase() === pf.category.toLowerCase()
-          );
-          return match ? { ...pf, fee: match.fee } : pf;
-        })} 
-      />
 
       {/* Sponsor CTA */}
       <section className="pb-16 px-4 md:px-8">
