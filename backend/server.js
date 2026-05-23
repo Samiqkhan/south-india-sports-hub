@@ -101,10 +101,18 @@ const initDb = async () => {
         partnerName VARCHAR(100),
         tournamentTitle VARCHAR(150) NOT NULL,
         amountPaid VARCHAR(50) NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'Paid',
-        date VARCHAR(50) NOT NULL
+        status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+        date VARCHAR(50) NOT NULL,
+        screenshotUrl LONGTEXT
       )
     `);
+
+    try {
+      await pool.query('ALTER TABLE player_registrations ADD COLUMN screenshotUrl LONGTEXT');
+      console.log("Migration: Added screenshotUrl column to player_registrations table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     // Create Tournament Applications table
     await pool.query(`
@@ -153,6 +161,33 @@ const initDb = async () => {
         fee VARCHAR(50) NOT NULL
       )
     `);
+
+    // Create Payment Config table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS payment_config (
+        id VARCHAR(50) PRIMARY KEY,
+        useRazorpay TINYINT(1) NOT NULL DEFAULT 0,
+        upiId VARCHAR(255) NOT NULL,
+        qrCodeUrl LONGTEXT,
+        razorpayKeyId VARCHAR(255),
+        razorpayKeySecret VARCHAR(255)
+      )
+    `);
+
+    // Seed default payment config if empty
+    const [configs] = await pool.query("SELECT COUNT(*) as count FROM payment_config");
+    if (configs[0].count === 0) {
+      console.log("Seeding initial default payment configuration...");
+      await pool.query(`
+        INSERT INTO payment_config (id, useRazorpay, upiId, qrCodeUrl, razorpayKeyId, razorpayKeySecret)
+        VALUES ('current', ?, ?, NULL, ?, ?)
+      `, [
+        process.env.USE_RAZORPAY === 'true' ? 1 : 0,
+        process.env.UPI_ID || 'sihsports@okaxis',
+        process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
+        process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
+      ]);
+    }
 
     console.log("Database tables checked/created successfully.");
 
@@ -250,18 +285,18 @@ app.get('/api/players', requireDb, async (req, res) => {
 });
 
 app.post('/api/players', requireDb, async (req, res) => {
-  const { playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status } = req.body;
+  const { playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, screenshotUrl } = req.body;
   const id = `pr-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const date = new Date().toISOString();
 
   try {
     await pool.query(`
       INSERT INTO player_registrations 
-      (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, playerName, phone, email, state, city, ageCategory, category, partnerName || null, tournamentTitle, amountPaid, status || 'Paid', date]);
+      (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date, screenshotUrl) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, playerName, phone, email, state, city, ageCategory, category, partnerName || null, tournamentTitle, amountPaid, status || 'Pending', date, screenshotUrl || null]);
     
-    res.status(201).json({ id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date });
+    res.status(201).json({ id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status: status || 'Pending', date, screenshotUrl });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -393,15 +428,45 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
 });
 
+// Helper to get active payment config
+async function getActivePaymentConfig() {
+  try {
+    const [rows] = await pool.query("SELECT * FROM payment_config WHERE id = 'current'");
+    if (rows.length > 0) {
+      return {
+        useRazorpay: rows[0].useRazorpay === 1,
+        upiId: rows[0].upiId,
+        qrCodeUrl: rows[0].qrCodeUrl,
+        razorpayKeyId: rows[0].razorpayKeyId || process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
+        razorpayKeySecret: rows[0].razorpayKeySecret || process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
+      };
+    }
+  } catch (e) {
+    console.error("Error fetching config from DB, falling back to process.env", e);
+  }
+  return {
+    useRazorpay: process.env.USE_RAZORPAY === 'true',
+    upiId: process.env.UPI_ID || 'sihsports@okaxis',
+    qrCodeUrl: null,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
+  };
+}
+
 app.post('/api/payments/create-order', async (req, res) => {
   const { amount } = req.body; // in paise
   try {
+    const config = await getActivePaymentConfig();
+    const dynamicRazorpay = new Razorpay({
+      key_id: config.razorpayKeyId,
+      key_secret: config.razorpayKeySecret
+    });
     const options = {
       amount: parseInt(amount, 10),
       currency: 'INR',
       receipt: `receipt_${Date.now()}`
     };
-    const order = await razorpay.orders.create(options);
+    const order = await dynamicRazorpay.orders.create(options);
     res.json(order);
   } catch (error) {
     console.error("Failed to create Razorpay order:", error);
@@ -413,10 +478,11 @@ app.post('/api/payments/verify', requireDb, async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationData } = req.body;
 
   try {
+    const config = await getActivePaymentConfig();
     // Generate signature
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7')
+      .createHmac("sha256", config.razorpayKeySecret)
       .update(sign.toString())
       .digest("hex");
 
@@ -431,13 +497,48 @@ app.post('/api/payments/verify', requireDb, async (req, res) => {
 
     await pool.query(`
       INSERT INTO player_registrations 
-      (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, playerName, phone, email, state, city, ageCategory, category, partnerName || null, tournamentTitle, amountPaid, 'Paid', date]);
+      (id, playerName, phone, email, state, city, ageCategory, category, partnerName, tournamentTitle, amountPaid, status, date, screenshotUrl) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, playerName, phone, email, state, city, ageCategory, category, partnerName || null, tournamentTitle, amountPaid, 'Paid', date, null]);
 
     res.json({ success: true, message: "Payment verified and registration recorded successfully.", id });
   } catch (error) {
     console.error("Payment verification or DB insertion failed:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- RAZORPAY & UPI CONFIG ENDPOINTS ---
+app.get('/api/payments/config', async (req, res) => {
+  try {
+    const config = await getActivePaymentConfig();
+    res.json({
+      useRazorpay: config.useRazorpay,
+      upiId: config.upiId,
+      qrCodeUrl: config.qrCodeUrl,
+      razorpayKeyId: config.razorpayKeyId,
+      razorpayKeySecret: config.razorpayKeySecret
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/payments/config', requireDb, async (req, res) => {
+  const { useRazorpay, upiId, qrCodeUrl, razorpayKeyId, razorpayKeySecret } = req.body;
+  try {
+    await pool.query(`
+      INSERT INTO payment_config (id, useRazorpay, upiId, qrCodeUrl, razorpayKeyId, razorpayKeySecret)
+      VALUES ('current', ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE 
+        useRazorpay = VALUES(useRazorpay),
+        upiId = VALUES(upiId),
+        qrCodeUrl = VALUES(qrCodeUrl),
+        razorpayKeyId = VALUES(razorpayKeyId),
+        razorpayKeySecret = VALUES(razorpayKeySecret)
+    `, [useRazorpay ? 1 : 0, upiId, qrCodeUrl || null, razorpayKeyId || null, razorpayKeySecret || null]);
+    res.json({ success: true, message: "Payment configuration updated successfully." });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -470,6 +571,7 @@ app.post('/api/db/reset', requireDb, async (req, res) => {
     await pool.query('DROP TABLE IF EXISTS tournament_applications');
     await pool.query('DROP TABLE IF EXISTS sponsor_registrations');
     await pool.query('DROP TABLE IF EXISTS game_fees');
+    await pool.query('DROP TABLE IF EXISTS payment_config');
     await initDb();
     res.json({ success: true, message: "Database reinitialized and seeded." });
   } catch (error) {

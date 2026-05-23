@@ -17,7 +17,8 @@ import {
   Mail,
   Phone,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  Upload
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -39,12 +40,15 @@ import {
   SponsorRegistration,
   getGameFees,
   updateGameFee,
-  GameFee
+  GameFee,
+  getPaymentConfig,
+  updatePaymentConfig,
+  PaymentConfig
 } from "@/lib/storage";
 
 const AdminPanel = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"players" | "tournaments" | "sponsors" | "pricing">("players");
+  const [activeTab, setActiveTab] = useState<"players" | "tournaments" | "sponsors" | "pricing" | "payments">("players");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   
@@ -57,6 +61,20 @@ const AdminPanel = () => {
   const [editFeeValue, setEditFeeValue] = useState("");
   const [isSavingFee, setIsSavingFee] = useState(false);
 
+  // Payment settings state
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({
+    useRazorpay: false,
+    upiId: "sihsports@okaxis",
+    qrCodeUrl: null,
+    razorpayKeyId: "",
+    razorpayKeySecret: ""
+  });
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [qrUploadError, setQrUploadError] = useState("");
+
+  // Receipt Modal State
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerRegistration | null>(null);
+
   // Load all data
   const loadData = async () => {
     try {
@@ -68,6 +86,13 @@ const AdminPanel = () => {
       setTournaments(tData);
       setSponsors(sData);
       setGameFees(fData);
+
+      try {
+        const configData = await getPaymentConfig();
+        setPaymentConfig(configData);
+      } catch (configErr) {
+        console.error("Error loading payment configuration:", configErr);
+      }
     } catch (error) {
       console.error("Error loading data from TiDB:", error);
     }
@@ -596,6 +621,23 @@ const AdminPanel = () => {
                 />
               )}
             </button>
+            <button
+              onClick={() => {
+                setActiveTab("payments");
+                setStatusFilter("All");
+              }}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all ${
+                activeTab === "payments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Payment Settings
+              {activeTab === "payments" && (
+                <motion.div
+                  layoutId="activeTabUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                />
+              )}
+            </button>
           </div>
 
           {/* Data Tables */}
@@ -625,6 +667,14 @@ const AdminPanel = () => {
                               <div className="text-xs text-electric font-medium mt-1">
                                 Partner: {player.partnerName}
                               </div>
+                            )}
+                            {player.screenshotUrl && (
+                              <button
+                                onClick={() => setSelectedPlayer(player)}
+                                className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline font-bold mt-2 bg-primary/10 px-2 py-0.5 rounded border border-primary/20 transition-all cursor-pointer block"
+                              >
+                                View Receipt
+                              </button>
                             )}
                           </td>
                           <td className="p-4">
@@ -952,10 +1002,286 @@ const AdminPanel = () => {
                   </tbody>
                 </table>
               )}
+
+              {activeTab === "payments" && (
+                <div className="p-6 md:p-8 space-y-8 bg-background/50">
+                  <div className="flex flex-col gap-1 pb-4 border-b border-border/50">
+                    <h3 className="font-display font-bold text-lg uppercase">System Payment Configuration</h3>
+                    <p className="text-muted-foreground text-xs">
+                      Switch between payment methods and update credentials. Changes take effect instantly.
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Method Selector */}
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          Active Payment Method
+                        </label>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentConfig(prev => ({ ...prev, useRazorpay: true }))}
+                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${
+                              paymentConfig.useRazorpay 
+                                ? 'border-primary bg-primary/5 text-primary glow-primary-border' 
+                                : 'border-border/60 bg-secondary/10 hover:border-border text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            <span className="font-display font-bold text-sm uppercase">Razorpay Gateway</span>
+                            <span className="text-[10px] opacity-75 mt-1 text-center">Credit Card, Net Banking, UPI</span>
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={() => setPaymentConfig(prev => ({ ...prev, useRazorpay: false }))}
+                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${
+                              !paymentConfig.useRazorpay 
+                                ? 'border-primary bg-primary/5 text-primary glow-primary-border' 
+                                : 'border-border/60 bg-secondary/10 hover:border-border text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            <span className="font-display font-bold text-sm uppercase">UPI QR Code</span>
+                            <span className="text-[10px] opacity-75 mt-1 text-center">Direct scan & receipt upload</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Config Form Fields based on selection */}
+                      {paymentConfig.useRazorpay ? (
+                        <div className="space-y-4 pt-2">
+                          <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">Razorpay Credentials</h4>
+                          
+                          <div className="space-y-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Razorpay Key ID
+                            </label>
+                            <input
+                              type="text"
+                              value={paymentConfig.razorpayKeyId || ""}
+                              onChange={(e) => setPaymentConfig(prev => ({ ...prev, razorpayKeyId: e.target.value }))}
+                              placeholder="rzp_test_..."
+                              className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-body"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Razorpay Key Secret
+                            </label>
+                            <input
+                              type="password"
+                              value={paymentConfig.razorpayKeySecret || ""}
+                              onChange={(e) => setPaymentConfig(prev => ({ ...prev, razorpayKeySecret: e.target.value }))}
+                              placeholder="••••••••••••••••"
+                              className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-body"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Saved credentials are securely encrypted on backend execution.</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 pt-2">
+                          <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">UPI QR Settings</h4>
+                          
+                          <div className="space-y-2">
+                            <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              Merchant UPI ID
+                            </label>
+                            <input
+                              type="text"
+                              value={paymentConfig.upiId || ""}
+                              onChange={(e) => setPaymentConfig(prev => ({ ...prev, upiId: e.target.value }))}
+                              placeholder="merchant@upi"
+                              className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-body"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Required to generate user payment links dynamically if no custom QR image is uploaded.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* QR Code Upload Section */}
+                    <div className="space-y-6 border-t md:border-t-0 md:border-l border-border/30 md:pl-8">
+                      {!paymentConfig.useRazorpay && (
+                        <div className="space-y-4">
+                          <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">Upload Custom Business QR Code</h4>
+                          <p className="text-muted-foreground text-xs">
+                            Upload your official merchant QR code image. If uploaded, we will display this image to players instead of dynamically generating one.
+                          </p>
+
+                          <div className="relative border-2 border-dashed border-primary/30 hover:border-primary/60 rounded-xl p-6 transition-all bg-secondary/15 flex flex-col items-center justify-center text-center cursor-pointer group min-h-[160px]">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (!file.type.startsWith("image/")) {
+                                  setQrUploadError("Please upload an image file (PNG, JPG, JPEG).");
+                                  return;
+                                }
+                                if (file.size > 2 * 1024 * 1024) {
+                                  setQrUploadError("QR Code image must be under 2MB.");
+                                  return;
+                                }
+                                setQrUploadError("");
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  setPaymentConfig(prev => ({ ...prev, qrCodeUrl: reader.result as string }));
+                                };
+                                reader.readAsDataURL(file);
+                              }}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <Upload className="w-8 h-8 text-primary group-hover:scale-110 transition-transform mb-2" />
+                            <p className="text-sm font-semibold text-foreground">
+                              Click or Drag to Upload QR Image
+                            </p>
+                            <p className="text-[11px] text-muted-foreground mt-1">PNG, JPG, JPEG up to 2MB</p>
+                          </div>
+
+                          {qrUploadError && (
+                            <p className="text-xs text-destructive font-semibold text-center mt-1">{qrUploadError}</p>
+                          )}
+
+                          {paymentConfig.qrCodeUrl && (
+                            <div className="flex flex-col items-center gap-3 p-4 border border-border bg-secondary/10 rounded-xl max-w-[200px] mx-auto relative">
+                              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Uploaded QR Preview</span>
+                              <img
+                                src={paymentConfig.qrCodeUrl}
+                                alt="Merchant QR code"
+                                className="w-full h-auto object-contain rounded border border-border bg-white p-1"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setPaymentConfig(prev => ({ ...prev, qrCodeUrl: null }))}
+                                className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground w-6 h-6 rounded-full text-xs flex items-center justify-center hover:brightness-110 shadow cursor-pointer"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {paymentConfig.useRazorpay && (
+                        <div className="flex flex-col items-center justify-center h-full min-h-[220px] text-center p-6 border border-primary/20 rounded-2xl bg-primary/5">
+                          <Sparkles className="w-10 h-10 text-primary mb-3 glow-primary" />
+                          <h4 className="font-display font-bold uppercase text-sm text-foreground">Razorpay Integration Active</h4>
+                          <p className="text-muted-foreground text-xs max-w-xs mt-2">
+                            Payments will be fully handled by the Razorpay Checkout gateway script automatically on the registration form.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Save Button */}
+                  <div className="pt-6 border-t border-border/50 flex justify-end">
+                    <button
+                      type="button"
+                      disabled={isSavingConfig}
+                      onClick={async () => {
+                        setIsSavingConfig(true);
+                        try {
+                          const success = await updatePaymentConfig(paymentConfig);
+                          if (success) {
+                            toast({
+                              title: "Settings Saved",
+                              description: "Payment configuration has been updated successfully.",
+                            });
+                          } else {
+                            throw new Error("API responded with an error");
+                          }
+                        } catch (err: any) {
+                          console.error(err);
+                          toast({
+                            title: "Save Failed",
+                            description: "Could not update payment configuration.",
+                            variant: "destructive"
+                          });
+                        } finally {
+                          setIsSavingConfig(false);
+                        }
+                      }}
+                      className="px-8 py-3 bg-primary text-primary-foreground font-bold uppercase tracking-wider rounded-lg text-xs glow-primary hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSavingConfig ? "Saving Configuration..." : "Save Settings"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Receipt Modal */}
+      {selectedPlayer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/85 backdrop-blur-sm">
+          <div className="glass-card max-w-lg w-full overflow-hidden border border-border flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-border flex justify-between items-center bg-secondary/15">
+              <div>
+                <h3 className="font-display font-bold uppercase text-lg text-foreground">
+                  Payment Receipt Proof
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Player: {selectedPlayer.playerName} • {selectedPlayer.tournamentTitle}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedPlayer(null)}
+                className="text-muted-foreground hover:text-foreground text-sm font-bold w-8 h-8 rounded-full border border-border/50 hover:bg-secondary/30 flex items-center justify-center transition-all cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 flex flex-col items-center bg-background/50">
+              {selectedPlayer.screenshotUrl ? (
+                <img
+                  src={selectedPlayer.screenshotUrl}
+                  alt="Payment screenshot"
+                  className="max-w-full max-h-[50vh] object-contain rounded-lg border border-border shadow"
+                />
+              ) : (
+                <div className="py-12 text-muted-foreground text-sm">No screenshot available.</div>
+              )}
+              
+              <div className="w-full mt-6 p-4 rounded-lg bg-secondary/20 border border-border/50 text-xs space-y-1.5 text-left">
+                <p><span className="text-muted-foreground font-semibold">Age Group & Event:</span> {selectedPlayer.ageCategory} • {selectedPlayer.category}</p>
+                <p><span className="text-muted-foreground font-semibold">Phone:</span> {selectedPlayer.phone}</p>
+                <p><span className="text-muted-foreground font-semibold">Email:</span> {selectedPlayer.email}</p>
+                <p><span className="text-muted-foreground font-semibold">Amount:</span> <strong className="text-electric">{selectedPlayer.amountPaid}</strong></p>
+                <p><span className="text-muted-foreground font-semibold">Current Status:</span> <strong className={selectedPlayer.status === 'Paid' ? 'text-primary' : 'text-accent'}>{selectedPlayer.status}</strong></p>
+              </div>
+            </div>
+            
+            <div className="p-6 border-t border-border flex flex-col sm:flex-row gap-3 bg-secondary/15">
+              {selectedPlayer.status !== "Paid" && (
+                <button
+                  onClick={async () => {
+                    await handlePlayerStatusChange(selectedPlayer.id, "Paid");
+                    // Refresh the selected player status in-place so modal updates
+                    setSelectedPlayer(prev => prev ? { ...prev, status: "Paid" } : null);
+                  }}
+                  className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-lg text-xs uppercase tracking-wider glow-primary hover:brightness-110 transition-all cursor-pointer"
+                >
+                  Approve & Mark Paid
+                </button>
+              )}
+              <button
+                onClick={() => setSelectedPlayer(null)}
+                className="flex-1 py-3 bg-secondary/30 text-foreground font-semibold rounded-lg text-xs uppercase tracking-wider hover:bg-secondary/50 transition-all border border-border/50 cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

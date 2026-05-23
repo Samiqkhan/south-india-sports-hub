@@ -1,9 +1,9 @@
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { CheckCircle, Upload } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
-import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment } from "@/lib/storage";
+import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment, getPaymentConfig } from "@/lib/storage";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -41,6 +41,23 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   
+  const [paymentConfig, setPaymentConfig] = useState<any>({ useRazorpay: false, upiId: "sihsports@okaxis" });
+  const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
+  const [screenshotName, setScreenshotName] = useState<string>("");
+  const [uploadError, setUploadError] = useState<string>("");
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const config = await getPaymentConfig();
+        setPaymentConfig(config);
+      } catch (err) {
+        console.error("Failed to load payment config, using default QR", err);
+      }
+    };
+    fetchConfig();
+  }, []);
+
   const [formData, setFormData] = useState({
     playerName: "",
     phone: "",
@@ -71,32 +88,12 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
       const amountVal = parseInt(amount.replace(/[^\d]/g, ""), 10);
       const amountInPaise = isNaN(amountVal) ? 0 : amountVal * 100;
 
-      if (amountInPaise === 0) {
-        // Free registration, skip payment verification and save directly
-        await addPlayerRegistration({
-          playerName: formData.playerName,
-          phone: formData.phone,
-          email: formData.email,
-          state: formData.state,
-          city: formData.city,
-          ageCategory: age,
-          category: category,
-          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
-          tournamentTitle: tournamentTitle,
-          amountPaid: amount,
-          status: 'Paid',
-        });
-        setSubmitted(true);
-        setIsProcessing(false);
-        return;
-      }
-
       // 1. Create order on the backend
       const order = await createRazorpayOrder(amountInPaise);
 
       // 2. Setup checkout options
       const options = {
-        key: "rzp_test_Ssqkj7T7DivUDd",
+        key: paymentConfig.razorpayKeyId || "rzp_test_Ssqkj7T7DivUDd",
         amount: order.amount,
         currency: order.currency,
         name: "South India Sports Hub",
@@ -161,6 +158,72 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please upload an image file (PNG, JPG, JPEG).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File is too large. Please upload an image under 5MB.");
+      return;
+    }
+
+    setUploadError("");
+    setScreenshotName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setScreenshotBase64(reader.result as string);
+    };
+    reader.onerror = () => {
+      setUploadError("Failed to read file. Please try again.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleQrSubmit = async () => {
+    if (!screenshotBase64) {
+      setUploadError("Please upload your payment screenshot before submitting.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const feeObj = playerFees.find(
+      (f) =>
+        f.category.toLowerCase() === category.toLowerCase() &&
+        f.ageCategory.toLowerCase() === age.toLowerCase()
+    );
+    const selectedFee = feeObj ? feeObj.fee : "₹0";
+
+    try {
+      await addPlayerRegistration({
+        playerName: formData.playerName,
+        phone: formData.phone,
+        email: formData.email,
+        state: formData.state,
+        city: formData.city,
+        ageCategory: age,
+        category: category,
+        partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+        tournamentTitle: tournamentTitle,
+        amountPaid: selectedFee,
+        status: 'Pending',
+        screenshotUrl: screenshotBase64,
+      });
+      setSubmitted(true);
+    } catch (error: any) {
+      console.error("QR Registration failed:", error);
+      alert("Failed to submit registration: " + error.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -172,7 +235,41 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     );
     const selectedFee = feeObj ? feeObj.fee : "₹0";
 
-    await handlePayment(selectedFee);
+    const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
+    const amountInPaise = isNaN(amountVal) ? 0 : amountVal * 100;
+
+    if (amountInPaise === 0) {
+      // Free registration, save directly without payment
+      setIsProcessing(true);
+      try {
+        await addPlayerRegistration({
+          playerName: formData.playerName,
+          phone: formData.phone,
+          email: formData.email,
+          state: formData.state,
+          city: formData.city,
+          ageCategory: age,
+          category: category,
+          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+          tournamentTitle: tournamentTitle,
+          amountPaid: selectedFee,
+          status: 'Paid',
+        });
+        setSubmitted(true);
+      } catch (err) {
+        console.error(err);
+        setSubmitted(true);
+      } finally {
+        setIsProcessing(false);
+      }
+      return;
+    }
+
+    if (paymentConfig.useRazorpay) {
+      await handlePayment(selectedFee);
+    } else {
+      setStep(2);
+    }
   };
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
@@ -221,6 +318,10 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
         f.ageCategory.toLowerCase() === age.toLowerCase()
     );
     const selectedFee = feeObj ? feeObj.fee : "₹0";
+    const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
+
+    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=SISA%20Sports%20Hub&am=${amountVal}&cu=INR&tn=SISA%20Registration`;
+    const qrImageUrl = paymentConfig.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
     return (
       <section id="register" className="section-padding" ref={ref}>
@@ -228,38 +329,98 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-card p-8 md:p-12"
+            className="glass-card p-8 md:p-12 space-y-6"
           >
-            <h3 className="font-display text-3xl font-bold uppercase mb-8">Payment Details</h3>
-            
-            <div className="mb-8 space-y-6">
-              <div className="text-left space-y-3 bg-secondary/10 p-4 rounded-xl border border-border/50">
-                <p className="text-muted-foreground uppercase tracking-wider text-xs font-semibold mb-2">Selected Event</p>
-                <div className="flex justify-between items-center bg-secondary/30 p-3 rounded-lg border border-border/50 text-sm">
-                  <span className="font-semibold uppercase tracking-wider">{age} - {category}</span>
-                  <span className="text-primary font-bold">{selectedFee}</span>
-                </div>
-              </div>
-              
-              <div className="p-6 bg-secondary/30 rounded-xl border border-border">
-                <p className="text-muted-foreground uppercase tracking-wider text-sm font-semibold mb-2">Total Amount</p>
-                <p className="text-5xl font-bold text-primary">{selectedFee}</p>
-              </div>
+            <h3 className="font-display text-3xl font-bold uppercase">UPI Payment</h3>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Scan the QR code using any UPI App (GPay, PhonePe, Paytm) to make the payment of <strong className="text-primary">{selectedFee}</strong>.
+            </p>
+
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl max-w-[280px] mx-auto border border-border/80 shadow-md">
+              <img
+                src={qrImageUrl}
+                alt="UPI Payment QR Code"
+                className="w-full h-auto object-contain"
+              />
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-3">Scan to Pay</span>
             </div>
-            
-            <button
-              onClick={() => handlePayment(selectedFee)}
-              className="w-full py-4 bg-[#3395FF] text-white font-bold rounded-lg text-lg uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-3 drop-shadow-md"
-            >
-              Pay with Razorpay
-            </button>
-            
-            <button
-              onClick={() => setStep(1)}
-              className="w-full mt-4 py-3 bg-secondary/20 text-foreground font-semibold rounded-lg text-sm uppercase tracking-wider hover:bg-secondary/50 transition-all"
-            >
-               Back to Details
-            </button>
+
+            <div className="md:hidden">
+              <a
+                href={upiUrl}
+                className="inline-flex items-center gap-2 text-xs text-primary font-bold hover:underline"
+              >
+                Or click here to open in your UPI App
+              </a>
+            </div>
+
+            <div className="text-left space-y-3 pt-4 border-t border-border/50">
+              <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                Upload Payment Screenshot <span className="text-primary">*</span>
+              </label>
+
+              <div className="relative border-2 border-dashed border-primary/30 hover:border-primary/60 rounded-xl p-6 transition-all bg-secondary/15 flex flex-col items-center justify-center text-center cursor-pointer group">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  required
+                />
+                <Upload className="w-8 h-8 text-primary group-hover:scale-110 transition-transform mb-2" />
+                <p className="text-sm font-semibold text-foreground">
+                  {screenshotName ? `Selected: ${screenshotName}` : "Click or Drag to Upload Receipt"}
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-1">PNG, JPG, JPEG up to 5MB</p>
+              </div>
+
+              {uploadError && (
+                <p className="text-xs text-destructive font-semibold text-center mt-1">{uploadError}</p>
+              )}
+
+              {screenshotBase64 && (
+                <div className="mt-3 relative rounded-lg border border-border p-2 bg-secondary/20 max-w-[150px] mx-auto">
+                  <img
+                    src={screenshotBase64}
+                    alt="Receipt preview"
+                    className="w-full h-24 object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScreenshotBase64(null);
+                      setScreenshotName("");
+                    }}
+                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground w-5 h-5 rounded-full text-xs flex items-center justify-center hover:brightness-110 shadow"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <button
+                onClick={handleQrSubmit}
+                disabled={isProcessing || !screenshotBase64}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isProcessing ? "Submitting Registration..." : "Submit Registration"}
+              </button>
+              
+              <button
+                onClick={() => {
+                  setStep(1);
+                  setScreenshotBase64(null);
+                  setScreenshotName("");
+                  setUploadError("");
+                }}
+                disabled={isProcessing}
+                className="w-full py-3 bg-secondary/20 text-foreground font-semibold rounded-lg text-sm uppercase tracking-wider hover:bg-secondary/50 transition-all disabled:opacity-50"
+              >
+                Back to Details
+              </button>
+            </div>
           </motion.div>
         </div>
       </section>

@@ -12,6 +12,7 @@ export interface PlayerRegistration {
   amountPaid: string;
   status: 'Paid' | 'Pending' | 'Refunded';
   date: string;
+  screenshotUrl?: string;
 }
 
 export interface TournamentApplication {
@@ -220,6 +221,30 @@ export const updateGameFee = async (id: string, fee: string): Promise<GameFee[]>
   });
   if (!res.ok) throw new Error("Failed to update game fee in database");
   return await getGameFees();
+};
+
+export interface PaymentConfig {
+  useRazorpay: boolean;
+  upiId: string;
+  qrCodeUrl: string | null;
+  razorpayKeyId: string;
+  razorpayKeySecret?: string;
+}
+
+export const getPaymentConfig = async (): Promise<PaymentConfig> => {
+  const res = await fetch(`${API_BASE}/payments/config`);
+  if (!res.ok) throw new Error("Failed to fetch payment configuration from database");
+  return await res.json();
+};
+
+export const updatePaymentConfig = async (config: PaymentConfig): Promise<boolean> => {
+  const res = await fetch(`${API_BASE}/payments/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config)
+  });
+  if (!res.ok) throw new Error("Failed to update payment configuration in database");
+  return res.ok;
 };
 
 
