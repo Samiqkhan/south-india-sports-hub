@@ -75,6 +75,32 @@ const AdminPanel = () => {
   // Receipt Modal State
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRegistration | null>(null);
 
+  // Authentication states
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("admin_auth") === "true";
+  });
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      loginEmail.trim() === "southindiasportsassociation1@gmail.com" &&
+      loginPassword === "sisa@123"
+    ) {
+      sessionStorage.setItem("admin_auth", "true");
+      setIsAuthenticated(true);
+      setLoginError("");
+      toast({
+        title: "Welcome Back",
+        description: "Successfully signed in to SISA admin panel.",
+      });
+    } else {
+      setLoginError("Invalid email or password. Please try again.");
+    }
+  };
+
   // Load all data
   const loadData = async () => {
     try {
@@ -409,6 +435,83 @@ const AdminPanel = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background text-foreground font-body flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="glass-card max-w-md w-full p-8 border border-primary/20 relative shadow-2xl z-10 animate-fade-in"
+        >
+          {/* Logo / Title */}
+          <div className="text-center mb-8">
+            <h2 className="font-display text-4xl font-extrabold uppercase tracking-wider mb-2">
+              SISA <span className="gradient-text">Admin</span>
+            </h2>
+            <p className="text-muted-foreground text-xs uppercase tracking-widest">
+              Secured Administration Portal
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="admin@sisa.org"
+                required
+                className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Password
+              </label>
+              <input
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="••••••••••••"
+                required
+                className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body text-sm"
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-xs text-destructive font-semibold text-center mt-1">
+                {loginError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3.5 bg-primary text-primary-foreground font-bold rounded-lg text-sm uppercase tracking-wider glow-primary hover:brightness-110 transition-all cursor-pointer"
+            >
+              Sign In
+            </button>
+            
+            <div className="text-center mt-6">
+              <Link
+                to="/"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline uppercase tracking-widest font-semibold"
+              >
+                ← Back to Home
+              </Link>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       <Navbar />
@@ -443,6 +546,19 @@ const AdminPanel = () => {
                 className="px-4 py-2 border border-destructive/30 hover:border-destructive text-destructive hover:bg-destructive/10 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
               >
                 <AlertTriangle className="w-3.5 h-3.5" /> Clear All Data
+              </button>
+              <button
+                onClick={() => {
+                  sessionStorage.removeItem("admin_auth");
+                  setIsAuthenticated(false);
+                  toast({
+                    title: "Signed Out",
+                    description: "You have successfully signed out of the admin panel.",
+                  });
+                }}
+                className="px-4 py-2 border border-border hover:border-foreground text-muted-foreground hover:text-foreground hover:bg-secondary/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
+              >
+                Sign Out
               </button>
             </div>
           </div>
