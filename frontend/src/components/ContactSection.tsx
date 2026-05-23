@@ -32,7 +32,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground uppercase tracking-wider">Phone</p>
-                <p className="text-foreground font-semibold">+91 98765 43210</p>
+                <p className="text-foreground font-semibold">+91 90800 60483</p>
               </div>
             </div>
 
@@ -70,17 +70,26 @@ const ContactSection = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="rounded-xl overflow-hidden h-[300px] md:h-auto"
+            className="rounded-xl overflow-hidden h-[300px] md:h-auto relative group border border-border/50 hover:border-primary/30 transition-colors"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d497511.23481098043!2d79.87933364999999!3d13.047985949999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265ea4f7d3361%3A0x6e61a70b6863d433!2sChennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              src="https://maps.google.com/maps?q=Sankagiri,%20Salem&t=&z=14&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="100%"
-              style={{ border: 0, filter: "invert(90%) hue-rotate(180deg)" }}
+              style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(1.2)" }}
               allowFullScreen
               loading="lazy"
               title="Location Map"
+              className="min-h-[300px] h-full"
             />
+            <a
+              href="https://maps.app.goo.gl/or4cBwn3ir3sEKJq5"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-4 right-4 bg-background/90 hover:bg-primary hover:text-primary-foreground backdrop-blur px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg border border-border/50 transition-all duration-300 transform group-hover:scale-105"
+            >
+              Open in Maps 🗺️
+            </a>
           </motion.div>
         </div>
       </div>
