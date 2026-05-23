@@ -49,9 +49,20 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border/50 pt-6 text-center">
+        <div className="border-t border-border/50 pt-6 text-center flex flex-col items-center justify-center gap-1.5">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} South India Sports Association. All rights reserved.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Developed by{" "}
+            <a
+              href="https://portfolio-samiq-khan.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-bold hover:text-white transition-all duration-300 drop-shadow-[0_0_8px_rgba(51,149,255,0.7)] hover:drop-shadow-[0_0_15px_rgba(51,149,255,1)] tracking-wider hover:scale-105 inline-block"
+            >
+              Samiq
+            </a>
           </p>
         </div>
       </div>

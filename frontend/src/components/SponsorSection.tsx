@@ -77,7 +77,7 @@ const SponsorSection = () => {
              <div className="glass-card p-2 md:p-3 relative z-10 group overflow-hidden">
                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
                <img
-                  src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2069&auto=format&fit=crop"
+                  src="/sponsorship_cover.png"
                   alt="Athletes celebrating on court"
                   className="rounded-lg object-cover w-full h-[500px] shadow-2xl relative z-10 filter brightness-90 group-hover:brightness-100 transition-all duration-500"
                />
