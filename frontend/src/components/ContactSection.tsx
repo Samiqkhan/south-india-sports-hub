@@ -70,7 +70,7 @@ const ContactSection = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="rounded-xl overflow-hidden h-[300px] md:h-auto relative group border border-border/50 hover:border-primary/30 transition-colors"
+            className="rounded-xl overflow-hidden h-[300px] md:h-auto relative group border border-border/50 hover:border-primary/30 transition-colors w-full max-w-full"
           >
             <iframe
               src="https://maps.google.com/maps?q=Sankagiri,%20Salem&t=&z=14&ie=UTF8&iwloc=&output=embed"
@@ -80,7 +80,8 @@ const ContactSection = () => {
               allowFullScreen
               loading="lazy"
               title="Location Map"
-              className="min-h-[300px] h-full"
+              className="min-h-[300px] h-full w-full max-w-full"
+              scrolling="no"
             />
             <a
               href="https://maps.app.goo.gl/or4cBwn3ir3sEKJq5"

@@ -760,7 +760,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                   required
                 />
                 <Upload className="w-8 h-8 text-primary group-hover:scale-110 transition-transform mb-2" />
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-semibold text-foreground truncate max-w-full px-4 block text-center">
                   {screenshotName ? `Selected: ${screenshotName}` : "Click or Drag to Upload Receipt"}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">PNG, JPG, JPEG up to 5MB</p>
@@ -1022,9 +1022,9 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                       required
                     />
                     {verificationDoc ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <CheckCircle className="w-8 h-8 text-primary" />
-                        <p className="text-foreground font-semibold text-sm truncate max-w-[280px]">
+                      <div className="flex flex-col items-center gap-2 w-full max-w-full">
+                        <CheckCircle className="w-8 h-8 text-primary shrink-0" />
+                        <p className="text-foreground font-semibold text-sm truncate max-w-full px-4 block text-center">
                           {verificationDoc.name}
                         </p>
                         <p className="text-muted-foreground text-xs">
