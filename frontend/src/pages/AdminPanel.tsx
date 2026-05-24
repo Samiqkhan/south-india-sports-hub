@@ -513,7 +513,7 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-body">
+    <div className="min-h-screen bg-background text-foreground font-body overflow-x-hidden w-full">
       <Navbar />
 
       <section className="pt-36 md:pt-28 pb-16 px-4 md:px-8">

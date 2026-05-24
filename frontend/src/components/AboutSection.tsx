@@ -59,14 +59,14 @@ const AboutSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="glass-card p-6 text-center hover-lift"
+              className="glass-card p-4 sm:p-6 text-center hover-lift"
             >
               <stat.icon className="w-8 h-8 text-primary mx-auto mb-4" />
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />

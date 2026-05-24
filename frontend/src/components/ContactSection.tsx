@@ -7,7 +7,7 @@ const ContactSection = () => {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="contact" className="section-padding" ref={ref}>
+    <section id="contact" className="section-padding overflow-hidden" ref={ref}>
       <div className="container mx-auto max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

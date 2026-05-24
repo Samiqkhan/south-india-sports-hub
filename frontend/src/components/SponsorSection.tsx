@@ -88,8 +88,8 @@ const SponsorSection = () => {
              </div>
              
              {/* Decorative accent elements */}
-             <div className="absolute -hidden lg:block -top-6 -right-6 w-24 h-24 border-t-2 border-r-2 border-primary/30 rounded-tr-3xl" />
-             <div className="absolute -hidden lg:block -bottom-6 -left-6 w-24 h-24 border-b-2 border-l-2 border-accent/30 rounded-bl-3xl" />
+             <div className="absolute hidden lg:block -top-6 -right-6 w-24 h-24 border-t-2 border-r-2 border-primary/30 rounded-tr-3xl" />
+             <div className="absolute hidden lg:block -bottom-6 -left-6 w-24 h-24 border-b-2 border-l-2 border-accent/30 rounded-bl-3xl" />
           </motion.div>
         </div>
       </div>

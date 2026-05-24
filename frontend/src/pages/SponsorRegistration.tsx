@@ -82,10 +82,10 @@ const SponsorRegistration = () => {
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden w-full">
       <Navbar />
 
-      <section className="pt-28 pb-16 px-4 md:px-8">
+      <section className="pt-28 pb-16 px-4 md:px-8 overflow-hidden">
         <div className="container mx-auto max-w-4xl">
           <Link
             to="/"
