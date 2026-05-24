@@ -24,7 +24,7 @@ const ContactSection = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass-card p-8 space-y-6"
+            className="glass-card p-5 sm:p-8 space-y-6 w-full max-w-full"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -42,7 +42,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground uppercase tracking-wider">Email</p>
-                <p className="text-foreground font-semibold">southindiasportsassociation.com</p>
+                <p className="text-foreground font-semibold break-all text-sm sm:text-base">southindiasportsassociation.com</p>
               </div>
             </div>
 
