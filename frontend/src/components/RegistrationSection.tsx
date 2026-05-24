@@ -78,8 +78,8 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     // Brand Title text
     doc.setTextColor(5, 255, 213);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text("SOUTH INDIA SPORTS HUB", 15, 22);
+    doc.setFontSize(20);
+    doc.text("SOUTH INDIA SPORTS ASSOCIATION", 15, 22);
 
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "normal");
@@ -101,22 +101,12 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     })}`, 125, 73);
 
     // Status Badge background and text
-    const isPaidState = details.status.toLowerCase().includes("paid");
-    if (isPaidState) {
-      doc.setFillColor(220, 252, 231); // green-100
-      doc.rect(125, 78, 48, 8, "F");
-      doc.setTextColor(21, 128, 61); // green-700
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.text("STATUS: PAID & CONFIRMED", 127, 83.5);
-    } else {
-      doc.setFillColor(254, 243, 199); // amber-100
-      doc.rect(125, 78, 48, 8, "F");
-      doc.setTextColor(180, 83, 9); // amber-700
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.text("STATUS: PENDING VERIFICATION", 127, 83.5);
-    }
+    doc.setFillColor(220, 252, 231); // green-100
+    doc.rect(125, 78, 48, 8, "F");
+    doc.setTextColor(21, 128, 61); // green-700
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("STATUS: SUCCESS", 127, 83.5);
 
     // Horizontal Separator
     doc.setDrawColor(226, 232, 240); // slate-200
@@ -214,7 +204,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const pdfPolicies = [
       "1. COMPULSORY ENTRY VERIFICATION: This invoice is a mandatory requirement. You MUST present this invoice (printed copy or digital PDF) along with a valid Government-issued ID card at the entry gate and verification desk. Failing to produce this document will result in denial of entry.",
       "2. SCHEDULE & REPORTING TIME: All players are required to report at the registration counter at least 30 minutes prior to their scheduled match timings. Late arrivals exceeding 15 minutes past the scheduled call will lead to automatic walkover disqualification.",
-      "3. REFUNDS & CANCELLATIONS: Registration fees paid are strictly non-refundable and non-transferable under any circumstances, except in the case of complete event cancellation by South India Sports Hub, in which case refunds will be processed within 7-10 working days.",
+      "3. REFUNDS & CANCELLATIONS: Registration fees paid are strictly non-refundable and non-transferable under any circumstances, except in the case of complete event cancellation by South India Sports Association, in which case refunds will be processed within 7-10 working days.",
       "4. OFFICIAL RULES & DECISION MAKING: Standard governing federation rules for the respective sport shall apply. The decision of the chief referee/umpire is final and absolute. Any argument or unsportsmanlike behavior will lead to immediate disqualification without any fee refunds.",
       "5. EQUIPMENT & VENUE COMPLIANCE: Players must bring their own standard-compliant equipment (rackets, bats, etc.). Only non-marking sports shoes are permitted on indoor courts. Strict adherence to the venue clean-green code of conduct is expected."
     ];
@@ -233,7 +223,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     doc.setFont("helvetica", "italic");
     doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
-    doc.text("Thank you for choosing South India Sports Hub. We look forward to seeing you compete!", 15, 275);
+    doc.text("Thank you for choosing South India Sports Association. We look forward to seeing you compete!", 15, 275);
     doc.text("For tournament queries or support, please email support@sihsports.com or visit www.sihsports.com.", 15, 280);
 
     // Trigger PDF download
@@ -295,7 +285,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
         key: paymentConfig.razorpayKeyId || "rzp_test_Ssqkj7T7DivUDd",
         amount: order.amount,
         currency: order.currency,
-        name: "South India Sports Hub",
+        name: "South India Sports Association",
         description: `Tournament Registration - ${tournamentTitle}`,
         order_id: order.id,
         prefill: {
@@ -340,7 +330,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                 partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
                 tournamentTitle: tournamentTitle,
                 amountPaid: amount,
-                status: 'Paid',
+                status: 'Success',
                 date: new Date().toISOString(),
                 razorpayPaymentId: response.razorpay_payment_id,
               });
@@ -443,7 +433,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           partnerName: result.partnerName,
           tournamentTitle: result.tournamentTitle,
           amountPaid: result.amountPaid,
-          status: 'Pending Verification',
+          status: 'Success',
           date: result.date,
         });
         setSubmitted(true);
@@ -500,7 +490,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
             partnerName: result.partnerName,
             tournamentTitle: result.tournamentTitle,
             amountPaid: result.amountPaid,
-            status: 'Paid',
+            status: 'Success',
             date: result.date,
           });
           setSubmitted(true);
@@ -519,7 +509,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
           tournamentTitle: tournamentTitle,
           amountPaid: selectedFee,
-          status: 'Paid',
+          status: 'Success',
           date: new Date().toISOString(),
         });
         setSubmitted(true);
@@ -539,7 +529,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
   if (submitted && successDetails) {
-    const isPaid = successDetails.status.toLowerCase().includes("paid");
+    const isPaid = successDetails.status.toLowerCase().includes("paid") || successDetails.status.toLowerCase().includes("success");
     
     return (
       <section id="register" className="section-padding animate-fade-in" ref={ref}>
@@ -722,7 +712,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const selectedFee = feeObj ? feeObj.fee : "₹0";
     const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
 
-    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=SISA%20Sports%20Hub&am=${amountVal}&cu=INR&tn=SISA%20Registration`;
+    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=SISA%20Sports%20Association&am=${amountVal}&cu=INR&tn=SISA%20Registration`;
     const qrImageUrl = paymentConfig.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
     return (
