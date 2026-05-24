@@ -1,9 +1,10 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { CheckCircle, Upload } from "lucide-react";
+import { CheckCircle, Upload, Download, FileText, AlertTriangle, ShieldAlert } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
 import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment, getPaymentConfig } from "@/lib/storage";
+import { jsPDF } from "jspdf";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -41,6 +42,203 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const [verificationDoc, setVerificationDoc] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [successDetails, setSuccessDetails] = useState<{
+    id: string;
+    playerName: string;
+    phone: string;
+    email: string;
+    state: string;
+    city: string;
+    ageCategory: string;
+    category: string;
+    partnerName?: string;
+    tournamentTitle: string;
+    amountPaid: string;
+    status: string;
+    date: string;
+    razorpayPaymentId?: string;
+  } | null>(null);
+
+  const downloadInvoicePDF = (details: typeof successDetails) => {
+    if (!details) return;
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    // Brand Header background
+    doc.setFillColor(15, 23, 42); // Slate 900
+    doc.rect(0, 0, 210, 40, "F");
+
+    // Brand Logo and Accent line
+    doc.setFillColor(5, 255, 213); // Neon Teal/Cyan accent color
+    doc.rect(0, 40, 210, 2, "F");
+
+    // Brand Title text
+    doc.setTextColor(5, 255, 213);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("SOUTH INDIA SPORTS HUB", 15, 22);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Official Tournament Entry Ticket & Invoice", 15, 30);
+
+    // Invoice Header details
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("REGISTRATION INVOICE", 125, 60);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Invoice No: ${details.id}`, 125, 67);
+    doc.text(`Date: ${new Date(details.date).toLocaleDateString("en-IN", {
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    })}`, 125, 73);
+
+    // Status Badge background and text
+    const isPaidState = details.status.toLowerCase().includes("paid");
+    if (isPaidState) {
+      doc.setFillColor(220, 252, 231); // green-100
+      doc.rect(125, 78, 48, 8, "F");
+      doc.setTextColor(21, 128, 61); // green-700
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("STATUS: PAID & CONFIRMED", 127, 83.5);
+    } else {
+      doc.setFillColor(254, 243, 199); // amber-100
+      doc.rect(125, 78, 48, 8, "F");
+      doc.setTextColor(180, 83, 9); // amber-700
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("STATUS: PENDING VERIFICATION", 127, 83.5);
+    }
+
+    // Horizontal Separator
+    doc.setDrawColor(226, 232, 240); // slate-200
+    doc.setLineWidth(0.5);
+    doc.line(15, 92, 195, 92);
+
+    // Left Column: Player info
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("BILL TO (PLAYER)", 15, 102);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(`Name: ${details.playerName}`, 15, 109);
+    doc.text(`Phone: ${details.phone}`, 15, 115);
+    doc.text(`Email: ${details.email}`, 15, 121);
+    doc.text(`City: ${details.city}`, 15, 127);
+    doc.text(`State: ${details.state}`, 15, 133);
+
+    // Right Column: Tournament info
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("TOURNAMENT DETAILS", 110, 102);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(`Tournament: ${details.tournamentTitle}`, 110, 109);
+    doc.text(`Event: ${details.category}`, 110, 115);
+    doc.text(`Age Group: ${details.ageCategory}`, 110, 121);
+    if (details.partnerName) {
+      doc.text(`Partner Name: ${details.partnerName}`, 110, 127);
+    }
+
+    // Horizontal Separator
+    doc.line(15, 142, 195, 142);
+
+    // Invoice Table Header
+    doc.setFillColor(248, 250, 252); // slate-50
+    doc.rect(15, 150, 180, 10, "F");
+
+    doc.setTextColor(71, 85, 105);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.text("Registration Fee Description", 18, 156.5);
+    doc.text("Qty", 140, 156.5);
+    doc.text("Amount", 168, 156.5);
+
+    // Invoice Table Row
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(`Entry Registration - ${details.category} (${details.ageCategory})`, 18, 168);
+    doc.text("1", 142, 168);
+    doc.text(details.amountPaid, 168, 168);
+
+    // Table divider line
+    doc.line(15, 175, 195, 175);
+
+    // Total Breakdown details
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(71, 85, 105);
+    doc.text("Subtotal:", 135, 184);
+    doc.text(details.amountPaid, 168, 184);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text("Total Paid:", 135, 191);
+    doc.setTextColor(13, 148, 136); // teal-600
+    doc.text(details.amountPaid, 168, 191);
+
+    if (details.razorpayPaymentId) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Razorpay ID: ${details.razorpayPaymentId}`, 15, 191);
+    }
+
+    // Policies Separator line
+    doc.setDrawColor(203, 213, 225); // slate-300
+    doc.line(15, 203, 195, 203);
+
+    // Policies section
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.text("REQUIRED TERMS & VENUE POLICIES", 15, 212);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(71, 85, 105);
+
+    const pdfPolicies = [
+      "1. COMPULSORY ENTRY VERIFICATION: This invoice is a mandatory requirement. You MUST present this invoice (printed copy or digital PDF) along with a valid Government-issued ID card at the entry gate and verification desk. Failing to produce this document will result in denial of entry.",
+      "2. SCHEDULE & REPORTING TIME: All players are required to report at the registration counter at least 30 minutes prior to their scheduled match timings. Late arrivals exceeding 15 minutes past the scheduled call will lead to automatic walkover disqualification.",
+      "3. REFUNDS & CANCELLATIONS: Registration fees paid are strictly non-refundable and non-transferable under any circumstances, except in the case of complete event cancellation by South India Sports Hub, in which case refunds will be processed within 7-10 working days.",
+      "4. OFFICIAL RULES & DECISION MAKING: Standard governing federation rules for the respective sport shall apply. The decision of the chief referee/umpire is final and absolute. Any argument or unsportsmanlike behavior will lead to immediate disqualification without any fee refunds.",
+      "5. EQUIPMENT & VENUE COMPLIANCE: Players must bring their own standard-compliant equipment (rackets, bats, etc.). Only non-marking sports shoes are permitted on indoor courts. Strict adherence to the venue clean-green code of conduct is expected."
+    ];
+
+    let currentY = 218;
+    pdfPolicies.forEach((pLine) => {
+      const splitLines = doc.splitTextToSize(pLine, 180);
+      doc.text(splitLines, 15, currentY);
+      currentY += (splitLines.length * 3.5) + 1.5;
+    });
+
+    // Footer copyright notes
+    doc.setDrawColor(241, 245, 249);
+    doc.line(15, 268, 195, 268);
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text("Thank you for choosing South India Sports Hub. We look forward to seeing you compete!", 15, 275);
+    doc.text("For tournament queries or support, please email support@sihsports.com or visit www.sihsports.com.", 15, 280);
+
+    // Trigger PDF download
+    doc.save(`SISA_Invoice_${details.id}.pdf`);
+  };
   
   const [paymentConfig, setPaymentConfig] = useState<any>({ useRazorpay: false, upiId: "sihsports@okaxis" });
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
@@ -130,6 +328,22 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
             });
 
             if (verificationResult.success) {
+              setSuccessDetails({
+                id: verificationResult.id || `pr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                playerName: formData.playerName,
+                phone: formData.phone,
+                email: formData.email,
+                state: formData.state,
+                city: formData.city,
+                ageCategory: age,
+                category: category,
+                partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+                tournamentTitle: tournamentTitle,
+                amountPaid: amount,
+                status: 'Paid',
+                date: new Date().toISOString(),
+                razorpayPaymentId: response.razorpay_payment_id,
+              });
               setSubmitted(true);
             } else {
               alert("Payment verification failed. Please contact support.");
@@ -202,7 +416,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const selectedFee = feeObj ? feeObj.fee : "₹0";
 
     try {
-      await addPlayerRegistration({
+      const result = await addPlayerRegistration({
         playerName: formData.playerName,
         phone: formData.phone,
         email: formData.email,
@@ -216,7 +430,24 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
         status: 'Pending',
         screenshotUrl: screenshotBase64,
       });
-      setSubmitted(true);
+      if (result) {
+        setSuccessDetails({
+          id: result.id,
+          playerName: result.playerName,
+          phone: result.phone,
+          email: result.email,
+          state: result.state,
+          city: result.city,
+          ageCategory: result.ageCategory,
+          category: result.category,
+          partnerName: result.partnerName,
+          tournamentTitle: result.tournamentTitle,
+          amountPaid: result.amountPaid,
+          status: 'Pending Verification',
+          date: result.date,
+        });
+        setSubmitted(true);
+      }
     } catch (error: any) {
       console.error("QR Registration failed:", error);
       alert("Failed to submit registration: " + error.message);
@@ -243,7 +474,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
       // Free registration, save directly without payment
       setIsProcessing(true);
       try {
-        await addPlayerRegistration({
+        const result = await addPlayerRegistration({
           playerName: formData.playerName,
           phone: formData.phone,
           email: formData.email,
@@ -256,9 +487,41 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           amountPaid: selectedFee,
           status: 'Paid',
         });
-        setSubmitted(true);
+        if (result) {
+          setSuccessDetails({
+            id: result.id,
+            playerName: result.playerName,
+            phone: result.phone,
+            email: result.email,
+            state: result.state,
+            city: result.city,
+            ageCategory: result.ageCategory,
+            category: result.category,
+            partnerName: result.partnerName,
+            tournamentTitle: result.tournamentTitle,
+            amountPaid: result.amountPaid,
+            status: 'Paid',
+            date: result.date,
+          });
+          setSubmitted(true);
+        }
       } catch (err) {
         console.error(err);
+        setSuccessDetails({
+          id: `pr-free-${Date.now()}`,
+          playerName: formData.playerName,
+          phone: formData.phone,
+          email: formData.email,
+          state: formData.state,
+          city: formData.city,
+          ageCategory: age,
+          category: category,
+          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
+          tournamentTitle: tournamentTitle,
+          amountPaid: selectedFee,
+          status: 'Paid',
+          date: new Date().toISOString(),
+        });
         setSubmitted(true);
       } finally {
         setIsProcessing(false);
@@ -275,38 +538,175 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
-  if (submitted) {
+  if (submitted && successDetails) {
+    const isPaid = successDetails.status.toLowerCase().includes("paid");
+    
     return (
-      <section id="register" className="section-padding" ref={ref}>
-        <div className="container mx-auto max-w-xl text-center">
+      <section id="register" className="section-padding animate-fade-in" ref={ref}>
+        <div className="container mx-auto max-w-2xl">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="glass-card p-12"
+            transition={{ duration: 0.5 }}
+            className="glass-card overflow-hidden border border-primary/20 shadow-2xl relative"
           >
-            <CheckCircle className="w-16 h-16 text-primary mx-auto mb-6" />
-            <h3 className="font-display text-3xl font-bold uppercase mb-4">Registration Submitted!</h3>
-            <p className="text-muted-foreground mb-6">
-              Thank you for registering. We'll send a confirmation to your email shortly.
-            </p>
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setFormData({
-                  playerName: "",
-                  phone: "",
-                  email: "",
-                  state: "",
-                  city: "",
-                });
-                setPartnerName("");
-                setVerificationDoc(null);
-                setStep(1);
-              }}
-              className="px-6 py-3 border border-border text-foreground font-semibold rounded-lg uppercase tracking-wider hover:bg-secondary transition-all"
-            >
-              Register Another Player
-            </button>
+            {/* Success Banner */}
+            <div className="bg-primary/10 p-6 md:p-8 text-center border-b border-primary/15 flex flex-col items-center">
+              <CheckCircle className="w-16 h-16 text-primary mb-4 animate-bounce" />
+              <h3 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-foreground">
+                Registration Successful!
+              </h3>
+              <p className="text-muted-foreground text-sm mt-2">
+                Your entry has been recorded in the database.
+              </p>
+            </div>
+
+            <div className="p-6 md:p-8 space-y-8">
+              {/* COMPULSORY DOWNLOAD ALERT BOX */}
+              <div className="bg-destructive/15 border-2 border-destructive/30 rounded-xl p-5 flex items-start gap-4">
+                <div className="bg-destructive/20 p-2.5 rounded-lg text-destructive shrink-0">
+                  <ShieldAlert className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-display text-sm font-bold uppercase tracking-wider text-destructive mb-1">
+                    Compulsory Action Required
+                  </h4>
+                  <p className="text-xs text-foreground/90 font-medium leading-relaxed">
+                    You <strong className="text-destructive underline">MUST</strong> download the PDF invoice below. It acts as your entry ticket. You will be required to present this invoice (printed or digital copy) along with a valid Govt Photo ID at the venue for verification. Entry will be denied without it.
+                  </p>
+                </div>
+              </div>
+
+              {/* Invoice visual preview card */}
+              <div className="bg-secondary/15 rounded-xl border border-border/80 p-5 md:p-6 space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-border/50">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">
+                      Registration / Invoice ID
+                    </span>
+                    <h5 className="font-mono text-sm font-bold text-foreground">
+                      {successDetails.id}
+                    </h5>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground">Status:</span>
+                    <span className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full tracking-wider ${
+                      isPaid ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                    }`}>
+                      {successDetails.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                  {/* Left Column */}
+                  <div className="space-y-3">
+                    <h6 className="text-xs uppercase font-extrabold text-primary tracking-widest border-b border-border/20 pb-1">
+                      Participant Details
+                    </h6>
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Full Name</p>
+                      <p className="font-semibold text-foreground">{successDetails.playerName}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Contact Info</p>
+                      <p className="font-semibold text-foreground">{successDetails.phone}</p>
+                      <p className="text-xs text-muted-foreground">{successDetails.email}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Location</p>
+                      <p className="font-semibold text-foreground">{successDetails.city}, {successDetails.state}</p>
+                    </div>
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="space-y-3">
+                    <h6 className="text-xs uppercase font-extrabold text-primary tracking-widest border-b border-border/20 pb-1">
+                      Tournament Details
+                    </h6>
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Event Name</p>
+                      <p className="font-semibold text-foreground">{successDetails.tournamentTitle}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Category & Age Group</p>
+                      <p className="font-semibold text-foreground">
+                        {successDetails.category} — {successDetails.ageCategory}
+                      </p>
+                    </div>
+                    {successDetails.partnerName && (
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-xs">Partner Name</p>
+                        <p className="font-semibold text-foreground">{successDetails.partnerName}</p>
+                      </div>
+                    )}
+                    <div className="space-y-1">
+                      <p className="text-muted-foreground text-xs">Amount Paid</p>
+                      <p className="text-lg font-bold text-electric">{successDetails.amountPaid}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Policy Highlights section */}
+              <div className="border-t border-border/50 pt-6">
+                <h5 className="font-display text-sm font-bold uppercase tracking-wider text-foreground mb-4">
+                  Important Venue Guidelines & Policies
+                </h5>
+                <ul className="space-y-3 text-xs text-muted-foreground pl-1 list-none">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>ID Verification:</strong> Present the downloaded PDF invoice and a valid Govt ID card at the entry gate. No entry without it.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Reporting Time:</strong> Report at the registration desk 30 minutes before your scheduled match. Disqualification applies for 15+ min delay.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Refund Policy:</strong> All fees are strictly non-refundable and non-transferable, unless the event is cancelled.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Code of Conduct:</strong> Fair play rules apply. Chief referee decisions are final. Indoor courts require non-marking shoes.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-4 pt-4 border-t border-border/50">
+                <button
+                  type="button"
+                  onClick={() => downloadInvoicePDF(successDetails)}
+                  className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+                >
+                  <Download className="w-5 h-5 group-hover:translate-y-0.5 transition-transform" />
+                  Download Invoice PDF
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitted(false);
+                    setSuccessDetails(null);
+                    setFormData({
+                      playerName: "",
+                      phone: "",
+                      email: "",
+                      state: "",
+                      city: "",
+                    });
+                    setPartnerName("");
+                    setVerificationDoc(null);
+                    setStep(1);
+                  }}
+                  className="w-full py-3 bg-secondary/20 border border-border/40 text-foreground font-semibold rounded-lg text-sm uppercase tracking-wider hover:bg-secondary/40 transition-all cursor-pointer"
+                >
+                  Register Another Player
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
