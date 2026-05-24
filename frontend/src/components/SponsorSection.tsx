@@ -43,7 +43,7 @@ const SponsorSection = () => {
               Empower <span className="gradient-text">Athletes</span> & Elevate Your Brand
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              Join South India Sports Hub to elevate your brand presence across premier sporting events. We offer customizable sponsorship packages designed to maximize your ROI while supporting the next generation of champions.
+              Join South India Sports Association to elevate your brand presence across premier sporting events. We offer customizable sponsorship packages designed to maximize your ROI while supporting the next generation of champions.
             </p>
 
             <div className="space-y-6 mb-10">

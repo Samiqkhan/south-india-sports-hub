@@ -109,7 +109,7 @@ const SponsorRegistration = () => {
                   Become a <span className="gradient-text">Sponsor</span>
                 </h1>
                 <p className="text-muted-foreground text-lg">
-                  Join South India Sports Hub to elevate your brand presence across premier sporting events. Connect with thousands of athletes and spectators.
+                  Join South India Sports Association to elevate your brand presence across premier sporting events. Connect with thousands of athletes and spectators.
                 </p>
               </div>
 

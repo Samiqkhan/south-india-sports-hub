@@ -110,7 +110,7 @@ const ApplyTournament = () => {
               Apply to Host Your <span className="gradient-text">Tournament</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Fill out the form below to bring your game to the South India Sports Hub platform. We provide end-to-end
+              Fill out the form below to bring your game to the South India Sports Association platform. We provide end-to-end
               tournament management solutions.
             </p>
           </motion.div>

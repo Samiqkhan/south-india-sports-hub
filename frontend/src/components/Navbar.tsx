@@ -47,7 +47,7 @@ const Navbar = () => {
         </div>
       )}
 
-      <div className="container mx-auto flex items-center justify-between py-4">
+      <div className="container mx-auto flex items-center justify-between py-4 px-4 sm:px-6 md:px-8">
         <Link to="/" className="font-display text-xl md:text-2xl font-bold tracking-wider uppercase">
           <span className="gradient-text">SISA</span>
         </Link>
