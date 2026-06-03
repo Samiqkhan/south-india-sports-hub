@@ -713,7 +713,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const selectedFee = feeObj ? feeObj.fee : "₹0";
     const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
 
-    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=South%20India%20Sports%20Association&am=${amountVal}&cu=INR&tn=Chess%20Tournament%20Registration`;
+    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=VIGNESH%20G&am=${amountVal}&cu=INR`;
     const qrImageUrl = paymentConfig.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
     return (
