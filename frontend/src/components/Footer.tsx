@@ -26,6 +26,12 @@ const Footer = () => {
                   {link}
                 </a>
               ))}
+              <a
+                href="/terms"
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Terms & Conditions
+              </a>
               <a href="/sponsor" className="block text-sm text-accent hover:text-accent-foreground transition-colors font-semibold pt-2">
                 Become a Sponsor
               </a>
