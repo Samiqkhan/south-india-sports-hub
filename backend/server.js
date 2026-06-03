@@ -184,7 +184,7 @@ const initDb = async () => {
         VALUES ('current', ?, ?, NULL, ?, ?)
       `, [
         process.env.USE_RAZORPAY === 'true' ? 1 : 0,
-        process.env.UPI_ID || 'sihsports@okaxis',
+        process.env.UPI_ID || 'vigneshvicky87302@oksbi',
         process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
         process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
       ]);
@@ -401,7 +401,7 @@ async function getActivePaymentConfig() {
   }
   return {
     useRazorpay: process.env.USE_RAZORPAY === 'true',
-    upiId: process.env.UPI_ID || 'sihsports@okaxis',
+    upiId: process.env.UPI_ID || 'vigneshvicky87302@oksbi',
     qrCodeUrl: null,
     razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
