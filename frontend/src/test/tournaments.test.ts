@@ -43,7 +43,7 @@ describe("Tournaments Data Verification", () => {
     // Check player fees are defined for all categories
     expect(badminton?.playerFees?.length).toBe(10);
     badminton?.playerFees?.forEach((pf) => {
-      expect(pf.fee).toBe("₹400");
+      expect(pf.fee).toBe("₹800");
     });
   });
 });

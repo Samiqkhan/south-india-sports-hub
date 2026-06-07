@@ -888,10 +888,10 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-8 max-w-xl mx-auto text-center"
         >
-          <div className="glass-card p-6 border border-primary/20 bg-primary/5 rounded-xl glow-primary">
-            <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-semibold mb-2">Tournament Entry Fee</p>
-            <p className="text-4xl md:text-5xl font-bold text-primary font-display mb-2">{feeDisplay}</p>
-            <p className="text-[11px] sm:text-xs text-foreground font-semibold uppercase tracking-wider">{subtextDisplay}</p>
+          <div className="glass-card p-5 border border-border/80 bg-secondary/15 rounded-xl text-center">
+            <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-bold mb-1">Tournament Entry Fee</p>
+            <p className="text-3xl md:text-4xl font-bold text-foreground font-display mb-1">{feeDisplay}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">{subtextDisplay}</p>
           </div>
         </motion.div>
 
