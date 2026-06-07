@@ -143,4 +143,147 @@ export const tournaments: Tournament[] = [
       { ageCategory: "Open", category: "Girls & Boys Mixed", fee: "₹400" },
     ],
   },
+  {
+    slug: "tamilnadu-badminton-tournament-2026",
+    title: "Tamilnadu Badminton tournament 2026",
+    subtitle: "One Spirit. One Game. One Champion.",
+    sport: "Badminton",
+    status: "Upcoming",
+    date: "June 27 & 28, 2026",
+    venue: "SBM Shuttle Court, Sangagiri",
+    lastDateToRegister: "25.06.2026",
+    contactNumbers: ["90800 60483", "90923 85001"],
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=SBM+Sports+Academy+Sankagiri+Behind+Axis+Bank",
+    prize: "₹2,00,000 in Cash Prizes",
+    categories: "Girls Singles U9-U15, Boys Singles U7-U15 & Boys Open Singles",
+    description:
+      "🏸 One Spirit. One Game. One Champion! Join the premier Tamilnadu Badminton Tournament 2026. Compete against top talent across South India for awards, gear, and cash prizes from a massive ₹2,00,000 prize pool.",
+    registrationCategories: ["Girls Singles", "Boys Singles", "Boys Open Singles"],
+    ageCategories: ["U-7", "U-9", "U-11", "U-13", "U-15", "Open"],
+    rules: [
+      {
+        title: "1. Shuttle & Equipment",
+        content: "Feather Shuttle will be used. Participants must carry their own badminton rackets and equipment.",
+      },
+      {
+        title: "2. Age Verification",
+        content: "Age proof is mandatory. Players must produce a valid identity card/document during reporting.",
+      },
+      {
+        title: "3. Match Format",
+        content: "21 Points Knockout Format (Golden Point Rule) will be followed for all matches. Organizer/Umpire decision will be final.",
+      },
+      {
+        title: "4. Footwear & Gear",
+        content: "Only non-marking shoes are allowed on the court. Participants must wear appropriate sports attire.",
+      },
+      {
+        title: "5. Reporting Time",
+        content: "Players must report 15 minutes before their match time. Walkover will be given for late reporting.",
+      },
+      {
+        title: "6. Registrations & Payments",
+        content: "No spot registration is allowed. Only online payment accepted. Fixtures will be released prior to the tournament. The organizing committee reserves the right to modify fixtures if necessary.",
+      },
+    ],
+    rewards: [
+      {
+        level: "Girls Singles U-9",
+        prizes: [
+          { position: "Winner", reward: "₹2,026" },
+          { position: "Runner-up", reward: "₹1,026" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Girls Singles U-11",
+        prizes: [
+          { position: "Winner", reward: "₹2,026" },
+          { position: "Runner-up", reward: "₹1,026" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Girls Singles U-13",
+        prizes: [
+          { position: "Winner", reward: "₹2,026" },
+          { position: "Runner-up", reward: "₹1,026" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Girls Singles U-15",
+        prizes: [
+          { position: "Winner", reward: "₹2,026" },
+          { position: "Runner-up", reward: "₹1,026" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Boys Singles U-7",
+        prizes: [
+          { position: "Winner", reward: "RACKET" },
+          { position: "Runner-up", reward: "KIT BAG" },
+          { position: "Semi Finalists (2)", reward: "SKIPPING ROPE" },
+        ],
+      },
+      {
+        level: "Boys Singles U-9",
+        prizes: [
+          { position: "Winner", reward: "₹2,526" },
+          { position: "Runner-up", reward: "₹1,526" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Boys Singles U-11",
+        prizes: [
+          { position: "Winner", reward: "₹2,526" },
+          { position: "Runner-up", reward: "₹1,526" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Boys Singles U-13",
+        prizes: [
+          { position: "Winner", reward: "₹2,526" },
+          { position: "Runner-up", reward: "₹1,526" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Boys Singles U-15",
+        prizes: [
+          { position: "Winner", reward: "₹2,526" },
+          { position: "Runner-up", reward: "₹1,526" },
+          { position: "Semi Finalists (2)", reward: "₹526" },
+        ],
+      },
+      {
+        level: "Boys Open Singles",
+        prizes: [
+          { position: "Winner", reward: "₹5,026" },
+          { position: "Runner-up", reward: "₹3,026" },
+          { position: "Semi Finalists (2)", reward: "₹1,026" },
+        ],
+      },
+    ],
+    fees: [
+      { item: "Entry Fee", amount: "₹800" },
+      { item: "Shuttle & Court Fees", amount: "Included" },
+      { item: "Refreshments", amount: "Complimentary" },
+    ],
+    playerFees: [
+      { ageCategory: "U-9", category: "Girls Singles", fee: "₹800" },
+      { ageCategory: "U-11", category: "Girls Singles", fee: "₹800" },
+      { ageCategory: "U-13", category: "Girls Singles", fee: "₹800" },
+      { ageCategory: "U-15", category: "Girls Singles", fee: "₹800" },
+      { ageCategory: "U-7", category: "Boys Singles", fee: "₹800" },
+      { ageCategory: "U-9", category: "Boys Singles", fee: "₹800" },
+      { ageCategory: "U-11", category: "Boys Singles", fee: "₹800" },
+      { ageCategory: "U-13", category: "Boys Singles", fee: "₹800" },
+      { ageCategory: "U-15", category: "Boys Singles", fee: "₹800" },
+      { ageCategory: "Open", category: "Boys Open Singles", fee: "₹800" },
+    ],
+  },
 ];

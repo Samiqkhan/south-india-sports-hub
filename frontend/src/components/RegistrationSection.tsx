@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { CheckCircle, Upload, Download, FileText, AlertTriangle, ShieldAlert } from "lucide-react";
+import { CheckCircle, Upload, Download, FileText, AlertTriangle, ShieldAlert, Copy, Check, ExternalLink } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
 import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment, getPaymentConfig } from "@/lib/storage";
@@ -230,7 +230,8 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     doc.save(`SISA_Invoice_${details.id}.pdf`);
   };
   
-  const [paymentConfig, setPaymentConfig] = useState<any>({ useRazorpay: false, upiId: "sihsports@okaxis" });
+  const [paymentConfig, setPaymentConfig] = useState<any>({ useRazorpay: false, upiId: "vigneshvicky87302@oksbi" });
+  const [copied, setCopied] = useState(false);
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
   const [screenshotName, setScreenshotName] = useState<string>("");
   const [uploadError, setUploadError] = useState<string>("");
@@ -246,6 +247,16 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     };
     fetchConfig();
   }, []);
+
+  // Update default age and category when the tournament changes
+  useEffect(() => {
+    if (ageCategories.length > 0) {
+      setAge(ageCategories[0]);
+    }
+    if (categories.length > 0) {
+      setCategory(categories[0]);
+    }
+  }, [ageCategories, categories]);
 
   const [formData, setFormData] = useState({
     playerName: "",
@@ -528,9 +539,20 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
+  // Calculate dynamic fees
+  const currentFeeObj = playerFees.find(
+    (f) =>
+      f.category.toLowerCase() === category.toLowerCase() &&
+      f.ageCategory.toLowerCase() === age.toLowerCase()
+  );
+  const distinctFees = Array.from(new Set(playerFees.map(pf => pf.fee)));
+  const feeDisplay = distinctFees.length === 1 ? distinctFees[0] : (currentFeeObj ? currentFeeObj.fee : (distinctFees.length > 0 ? distinctFees.join(" - ") : "₹400"));
+  const subtextDisplay = distinctFees.length === 1 
+    ? "For All Categories & Age Groups" 
+    : `For Selected Category (${age} - ${category})`;
+
   if (submitted && successDetails) {
     const isPaid = successDetails.status.toLowerCase().includes("paid") || successDetails.status.toLowerCase().includes("success");
-    
     return (
       <section id="register" className="section-padding animate-fade-in" ref={ref}>
         <div className="container mx-auto max-w-2xl">
@@ -712,7 +734,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const selectedFee = feeObj ? feeObj.fee : "₹0";
     const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
 
-    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=SISA%20Sports%20Association&am=${amountVal}&cu=INR&tn=SISA%20Registration`;
+    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=VIGNESH%20G&am=${amountVal}&cu=INR`;
     const qrImageUrl = paymentConfig.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
     return (
@@ -725,19 +747,54 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           >
             <h3 className="font-display text-3xl font-bold uppercase">UPI Payment</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Scan the QR code using any UPI App (GPay, PhonePe, Paytm) to make the payment of <strong className="text-primary">{selectedFee}</strong>.
+              Pay using any UPI App (GPay, PhonePe, Paytm, BHIM) on your mobile device, or copy the UPI ID below for a manual transfer.
             </p>
 
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl max-w-[280px] mx-auto border border-border/80 shadow-md">
-              <img
-                src={qrImageUrl}
-                alt="UPI Payment QR Code"
-                className="w-full h-auto object-contain"
-              />
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-3">Scan to Pay</span>
+            <div className="space-y-5 max-w-sm mx-auto">
+              <div className="flex items-center justify-between p-4 bg-secondary/20 border border-border/60 rounded-xl shadow-inner relative group overflow-hidden">
+                <div className="text-left z-10">
+                  <span className="text-[9px] uppercase font-extrabold text-primary tracking-widest block mb-0.5">SISA Business UPI ID</span>
+                  <span className="font-mono text-sm font-bold text-foreground select-all">
+                    {paymentConfig.upiId}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(paymentConfig.upiId);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="z-10 p-2.5 hover:bg-secondary rounded-lg transition-all border border-border/30 hover:border-primary/50 flex items-center gap-1.5 text-xs font-semibold text-primary cursor-pointer active:scale-95"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-400">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy ID</span>
+                    </>
+                  )}
+                </button>
+                {/* Visual subtle reflection background overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+              </div>
+
+              <a
+                href={upiUrl}
+                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+              >
+                <ExternalLink className="w-5 h-5" />
+                Pay via UPI App
+              </a>
+
+              <p className="text-xs text-muted-foreground">
+                Payment Amount: <strong className="text-electric">{selectedFee}</strong>
+              </p>
             </div>
-
-
 
             <div className="text-left space-y-3 pt-4 border-t border-border/50">
               <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -831,10 +888,10 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-8 max-w-xl mx-auto text-center"
         >
-          <div className="glass-card p-6 border border-primary/20 bg-primary/5 rounded-xl glow-primary">
-            <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-semibold mb-2">Tournament Entry Fee</p>
-            <p className="text-4xl md:text-5xl font-bold text-primary font-display mb-2">₹400</p>
-            <p className="text-[11px] sm:text-xs text-foreground font-semibold uppercase tracking-wider">For All Categories & Age Groups</p>
+          <div className="glass-card p-5 border border-border/80 bg-secondary/15 rounded-xl text-center">
+            <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-bold mb-1">Tournament Entry Fee</p>
+            <p className="text-3xl md:text-4xl font-bold text-foreground font-display mb-1">{feeDisplay}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">{subtextDisplay}</p>
           </div>
         </motion.div>
 

@@ -184,7 +184,7 @@ const initDb = async () => {
         VALUES ('current', ?, ?, NULL, ?, ?)
       `, [
         process.env.USE_RAZORPAY === 'true' ? 1 : 0,
-        process.env.UPI_ID || 'sihsports@okaxis',
+        process.env.UPI_ID || 'vigneshvicky87302@oksbi',
         process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
         process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
       ]);
@@ -204,7 +204,17 @@ const initDb = async () => {
         ['gf-1', 'chess-tournament-2026', 'U-9', 'Girls & Boys Mixed', '₹400'],
         ['gf-2', 'chess-tournament-2026', 'U-12', 'Girls & Boys Mixed', '₹400'],
         ['gf-3', 'chess-tournament-2026', 'U-15', 'Girls & Boys Mixed', '₹400'],
-        ['gf-4', 'chess-tournament-2026', 'Open', 'Girls & Boys Mixed', '₹400']
+        ['gf-4', 'chess-tournament-2026', 'Open', 'Girls & Boys Mixed', '₹400'],
+        ['gf-b1', 'tamilnadu-badminton-tournament-2026', 'U-9', 'Girls Singles', '₹800'],
+        ['gf-b2', 'tamilnadu-badminton-tournament-2026', 'U-11', 'Girls Singles', '₹800'],
+        ['gf-b3', 'tamilnadu-badminton-tournament-2026', 'U-13', 'Girls Singles', '₹800'],
+        ['gf-b4', 'tamilnadu-badminton-tournament-2026', 'U-15', 'Girls Singles', '₹800'],
+        ['gf-b5', 'tamilnadu-badminton-tournament-2026', 'U-7', 'Boys Singles', '₹800'],
+        ['gf-b6', 'tamilnadu-badminton-tournament-2026', 'U-9', 'Boys Singles', '₹800'],
+        ['gf-b7', 'tamilnadu-badminton-tournament-2026', 'U-11', 'Boys Singles', '₹800'],
+        ['gf-b8', 'tamilnadu-badminton-tournament-2026', 'U-13', 'Boys Singles', '₹800'],
+        ['gf-b9', 'tamilnadu-badminton-tournament-2026', 'U-15', 'Boys Singles', '₹800'],
+        ['gf-b10', 'tamilnadu-badminton-tournament-2026', 'Open', 'Boys Open Singles', '₹800']
       ];
       for (const f of seedFees) {
         await pool.query(`
@@ -212,6 +222,31 @@ const initDb = async () => {
           (id, tournamentSlug, ageCategory, category, fee) 
           VALUES (?, ?, ?, ?, ?)
         `, f);
+      }
+    } else {
+      // Check if badminton fees specifically are missing, if so, seed them
+      const [badmintonFees] = await pool.query("SELECT COUNT(*) as count FROM game_fees WHERE tournamentSlug = 'tamilnadu-badminton-tournament-2026'");
+      if (badmintonFees[0].count === 0) {
+        console.log("Seeding badminton game fees...");
+        const badmintonSeed = [
+          ['gf-b1', 'tamilnadu-badminton-tournament-2026', 'U-9', 'Girls Singles', '₹800'],
+          ['gf-b2', 'tamilnadu-badminton-tournament-2026', 'U-11', 'Girls Singles', '₹800'],
+          ['gf-b3', 'tamilnadu-badminton-tournament-2026', 'U-13', 'Girls Singles', '₹800'],
+          ['gf-b4', 'tamilnadu-badminton-tournament-2026', 'U-15', 'Girls Singles', '₹800'],
+          ['gf-b5', 'tamilnadu-badminton-tournament-2026', 'U-7', 'Boys Singles', '₹800'],
+          ['gf-b6', 'tamilnadu-badminton-tournament-2026', 'U-9', 'Boys Singles', '₹800'],
+          ['gf-b7', 'tamilnadu-badminton-tournament-2026', 'U-11', 'Boys Singles', '₹800'],
+          ['gf-b8', 'tamilnadu-badminton-tournament-2026', 'U-13', 'Boys Singles', '₹800'],
+          ['gf-b9', 'tamilnadu-badminton-tournament-2026', 'U-15', 'Boys Singles', '₹800'],
+          ['gf-b10', 'tamilnadu-badminton-tournament-2026', 'Open', 'Boys Open Singles', '₹800']
+        ];
+        for (const f of badmintonSeed) {
+          await pool.query(`
+            INSERT INTO game_fees 
+            (id, tournamentSlug, ageCategory, category, fee) 
+            VALUES (?, ?, ?, ?, ?)
+          `, f);
+        }
       }
     }
   } catch (error) {
@@ -401,7 +436,7 @@ async function getActivePaymentConfig() {
   }
   return {
     useRazorpay: process.env.USE_RAZORPAY === 'true',
-    upiId: process.env.UPI_ID || 'sihsports@okaxis',
+    upiId: process.env.UPI_ID || 'vigneshvicky87302@oksbi',
     qrCodeUrl: null,
     razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Ssqkj7T7DivUDd',
     razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || 'MgmaWgJ3niZglmQ3Q338DuQ7'
