@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
@@ -18,7 +18,9 @@ import {
   Phone,
   Calendar,
   AlertTriangle,
-  Upload
+  Upload,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -60,6 +62,7 @@ const AdminPanel = () => {
   const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
   const [editFeeValue, setEditFeeValue] = useState("");
   const [isSavingFee, setIsSavingFee] = useState(false);
+  const [expandedTournaments, setExpandedTournaments] = useState<string[]>([]);
 
   // Payment settings state
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({
@@ -1067,69 +1070,110 @@ const AdminPanel = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/20">
-                    {filteredGameFees.length > 0 ? (
-                      filteredGameFees.map((fee) => (
-                        <tr key={fee.id} className="hover:bg-secondary/10 transition-colors">
-                          <td className="p-4 font-semibold text-foreground uppercase tracking-wider text-xs">
-                            {fee.tournamentSlug.replace(/-/g, " ")}
-                          </td>
-                          <td className="p-4 text-foreground font-medium uppercase tracking-widest text-xs">
-                            {fee.ageCategory}
-                          </td>
-                          <td className="p-4 text-xs text-muted-foreground">
-                            {fee.category}
-                          </td>
-                          <td className="p-4 text-center font-bold text-electric">
-                            {editingFeeId === fee.id ? (
-                              <input
-                                type="text"
-                                value={editFeeValue}
-                                onChange={(e) => setEditFeeValue(e.target.value)}
-                                className="w-24 px-2 py-1 bg-background border border-primary/50 rounded text-foreground font-semibold focus:outline-none text-center"
-                                placeholder="₹400"
-                              />
-                            ) : (
-                              fee.fee
-                            )}
-                          </td>
-                          <td className="p-4 text-center">
-                            {editingFeeId === fee.id ? (
-                              <div className="flex justify-center gap-2">
-                                <button
-                                  onClick={() => handleUpdateFee(fee.id)}
-                                  disabled={isSavingFee}
-                                  className="px-3 py-1 bg-primary text-primary-foreground font-bold text-xs rounded hover:brightness-110 disabled:opacity-50"
-                                >
-                                  {isSavingFee ? "Saving..." : "Save"}
-                                </button>
-                                <button
-                                  onClick={() => setEditingFeeId(null)}
-                                  className="px-3 py-1 bg-secondary/30 text-foreground font-semibold text-xs rounded hover:bg-secondary/50"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  setEditingFeeId(fee.id);
-                                  setEditFeeValue(fee.fee);
-                                }}
-                                className="px-3 py-1.5 border border-primary/20 hover:border-primary text-primary hover:bg-primary/10 rounded font-semibold text-xs uppercase tracking-wider transition-all"
-                              >
-                                Edit Fee
-                              </button>
-                            )}
+                    {(() => {
+                      const groupedFees = filteredGameFees.reduce((acc, fee) => {
+                        if (!acc[fee.tournamentSlug]) acc[fee.tournamentSlug] = [];
+                        acc[fee.tournamentSlug].push(fee);
+                        return acc;
+                      }, {} as Record<string, typeof filteredGameFees>);
+
+                      const toggleTournament = (slug: string) => {
+                        setExpandedTournaments(prev => 
+                          prev.includes(slug) ? prev.filter(t => t !== slug) : [...prev, slug]
+                        );
+                      };
+
+                      return Object.keys(groupedFees).length > 0 ? (
+                        Object.entries(groupedFees).map(([slug, fees]) => (
+                          <Fragment key={slug}>
+                            {/* Tournament Header Row */}
+                            <tr 
+                              className="bg-secondary/20 hover:bg-secondary/40 cursor-pointer border-b border-border/50"
+                              onClick={() => toggleTournament(slug)}
+                            >
+                              <td colSpan={5} className="p-4">
+                                <div className="flex items-center gap-3">
+                                  {expandedTournaments.includes(slug) ? (
+                                    <ChevronDown className="w-5 h-5 text-primary" />
+                                  ) : (
+                                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                                  )}
+                                  <span className="font-display font-bold uppercase tracking-wider text-sm text-foreground">
+                                    {slug.replace(/-/g, " ")}
+                                  </span>
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
+                                    {fees.length} items
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                            
+                            {/* Expanded Fee Rows */}
+                            {expandedTournaments.includes(slug) && fees.map((fee) => (
+                              <tr key={fee.id} className="hover:bg-secondary/10 transition-colors bg-background/30">
+                                <td className="p-4 pl-12 text-muted-foreground/50 font-medium uppercase tracking-widest text-[10px]">
+                                  ↳ Sub-Category
+                                </td>
+                                <td className="p-4 text-foreground font-medium uppercase tracking-widest text-xs">
+                                  {fee.ageCategory}
+                                </td>
+                                <td className="p-4 text-xs text-muted-foreground">
+                                  {fee.category}
+                                </td>
+                                <td className="p-4 text-center font-bold text-electric">
+                                  {editingFeeId === fee.id ? (
+                                    <input
+                                      type="text"
+                                      value={editFeeValue}
+                                      onChange={(e) => setEditFeeValue(e.target.value)}
+                                      className="w-24 px-2 py-1 bg-background border border-primary/50 rounded text-foreground font-semibold focus:outline-none text-center"
+                                      placeholder="₹400"
+                                    />
+                                  ) : (
+                                    fee.fee
+                                  )}
+                                </td>
+                                <td className="p-4 text-center">
+                                  {editingFeeId === fee.id ? (
+                                    <div className="flex justify-center gap-2">
+                                      <button
+                                        onClick={() => handleUpdateFee(fee.id)}
+                                        disabled={isSavingFee}
+                                        className="px-3 py-1 bg-primary text-primary-foreground font-bold text-xs rounded hover:brightness-110 disabled:opacity-50"
+                                      >
+                                        {isSavingFee ? "Saving..." : "Save"}
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingFeeId(null)}
+                                        className="px-3 py-1 bg-secondary/30 text-foreground font-semibold text-xs rounded hover:bg-secondary/50"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => {
+                                        setEditingFeeId(fee.id);
+                                        setEditFeeValue(fee.fee);
+                                      }}
+                                      className="px-3 py-1.5 border border-primary/20 hover:border-primary text-primary hover:bg-primary/10 rounded font-semibold text-xs uppercase tracking-wider transition-all"
+                                    >
+                                      Edit Fee
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </Fragment>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="p-12 text-center text-muted-foreground">
+                            No game pricing entries found matching search.
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="p-12 text-center text-muted-foreground">
-                          No game pricing entries found matching search.
-                        </td>
-                      </tr>
-                    )}
+                      );
+                    })()}
                   </tbody>
                 </table>
               )}
