@@ -1,0 +1,15 @@
+{
+  "name": "south-india-sports-hub-root",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "npm install --prefix backend",
+    "install:frontend": "npm install --prefix frontend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix frontend"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
