@@ -401,6 +401,17 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     reader.readAsDataURL(file);
   };
 
+  const getSelectedFee = () => {
+    const feeObj = playerFees.find(
+      (f) =>
+        f.category.toLowerCase() === category.toLowerCase() &&
+        f.ageCategory.toLowerCase() === age.toLowerCase()
+    );
+    if (feeObj) return feeObj.fee;
+    if (playerFees && playerFees.length > 0) return playerFees[0].fee;
+    return "₹400"; // Fallback fee
+  };
+
   const handleQrSubmit = async () => {
     if (!screenshotBase64) {
       setUploadError("Please upload your payment screenshot before submitting.");
@@ -409,12 +420,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
 
     setIsProcessing(true);
 
-    const feeObj = playerFees.find(
-      (f) =>
-        f.category.toLowerCase() === category.toLowerCase() &&
-        f.ageCategory.toLowerCase() === age.toLowerCase()
-    );
-    const selectedFee = feeObj ? feeObj.fee : "₹0";
+    const selectedFee = getSelectedFee();
 
     try {
       const result = await addPlayerRegistration({
@@ -460,75 +466,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Find amount
-    const feeObj = playerFees.find(
-      (f) =>
-        f.category.toLowerCase() === category.toLowerCase() &&
-        f.ageCategory.toLowerCase() === age.toLowerCase()
-    );
-    const selectedFee = feeObj ? feeObj.fee : "₹0";
-
-    const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
-    const amountInPaise = isNaN(amountVal) ? 0 : amountVal * 100;
-
-    if (amountInPaise === 0) {
-      // Free registration, save directly without payment
-      setIsProcessing(true);
-      try {
-        const result = await addPlayerRegistration({
-          playerName: formData.playerName,
-          phone: formData.phone,
-          email: formData.email,
-          state: formData.state,
-          city: formData.city,
-          ageCategory: age,
-          category: category,
-          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
-          tournamentTitle: tournamentTitle,
-          amountPaid: selectedFee,
-          status: 'Paid',
-        });
-        if (result) {
-          setSuccessDetails({
-            id: result.id,
-            playerName: result.playerName,
-            phone: result.phone,
-            email: result.email,
-            state: result.state,
-            city: result.city,
-            ageCategory: result.ageCategory,
-            category: result.category,
-            partnerName: result.partnerName,
-            tournamentTitle: result.tournamentTitle,
-            amountPaid: result.amountPaid,
-            status: 'Success',
-            date: result.date,
-          });
-          setSubmitted(true);
-        }
-      } catch (err) {
-        console.error(err);
-        setSuccessDetails({
-          id: `pr-free-${Date.now()}`,
-          playerName: formData.playerName,
-          phone: formData.phone,
-          email: formData.email,
-          state: formData.state,
-          city: formData.city,
-          ageCategory: age,
-          category: category,
-          partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
-          tournamentTitle: tournamentTitle,
-          amountPaid: selectedFee,
-          status: 'Success',
-          date: new Date().toISOString(),
-        });
-        setSubmitted(true);
-      } finally {
-        setIsProcessing(false);
-      }
-      return;
-    }
+    const selectedFee = getSelectedFee();
 
     if (paymentConfig.useRazorpay) {
       await handlePayment(selectedFee);
@@ -726,12 +664,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   }
 
   if (step === 2 && !submitted) {
-    const feeObj = playerFees.find(
-      (f) =>
-        f.category.toLowerCase() === category.toLowerCase() &&
-        f.ageCategory.toLowerCase() === age.toLowerCase()
-    );
-    const selectedFee = feeObj ? feeObj.fee : "₹0";
+    const selectedFee = getSelectedFee();
     const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
 
     const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=VIGNESH%20G&am=${amountVal}&cu=INR`;
