@@ -747,54 +747,21 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           >
             <h3 className="font-display text-3xl font-bold uppercase">UPI Payment</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Pay using any UPI App (GPay, PhonePe, Paytm, BHIM) on your mobile device, or copy the UPI ID below for a manual transfer.
+              Scan the QR code below using any UPI App (GPay, PhonePe, Paytm, BHIM) on your mobile device to complete the payment.
             </p>
 
-            <div className="space-y-5 max-w-sm mx-auto">
-              <div className="flex items-center justify-between p-4 bg-secondary/20 border border-border/60 rounded-xl shadow-inner relative group overflow-hidden">
-                <div className="text-left z-10">
-                  <span className="text-[9px] uppercase font-extrabold text-primary tracking-widest block mb-0.5">SISA Business UPI ID</span>
-                  <span className="font-mono text-sm font-bold text-foreground select-all">
-                    {paymentConfig.upiId}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(paymentConfig.upiId);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  className="z-10 p-2.5 hover:bg-secondary rounded-lg transition-all border border-border/30 hover:border-primary/50 flex items-center gap-1.5 text-xs font-semibold text-primary cursor-pointer active:scale-95"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy ID</span>
-                    </>
-                  )}
-                </button>
-                {/* Visual subtle reflection background overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-              </div>
-
-              <a
-                href={upiUrl}
-                className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg text-lg uppercase tracking-wider glow-primary hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-              >
-                <ExternalLink className="w-5 h-5" />
-                Pay via UPI App
-              </a>
-
-              <p className="text-xs text-muted-foreground">
-                Payment Amount: <strong className="text-electric">{selectedFee}</strong>
-              </p>
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl max-w-[280px] mx-auto border border-border/80 shadow-md">
+              <img
+                src={qrImageUrl}
+                alt="UPI Payment QR Code"
+                className="w-full h-auto object-contain"
+              />
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-3">Scan to Pay</span>
             </div>
+
+            <p className="text-xs text-muted-foreground mt-4 mb-2">
+              Payment Amount: <strong className="text-electric">{selectedFee}</strong>
+            </p>
 
             <div className="text-left space-y-3 pt-4 border-t border-border/50">
               <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground">
