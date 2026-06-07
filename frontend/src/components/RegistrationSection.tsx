@@ -248,6 +248,16 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     fetchConfig();
   }, []);
 
+  // Update default age and category when the tournament changes
+  useEffect(() => {
+    if (ageCategories.length > 0) {
+      setAge(ageCategories[0]);
+    }
+    if (categories.length > 0) {
+      setCategory(categories[0]);
+    }
+  }, [ageCategories, categories]);
+
   const [formData, setFormData] = useState({
     playerName: "",
     phone: "",
@@ -529,9 +539,20 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
 
   const cities = formData.state ? SOUTH_INDIA_LOCATIONS[formData.state as SouthIndiaState] : [];
 
+  // Calculate dynamic fees
+  const currentFeeObj = playerFees.find(
+    (f) =>
+      f.category.toLowerCase() === category.toLowerCase() &&
+      f.ageCategory.toLowerCase() === age.toLowerCase()
+  );
+  const distinctFees = Array.from(new Set(playerFees.map(pf => pf.fee)));
+  const feeDisplay = distinctFees.length === 1 ? distinctFees[0] : (currentFeeObj ? currentFeeObj.fee : (distinctFees.length > 0 ? distinctFees.join(" - ") : "₹400"));
+  const subtextDisplay = distinctFees.length === 1 
+    ? "For All Categories & Age Groups" 
+    : `For Selected Category (${age} - ${category})`;
+
   if (submitted && successDetails) {
     const isPaid = successDetails.status.toLowerCase().includes("paid") || successDetails.status.toLowerCase().includes("success");
-    
     return (
       <section id="register" className="section-padding animate-fade-in" ref={ref}>
         <div className="container mx-auto max-w-2xl">
@@ -869,8 +890,8 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
         >
           <div className="glass-card p-6 border border-primary/20 bg-primary/5 rounded-xl glow-primary">
             <p className="text-muted-foreground uppercase tracking-widest text-[10px] md:text-xs font-semibold mb-2">Tournament Entry Fee</p>
-            <p className="text-4xl md:text-5xl font-bold text-primary font-display mb-2">₹400</p>
-            <p className="text-[11px] sm:text-xs text-foreground font-semibold uppercase tracking-wider">For All Categories & Age Groups</p>
+            <p className="text-4xl md:text-5xl font-bold text-primary font-display mb-2">{feeDisplay}</p>
+            <p className="text-[11px] sm:text-xs text-foreground font-semibold uppercase tracking-wider">{subtextDisplay}</p>
           </div>
         </motion.div>
 
