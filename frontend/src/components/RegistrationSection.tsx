@@ -1,10 +1,11 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { CheckCircle, Upload, Download, FileText, AlertTriangle, ShieldAlert, Copy, Check, ExternalLink } from "lucide-react";
+import { CheckCircle, Upload, Download, FileText, AlertTriangle, ShieldAlert, Copy, Check, ExternalLink, Play } from "lucide-react";
 import { PlayerFee } from "@/data/tournaments";
 import { SOUTH_INDIA_LOCATIONS, SouthIndiaState } from "@/data/locations";
 import { addPlayerRegistration, createRazorpayOrder, verifyRazorpayPayment, getPaymentConfig } from "@/lib/storage";
 import { jsPDF } from "jspdf";
+import { useToast } from "@/components/ui/use-toast";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -39,6 +40,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
   const [age, setAge] = useState(ageCategories[0] || "");
   const [category, setCategory] = useState(categories[0] || "");
   const [partnerName, setPartnerName] = useState("");
+  const { toast } = useToast();
   const [verificationDoc, setVerificationDoc] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -265,6 +267,16 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     state: "" as SouthIndiaState | "",
     city: "",
   });
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(paymentConfig.upiId || "sihsports@okaxis");
+    setCopied(true);
+    toast({
+      title: "UPI ID Copied!",
+      description: `Copied: ${paymentConfig.upiId || "sihsports@okaxis"}`,
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -667,23 +679,74 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     const selectedFee = getSelectedFee();
     const amountVal = parseInt(selectedFee.replace(/[^\d]/g, ""), 10);
 
-    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=VIGNESH%20G&am=${amountVal}&cu=INR`;
+    const upiUrl = `upi://pay?pa=${paymentConfig.upiId}&pn=Vignesh%20i3&am=${amountVal}&cu=INR`;
     const qrImageUrl = paymentConfig.qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
     return (
-      <section id="register" className="section-padding" ref={ref}>
-        <div className="container mx-auto max-w-xl text-center">
+      <section id="register" className="section-padding animate-fade-in" ref={ref}>
+        <div className="container mx-auto max-w-xl">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-card p-8 md:p-12 space-y-6"
+            className="glass-card p-6 md:p-10 space-y-6 text-left"
           >
-            <h3 className="font-display text-3xl font-bold uppercase">UPI Payment</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Scan the QR code below using any UPI App (GPay, PhonePe, Paytm, BHIM) on your mobile device to complete the payment.
-            </p>
+            <div className="text-center space-y-2">
+              <h3 className="font-display text-3xl font-bold uppercase tracking-wide">UPI Payment</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+                Follow the steps below to make the payment of <strong className="text-primary">{selectedFee}</strong> and complete your registration.
+              </p>
+            </div>
 
-            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl max-w-[280px] mx-auto border border-border/80 shadow-md">
+            {/* Step-by-Step Payment Instructions */}
+            <div className="space-y-4 pt-2">
+              <h4 className="text-xs font-extrabold uppercase tracking-widest text-primary border-b border-border/30 pb-2">
+                Payment Steps
+              </h4>
+              
+              <div className="space-y-4 text-sm">
+                {/* Step 1 */}
+                <div className="flex gap-3.5 items-start">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-semibold text-foreground">Scan QR Code or Copy UPI ID</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Scan the QR code below using any UPI App (GPay, PhonePe, Paytm, BHIM) or click the copy icon to copy our UPI ID.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex gap-3.5 items-start">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-semibold text-foreground">Make the Payment</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Enter the payment amount <strong className="text-primary">{selectedFee}</strong>. The payee name in your app will show as <strong className="text-foreground">"Vignesh i3"</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex gap-3.5 items-start">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-semibold text-foreground">Upload Screenshot & Submit</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      After payment, take a screenshot of the confirmation page and upload it below. Our team will verify the payment and book your slot.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* QR Code Section */}
+            <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl max-w-[260px] mx-auto border border-border/80 shadow-md mt-6">
               <img
                 src={qrImageUrl}
                 alt="UPI Payment QR Code"
@@ -692,11 +755,49 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
               <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-3">Scan to Pay</span>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-4 mb-2">
-              Payment Amount: <strong className="text-electric">{selectedFee}</strong>
-            </p>
+            {/* Copy UPI ID Box */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground text-center">
+                Or Copy UPI ID
+              </label>
+              <div className="flex items-center justify-between p-3 bg-secondary/35 border border-border rounded-xl max-w-[320px] mx-auto w-full">
+                <span className="font-mono text-xs font-semibold select-all truncate text-foreground pr-2">
+                  {paymentConfig.upiId || "sihsports@okaxis"}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyUpi}
+                  className="text-primary hover:text-white p-1.5 rounded-lg bg-secondary/80 hover:bg-primary transition-colors flex items-center justify-center shrink-0"
+                  title="Copy UPI ID"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
 
-            <div className="text-left space-y-3 pt-4 border-t border-border/50">
+            {/* Tutorial Video Section */}
+            <div className="bg-secondary/15 rounded-xl border border-border/80 p-4 space-y-3 mt-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+                <Play className="w-3.5 h-3.5 animate-pulse" /> Watch Tutorial: How to Pay
+              </h4>
+              <div className="aspect-video w-full rounded-lg overflow-hidden border border-border bg-black relative">
+                <video
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                  poster="https://images.unsplash.com/photo-1563013544-824ae1d704d3?auto=format&fit=crop&q=80&w=800"
+                >
+                  <source src="https://assets.mixkit.co/videos/preview/mixkit-paying-with-a-smartphone-at-a-terminal-close-up-40332-large.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
+                Watch the guide above for a step-by-step visual demonstration on how to pay via QR or UPI ID and complete your slot booking.
+              </p>
+            </div>
+
+            {/* Screenshot Upload Form */}
+            <div className="space-y-3 pt-4 border-t border-border/50">
               <label className="block text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 Upload Payment Screenshot <span className="text-primary">*</span>
               </label>
