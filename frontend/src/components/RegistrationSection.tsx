@@ -101,12 +101,12 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     })}`, 125, 73);
 
     // Status Badge background and text
-    doc.setFillColor(220, 252, 231); // green-100
+    doc.setFillColor(254, 243, 199); // amber-100
     doc.rect(125, 78, 48, 8, "F");
-    doc.setTextColor(21, 128, 61); // green-700
+    doc.setTextColor(180, 83, 9); // amber-700
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("STATUS: SUCCESS", 127, 83.5);
+    doc.text("STATUS: PENDING", 127, 83.5);
 
     // Horizontal Separator
     doc.setDrawColor(226, 232, 240); // slate-200
@@ -341,7 +341,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                 partnerName: category.toLowerCase().includes("doubles") ? partnerName : undefined,
                 tournamentTitle: tournamentTitle,
                 amountPaid: amount,
-                status: 'Success',
+                status: 'Pending',
                 date: new Date().toISOString(),
                 razorpayPaymentId: response.razorpay_payment_id,
               });
@@ -450,7 +450,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
           partnerName: result.partnerName,
           tournamentTitle: result.tournamentTitle,
           amountPaid: result.amountPaid,
-          status: 'Success',
+          status: 'Pending',
           date: result.date,
         });
         setSubmitted(true);
