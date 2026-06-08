@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="font-display text-2xl font-bold uppercase gradient-text mb-3">SISA</h3>
+            <img src="/logo.png" alt="SISA Logo" className="h-10 w-auto object-contain mb-3" />
             <p className="text-muted-foreground text-sm leading-relaxed">
               South India Sports Association — Promoting competitive sports excellence across South India.
             </p>
