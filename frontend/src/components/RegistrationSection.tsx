@@ -106,7 +106,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
     doc.setTextColor(180, 83, 9); // amber-700
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("STATUS: PENDING", 127, 83.5);
+    doc.text("APPROVAL STATUS: PENDING", 127, 83.5);
 
     // Horizontal Separator
     doc.setDrawColor(226, 232, 240); // slate-200
@@ -539,7 +539,7 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                     </h5>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-muted-foreground">Status:</span>
+                    <span className="text-xs font-semibold text-muted-foreground">Approval Status:</span>
                     <span className={`px-3 py-1 text-xs font-extrabold uppercase rounded-full tracking-wider ${
                       isPaid ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
                     }`}>
