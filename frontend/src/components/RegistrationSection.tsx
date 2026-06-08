@@ -35,6 +35,7 @@ interface RegistrationSectionProps {
 
 const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories = [], playerFees = [] }: RegistrationSectionProps) => {
   const ref = useRef(null);
+  const isFirstMount = useRef(true);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const [submitted, setSubmitted] = useState(false);
   const [age, setAge] = useState(ageCategories[0] || "");
@@ -259,6 +260,18 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
       setCategory(categories[0]);
     }
   }, [ageCategories, categories]);
+
+  // Scroll to the top of the form when step or submission state changes
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    const element = document.getElementById("register");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [step, submitted]);
 
   const [formData, setFormData] = useState({
     playerName: "",
@@ -944,7 +957,6 @@ const RegistrationSection = ({ tournamentTitle, categories = [], ageCategories =
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="you@example.com"
-                  required
                   className="w-full px-4 py-3 bg-secondary/50 border border-border rounded-lg text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all font-body"
                 />
               </div>

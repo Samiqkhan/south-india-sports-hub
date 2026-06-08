@@ -34,9 +34,9 @@ const Navbar = () => {
       {isHome && (
         <div className="bg-gradient-to-r from-primary via-electric to-accent text-white text-center py-2 px-4 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider relative flex items-center justify-center group overflow-hidden w-full">
           <div className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 max-w-full text-center">
-            <span>🏆 SISA Chess Tournament 2026 registration is live!</span>
+            <span>🏆 Tamilnadu Badminton Tournament 2026 registration is live!</span>
             <Link
-              to="/tournament/chess-tournament-2026"
+              to="/tournament/tamilnadu-badminton-tournament-2026"
               className="underline hover:text-white/80 transition-colors uppercase tracking-widest font-bold inline-flex items-center gap-1"
             >
               Click here to redirect →
