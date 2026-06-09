@@ -57,6 +57,10 @@ const TournamentDetail = () => {
     details.push({ icon: Clock, label: "Last Date to Register", value: tournament.lastDateToRegister });
   }
 
+  if (tournament.reportingTime) {
+    details.push({ icon: Clock, label: "Reporting Time", value: tournament.reportingTime });
+  }
+
   if (tournament.contactNumbers && tournament.contactNumbers.length > 0) {
     details.push({ icon: Phone, label: "Contact Numbers", value: tournament.contactNumbers.join(", ") });
   }

@@ -50,6 +50,7 @@ export interface Tournament {
   lastDateToRegister?: string;
   contactNumbers?: string[];
   mapUrl?: string;
+  reportingTime?: string;
 }
 
 export const tournaments: Tournament[] = [
@@ -205,6 +206,7 @@ export const tournaments: Tournament[] = [
     date: "June 26, 2026",
     venue: "SBM SHUTTLE COURT, 18D6, Settia Gounder Complex, Axis bank, Bhavani Main road, Sankagiri, Salem 6377301, Tamilnadu",
     lastDateToRegister: "25.06.2026",
+    reportingTime: "9:00 AM",
     contactNumbers: ["90800 60483", "9092385001"],
     mapUrl: "https://www.google.com/maps/search/?api=1&query=SBM+SHUTTLE+COURT+18D6+Settia+Gounder+Complex+Axis+bank+Bhavani+Main+road+Sankagiri+Salem+6377301+Tamilnadu",
     prize: "Over ₹13,000 in Prizes",
@@ -238,6 +240,11 @@ export const tournaments: Tournament[] = [
         title: "5. Arbiter Decisions",
         content:
           "The decision of the Chief Arbiter is final and binding on all participants. Any appeal must be made in writing within 15 minutes of the end of the round with an appeal fee.",
+      },
+      {
+        title: "6. Reporting Time",
+        content:
+          "All participants must report at the registration desk by 9:00 AM. The first round of the tournament will commence shortly after.",
       },
     ],
     rewards: [
