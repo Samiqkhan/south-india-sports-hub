@@ -10,9 +10,11 @@ const HeroSection = () => {
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-electric/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "0.5s" }} />
         
-        {/* Shuttle SVGs floating */}
-        <div className="absolute top-1/4 right-1/4 text-primary/20 animate-shuttle-float text-6xl">🏸</div>
-        <div className="absolute bottom-1/3 left-1/5 text-electric/20 animate-shuttle-float text-4xl" style={{ animationDelay: "1.5s" }}>🏸</div>
+        {/* Floating icons (Badminton & Chess) */}
+        <div className="absolute top-1/4 right-1/4 text-primary/20 animate-shuttle-float text-6xl select-none">🏸</div>
+        <div className="absolute bottom-1/3 left-1/5 text-electric/20 animate-shuttle-float text-4xl select-none" style={{ animationDelay: "1.5s" }}>🏸</div>
+        <div className="absolute top-1/3 left-1/4 text-accent/20 animate-shuttle-float text-5xl select-none" style={{ animationDelay: "0.7s" }}>♞</div>
+        <div className="absolute bottom-1/4 right-1/5 text-primary/25 animate-shuttle-float text-5xl select-none" style={{ animationDelay: "2.2s" }}>♟️</div>
 
         {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
