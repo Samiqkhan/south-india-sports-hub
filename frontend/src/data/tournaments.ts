@@ -203,10 +203,10 @@ export const tournaments: Tournament[] = [
     sport: "Chess",
     status: "Upcoming",
     date: "June 26, 2026",
-    venue: "Sankagiri, Salem",
+    venue: "SBM SHUTTLE COURT, 18D6, Settia Gounder Complex, Axis bank, Bhavani Main road, Sankagiri, Salem 6377301, Tamilnadu",
     lastDateToRegister: "25.06.2026",
     contactNumbers: ["90800 60483", "9092385001"],
-    mapUrl: "https://maps.app.goo.gl/or4cBwn3ir3sEKJq5",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=SBM+SHUTTLE+COURT+18D6+Settia+Gounder+Complex+Axis+bank+Bhavani+Main+road+Sankagiri+Salem+6377301+Tamilnadu",
     prize: "Over ₹13,000 in Prizes",
     categories: "U9, U12, U15 & Open (Mixed)",
     description:

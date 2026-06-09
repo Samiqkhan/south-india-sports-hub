@@ -111,7 +111,7 @@ const TournamentDetail = () => {
                     >
                       <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-electric mx-auto mb-1.5 sm:mb-2" />
                       <p className="text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider mb-1">{item.label}</p>
-                      <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground truncate">{item.value}</p>
+                      <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground truncate" title={item.value}>{item.value}</p>
                       <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <span className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-widest mt-12 bg-background/80 px-2 py-0.5 rounded backdrop-blur flex items-center gap-1">
                           View on Maps <ExternalLink className="w-3 h-3" />
@@ -128,7 +128,7 @@ const TournamentDetail = () => {
                   >
                     <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-electric mx-auto mb-1.5 sm:mb-2" />
                     <p className="text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider mb-1">{item.label}</p>
-                    <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground break-words">{item.value}</p>
+                    <p className="font-semibold text-xs sm:text-sm md:text-base text-foreground break-words" title={item.value}>{item.value}</p>
                   </div>
                 );
               })}
