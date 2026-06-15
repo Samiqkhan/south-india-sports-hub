@@ -82,7 +82,7 @@ export const tournaments: Tournament[] = [
         { name: "Mr. Pradeep", company: "RKS Transports", photo: "/sponsors/rks_transport.png", subText: "3rd Winner Trophy Sponsor", phone: "9865728777", prizeValue: "₹8,000" }
       ],
       cashPrize: [
-        { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/elite_sports.png", subText: "Cash Sponsor", phone: "9443292058" },
+        { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/krn_transport.png", subText: "Cash Sponsor", phone: "9443292058" },
         { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/apex_sports.png", subText: "Cash Sponsor" },
         { name: "Vijay", company: "Vetri Xerox", photo: "/sponsors/salem_badminton.png", subText: "Cash Sponsor", phone: "9788622771" },
         { name: "Anand", company: "Ampere Electric Scooty - Sankagiri", photo: "/sponsors/prime_fitness.png", subText: "Cash Sponsor", phone: "9952823987" },
