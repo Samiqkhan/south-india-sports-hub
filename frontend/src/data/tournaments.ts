@@ -84,14 +84,14 @@ export const tournaments: Tournament[] = [
       cashPrize: [
         { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/krn_transport.png", subText: "Cash Sponsor", phone: "9443292058" },
         { name: "Vijay", company: "Vetri Xerox", photo: "/sponsors/vetri_xerox.jpg", subText: "Cash Sponsor", phone: "9788622771" },
+        { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/simon_road_lines.png", subText: "Cash Sponsor" },
         { name: "Anand", company: "Ampere Electric Scooty - Sankagiri", photo: "/sponsors/ampere_scooty.png", subText: "Cash Sponsor", phone: "9952823987" },
         { name: "Suresh", company: "Photographer - Sankagiri", photo: "/sponsors/suresh_photographer.png", subText: "Cash Sponsor", phone: "9688821200" },
         { name: "Nandha", company: "RV Surgical", photo: "/sponsors/nandha_rv_surgical.png", subText: "Cash Sponsor", phone: "9489925688" },
         { name: "Chenny's Park School", company: "Kuppanur Bypass, Sankagiri", photo: "/sponsors/chennys_school.png", subText: "Official School Partner", phone: "9790097650" },
         { name: "Sibi", company: "SA Construction - Sankagiri", photo: "/sponsors/sa_construction.png", subText: "Cash Sponsor", phone: "9626482815" },
         { name: "Manoj", company: "SNR Transport", photo: "/sponsors/snr_transport.png", subText: "Cash Sponsor", phone: "9788855477" },
-        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor", phone: "9442237575" },
-        { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/simon_road_lines.png", subText: "Cash Sponsor" }
+        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor", phone: "9442237575" }
       ]
     },
     date: "June 27 & 28, 2026",
