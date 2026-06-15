@@ -91,7 +91,7 @@ export const tournaments: Tournament[] = [
         { name: "Chenny's Park School", company: "Kuppanur Bypass, Sankagiri", photo: "/sponsors/chennys_school.png", subText: "Official School Partner", phone: "9790097650" },
         { name: "Sibi", company: "SA Construction - Sankagiri", photo: "/sponsors/sa_construction.png", subText: "Cash Sponsor", phone: "9626482815" },
         { name: "Manoj", company: "SNR Transport", photo: "/sponsors/snr_transport.png", subText: "Cash Sponsor", phone: "9788855477" },
-        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor" }
+        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor", phone: "9442237575" }
       ]
     },
     date: "June 27 & 28, 2026",
