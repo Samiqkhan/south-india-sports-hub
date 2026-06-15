@@ -93,11 +93,11 @@ const SponsorsShowcase = ({ sponsors }: SponsorsShowcaseProps) => {
                 >
                   <div className="bg-card/90 backdrop-blur-md rounded-[15px] p-6 flex flex-col items-center text-center h-full transition-transform duration-300 group-hover:scale-[0.99]">
                     {/* Sponsor Logo Container */}
-                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-background border border-border/50 flex items-center justify-center mb-4 p-2 relative group-hover:border-primary/40 transition-all duration-300">
+                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-background border border-border/50 flex items-center justify-center mb-4 relative group-hover:border-primary/40 transition-all duration-300">
                       <img
                         src={sponsor.photo}
                         alt={sponsor.name}
-                        className="object-contain w-full h-full max-w-full max-h-full transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "/placeholder.svg";
                         }}
@@ -127,13 +127,21 @@ const SponsorsShowcase = ({ sponsors }: SponsorsShowcaseProps) => {
                     </div>
                     {/* Phone Number */}
                     {sponsor.phone && (
-                      <a
-                        href={`tel:${sponsor.phone}`}
-                        className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors bg-secondary/30 hover:bg-secondary/60 px-3.5 py-1 rounded-full border border-border/40 font-mono"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
-                        <span>{sponsor.phone}</span>
-                      </a>
+                      <div className="mt-4 flex flex-wrap gap-1.5 justify-center">
+                        {sponsor.phone.split(",").map((num, idx) => {
+                          const cleanNum = num.trim();
+                          return (
+                            <a
+                              key={idx}
+                              href={`tel:${cleanNum}`}
+                              className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground hover:text-primary transition-colors bg-secondary/30 hover:bg-secondary/60 px-2.5 py-1 rounded-full border border-border/40 font-mono"
+                            >
+                              <Phone className="w-3 h-3 text-primary shrink-0" />
+                              <span>{cleanNum}</span>
+                            </a>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -176,11 +184,11 @@ const SponsorsShowcase = ({ sponsors }: SponsorsShowcaseProps) => {
                 >
                   <div className="bg-card/90 backdrop-blur-md rounded-[15px] p-6 flex flex-col items-center text-center h-full transition-transform duration-300 group-hover:scale-[0.99]">
                     {/* Sponsor Logo Container */}
-                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-background border border-border/50 flex items-center justify-center mb-4 p-2 relative group-hover:border-accent/40 transition-all duration-300">
+                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-background border border-border/50 flex items-center justify-center mb-4 relative group-hover:border-accent/40 transition-all duration-300">
                       <img
                         src={sponsor.photo}
                         alt={sponsor.name}
-                        className="object-contain w-full h-full max-w-full max-h-full transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "/placeholder.svg";
                         }}
@@ -210,13 +218,21 @@ const SponsorsShowcase = ({ sponsors }: SponsorsShowcaseProps) => {
                     </div>
                     {/* Phone Number */}
                     {sponsor.phone && (
-                      <a
-                        href={`tel:${sponsor.phone}`}
-                        className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors bg-secondary/30 hover:bg-secondary/60 px-3.5 py-1 rounded-full border border-border/40 font-mono"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-accent shrink-0" />
-                        <span>{sponsor.phone}</span>
-                      </a>
+                      <div className="mt-4 flex flex-wrap gap-1.5 justify-center">
+                        {sponsor.phone.split(",").map((num, idx) => {
+                          const cleanNum = num.trim();
+                          return (
+                            <a
+                              key={idx}
+                              href={`tel:${cleanNum}`}
+                              className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground hover:text-accent transition-colors bg-secondary/30 hover:bg-secondary/60 px-2.5 py-1 rounded-full border border-border/40 font-mono"
+                            >
+                              <Phone className="w-3 h-3 text-accent shrink-0" />
+                              <span>{cleanNum}</span>
+                            </a>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                 </motion.div>

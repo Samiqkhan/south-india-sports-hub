@@ -78,20 +78,20 @@ export const tournaments: Tournament[] = [
     sponsors: {
       trophyPrize: [
         { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/vaari_transmotors.jpg", subText: "1st Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹12,000" },
-        { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/classic_sports.png", subText: "2nd Winner Trophy Sponsor", phone: "9442683383", prizeValue: "₹10,000" },
+        { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/sendhur_tyres.png", subText: "2nd Winner Trophy Sponsor", phone: "9442683355, 9865143355", prizeValue: "₹10,000" },
         { name: "Mr. Pradeep", company: "RKS Transports", photo: "/sponsors/rks_transport.png", subText: "3rd Winner Trophy Sponsor", phone: "9865728777", prizeValue: "₹8,000" }
       ],
       cashPrize: [
         { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/krn_transport.png", subText: "Cash Sponsor", phone: "9443292058" },
-        { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/apex_sports.png", subText: "Cash Sponsor" },
-        { name: "Vijay", company: "Vetri Xerox", photo: "/sponsors/salem_badminton.png", subText: "Cash Sponsor", phone: "9788622771" },
-        { name: "Anand", company: "Ampere Electric Scooty - Sankagiri", photo: "/sponsors/prime_fitness.png", subText: "Cash Sponsor", phone: "9952823987" },
-        { name: "Suresh", company: "Photographer - Sankagiri", photo: "/sponsors/victor_shuttle.png", subText: "Cash Sponsor", phone: "9688821200" },
-        { name: "Nandha", company: "RV Surgical", photo: "/sponsors/sisa_sports_hub.png", subText: "Cash Sponsor", phone: "9489925688" },
+        { name: "Vijay", company: "Vetri Xerox", photo: "/sponsors/vetri_xerox.jpg", subText: "Cash Sponsor", phone: "9788622771" },
+        { name: "Anand", company: "Ampere Electric Scooty - Sankagiri", photo: "/sponsors/ampere_scooty.png", subText: "Cash Sponsor", phone: "9952823987" },
+        { name: "Suresh", company: "Photographer - Sankagiri", photo: "/sponsors/suresh_photographer.png", subText: "Cash Sponsor", phone: "9688821200" },
+        { name: "Nandha", company: "RV Surgical", photo: "/sponsors/nandha_rv_surgical.png", subText: "Cash Sponsor", phone: "9489925688" },
         { name: "Chenny's Park School", company: "Kuppanur Bypass, Sankagiri", photo: "/sponsors/chennys_school.png", subText: "Official School Partner", phone: "9790097650" },
         { name: "Sibi", company: "SA Construction - Sankagiri", photo: "/sponsors/sa_construction.png", subText: "Cash Sponsor", phone: "9626482815" },
         { name: "Manoj", company: "SNR Transport", photo: "/sponsors/snr_transport.png", subText: "Cash Sponsor", phone: "9788855477" },
-        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor", phone: "9442237575" }
+        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor", phone: "9442237575" },
+        { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/simon_road_lines.png", subText: "Cash Sponsor" }
       ]
     },
     date: "June 27 & 28, 2026",
