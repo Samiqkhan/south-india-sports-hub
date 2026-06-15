@@ -29,6 +29,20 @@ export interface TournamentVenue {
   locations: string[];
 }
 
+export interface SponsorDetail {
+  name: string;
+  company: string;
+  photo: string;
+  subText?: string;
+  phone?: string;
+  prizeValue?: string;
+}
+
+export interface TournamentSponsors {
+  trophyPrize: SponsorDetail[];
+  cashPrize: SponsorDetail[];
+}
+
 export interface Tournament {
   slug: string;
   title: string;
@@ -51,6 +65,7 @@ export interface Tournament {
   contactNumbers?: string[];
   mapUrl?: string;
   reportingTime?: string;
+  sponsors?: TournamentSponsors;
 }
 
 export const tournaments: Tournament[] = [
@@ -60,6 +75,21 @@ export const tournaments: Tournament[] = [
     subtitle: "One Spirit. One Game. One Champion.",
     sport: "Badminton",
     status: "Upcoming",
+    sponsors: {
+      trophyPrize: [
+        { name: "Mr. Swamynathan & Mr. Subramani", company: "Sri Vaari (Kidavirundhu), Kuppanur", photo: "/sponsors/balaji_awards.png", subText: "1st Winner Trophy Sponsor", phone: "9944776646", prizeValue: "₹12,000" },
+        { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/classic_sports.png", subText: "2nd Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹10,000" },
+        { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/champion_trophies.png", subText: "3rd Winner Trophy Sponsor", phone: "9442683383", prizeValue: "₹8,000" }
+      ],
+      cashPrize: [
+        { name: "RKS Transport", company: "Sankagiri", photo: "/sponsors/apex_sports.png", subText: "Cash Sponsor" },
+        { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/elite_sports.png", subText: "Cash Sponsor" },
+        { name: "Master Water", company: "Sankagiri", photo: "/sponsors/prime_fitness.png", subText: "Official Water Partner" },
+        { name: "Mr. Venkatachellam", company: "Bommidian", photo: "/sponsors/sisa_sports_hub.png", subText: "Cash Sponsor" },
+        { name: "Mr. Vijay", company: "Vetri Xerox", photo: "/sponsors/salem_badminton.png", subText: "Cash Sponsor" },
+        { name: "Rakshan", company: "Sankagiri", photo: "/sponsors/victor_shuttle.png", subText: "Cash Sponsor" }
+      ]
+    },
     date: "June 27 & 28, 2026",
     venue: "SBM Shuttle Court, Sangagiri",
     lastDateToRegister: "25.06.2026",

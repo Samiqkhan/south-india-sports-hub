@@ -8,6 +8,7 @@ import RulesSection from "@/components/RulesSection";
 import RegistrationSection from "@/components/RegistrationSection";
 import RewardsSection from "@/components/RewardsSection";
 import VenueModal from "@/components/VenueModal";
+import SponsorsShowcase from "@/components/SponsorsShowcase";
 import { tournaments } from "@/data/tournaments";
 import { getGameFees, GameFee } from "@/lib/storage";
 
@@ -172,6 +173,9 @@ const TournamentDetail = () => {
 
       {/* Rules */}
       <RulesSection rules={tournament.rules} />
+
+      {/* Sponsors Showcase */}
+      <SponsorsShowcase sponsors={tournament.sponsors} />
 
       {/* Sponsor CTA */}
       <section className="pb-16 px-4 md:px-8">
