@@ -77,7 +77,7 @@ export const tournaments: Tournament[] = [
     status: "Upcoming",
     sponsors: {
       trophyPrize: [
-        { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/balaji_awards.png", subText: "1st Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹12,000" },
+        { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/vaari_transmotors.jpg", subText: "1st Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹12,000" },
         { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/classic_sports.png", subText: "2nd Winner Trophy Sponsor", phone: "9442683383", prizeValue: "₹10,000" },
         { name: "RKS Transport", company: "Sankagiri", photo: "/sponsors/champion_trophies.png", subText: "3rd Winner Trophy Sponsor", prizeValue: "₹8,000" }
       ],
