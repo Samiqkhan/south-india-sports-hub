@@ -77,17 +77,21 @@ export const tournaments: Tournament[] = [
     status: "Upcoming",
     sponsors: {
       trophyPrize: [
-        { name: "Mr. Swamynathan & Mr. Subramani", company: "Sri Vaari (Kidavirundhu), Kuppanur", photo: "/sponsors/balaji_awards.png", subText: "1st Winner Trophy Sponsor", phone: "9944776646", prizeValue: "₹12,000" },
-        { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/classic_sports.png", subText: "2nd Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹10,000" },
-        { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/champion_trophies.png", subText: "3rd Winner Trophy Sponsor", phone: "9442683383", prizeValue: "₹8,000" }
+        { name: "Sri Vaari Transmotors", company: "Sankagiri", photo: "/sponsors/balaji_awards.png", subText: "1st Winner Trophy Sponsor", phone: "7373344877", prizeValue: "₹12,000" },
+        { name: "Mr. Palanisamy & Mr. P.S. Selvaranu", company: "Sri Sendhur Tyres - Sankagiri", photo: "/sponsors/classic_sports.png", subText: "2nd Winner Trophy Sponsor", phone: "9442683383", prizeValue: "₹10,000" },
+        { name: "RKS Transport", company: "Sankagiri", photo: "/sponsors/champion_trophies.png", subText: "3rd Winner Trophy Sponsor", prizeValue: "₹8,000" }
       ],
       cashPrize: [
-        { name: "RKS Transport", company: "Sankagiri", photo: "/sponsors/apex_sports.png", subText: "Cash Sponsor" },
-        { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/elite_sports.png", subText: "Cash Sponsor" },
-        { name: "Master Water", company: "Sankagiri", photo: "/sponsors/prime_fitness.png", subText: "Official Water Partner" },
-        { name: "Mr. Venkatachellam", company: "Bommidian", photo: "/sponsors/sisa_sports_hub.png", subText: "Cash Sponsor" },
-        { name: "Mr. Vijay", company: "Vetri Xerox", photo: "/sponsors/salem_badminton.png", subText: "Cash Sponsor" },
-        { name: "Rakshan", company: "Sankagiri", photo: "/sponsors/victor_shuttle.png", subText: "Cash Sponsor" }
+        { name: "Mr. N Suresh", company: "KRN Transport - Sankagiri", photo: "/sponsors/elite_sports.png", subText: "Cash Sponsor", phone: "9443292058" },
+        { name: "M. Rajini", company: "Simon Road Lines", photo: "/sponsors/apex_sports.png", subText: "Cash Sponsor" },
+        { name: "Vijay", company: "Vetri Xerox", photo: "/sponsors/salem_badminton.png", subText: "Cash Sponsor", phone: "9788622771" },
+        { name: "Anand", company: "Ampere Electric Scooty - Sankagiri", photo: "/sponsors/prime_fitness.png", subText: "Cash Sponsor", phone: "9952823987" },
+        { name: "Suresh", company: "Photographer - Sankagiri", photo: "/sponsors/victor_shuttle.png", subText: "Cash Sponsor", phone: "9688821200" },
+        { name: "Nandha", company: "RV Surgical", photo: "/sponsors/sisa_sports_hub.png", subText: "Cash Sponsor", phone: "9489925688" },
+        { name: "Chenny's Park School", company: "Kuppanur Bypass, Sankagiri", photo: "/sponsors/chennys_school.png", subText: "Official School Partner", phone: "9790097650" },
+        { name: "Sibi", company: "SA Construction - Sankagiri", photo: "/sponsors/sa_construction.png", subText: "Cash Sponsor", phone: "9626482815" },
+        { name: "Manoj", company: "SNR Transport", photo: "/sponsors/snr_transport.png", subText: "Cash Sponsor", phone: "9788855477" },
+        { name: "NRS Transport", company: "Sankagiri", photo: "/sponsors/nrs_transport.png", subText: "Cash Sponsor" }
       ]
     },
     date: "June 27 & 28, 2026",
