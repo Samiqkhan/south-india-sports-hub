@@ -53,6 +53,8 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState<"players" | "tournaments" | "sponsors" | "pricing" | "payments">("players");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [tournamentFilter, setTournamentFilter] = useState("All");
+  const [locationFilter, setLocationFilter] = useState("All");
   
   // Data States
   const [players, setPlayers] = useState<PlayerRegistration[]>([]);
@@ -336,6 +338,23 @@ const AdminPanel = () => {
   const totalTournamentApps = tournaments.length;
   const totalSponsors = sponsors.length;
 
+  // Filter Options extractors
+  const getUniqueLocations = () => {
+    let list: string[] = [];
+    if (activeTab === "players") list = players.map(p => p.city);
+    else if (activeTab === "tournaments") list = tournaments.map(t => t.city);
+    else if (activeTab === "sponsors") list = sponsors.map(s => s.city);
+    return Array.from(new Set(list.filter(Boolean))).sort();
+  };
+
+  const getUniqueTournaments = () => {
+    let list: string[] = [];
+    if (activeTab === "players") list = players.map(p => p.tournamentTitle);
+    else if (activeTab === "tournaments") list = tournaments.map(t => t.tournamentTitle);
+    else if (activeTab === "sponsors") list = sponsors.flatMap(s => s.interestedTournaments ? s.interestedTournaments.split(',').map(x=>x.trim()) : []);
+    return Array.from(new Set(list.filter(Boolean))).sort();
+  };
+
   // Filtered Lists based on search query and status filter
   const filteredPlayers = players.filter(p => {
     const matchesSearch = 
@@ -345,7 +364,9 @@ const AdminPanel = () => {
       p.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.tournamentTitle.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesTournament = tournamentFilter === "All" || p.tournamentTitle === tournamentFilter;
+    const matchesLocation = locationFilter === "All" || p.city === locationFilter;
+    return matchesSearch && matchesStatus && matchesTournament && matchesLocation;
   });
 
   const filteredTournaments = tournaments.filter(t => {
@@ -356,7 +377,9 @@ const AdminPanel = () => {
       t.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesTournament = tournamentFilter === "All" || t.tournamentTitle === tournamentFilter;
+    const matchesLocation = locationFilter === "All" || t.city === locationFilter;
+    return matchesSearch && matchesStatus && matchesTournament && matchesLocation;
   });
 
   const filteredSponsors = sponsors.filter(s => {
@@ -367,7 +390,9 @@ const AdminPanel = () => {
       s.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "All" || s.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesTournament = tournamentFilter === "All" || (s.interestedTournaments && s.interestedTournaments.includes(tournamentFilter));
+    const matchesLocation = locationFilter === "All" || s.city === locationFilter;
+    return matchesSearch && matchesStatus && matchesTournament && matchesLocation;
   });
 
   const filteredGameFees = gameFees.filter(fee => {
@@ -637,13 +662,35 @@ const AdminPanel = () => {
                   />
                 </div>
 
-                {/* Status Filter */}
+                {/* Filters */}
                 {activeTab !== "pricing" && (
-                  <div>
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <select
+                      value={tournamentFilter}
+                      onChange={(e) => setTournamentFilter(e.target.value)}
+                      className="flex-1 sm:flex-none min-w-[120px] bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
+                    >
+                      <option value="All">All Tournaments</option>
+                      {getUniqueTournaments().map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={locationFilter}
+                      onChange={(e) => setLocationFilter(e.target.value)}
+                      className="flex-1 sm:flex-none min-w-[120px] bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
+                    >
+                      <option value="All">All Locations</option>
+                      {getUniqueLocations().map(l => (
+                        <option key={l} value={l}>{l}</option>
+                      ))}
+                    </select>
+
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
+                      className="flex-1 sm:flex-none min-w-[120px] bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body appearance-none cursor-pointer pr-8 relative"
                     >
                       <option value="All">All Statuses</option>
                       {activeTab === "players" && (
@@ -691,6 +738,8 @@ const AdminPanel = () => {
               onClick={() => {
                 setActiveTab("players");
                 setStatusFilter("All");
+                setTournamentFilter("All");
+                setLocationFilter("All");
               }}
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "players" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -708,6 +757,8 @@ const AdminPanel = () => {
               onClick={() => {
                 setActiveTab("tournaments");
                 setStatusFilter("All");
+                setTournamentFilter("All");
+                setLocationFilter("All");
               }}
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "tournaments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -725,6 +776,8 @@ const AdminPanel = () => {
               onClick={() => {
                 setActiveTab("sponsors");
                 setStatusFilter("All");
+                setTournamentFilter("All");
+                setLocationFilter("All");
               }}
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "sponsors" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -742,6 +795,8 @@ const AdminPanel = () => {
               onClick={() => {
                 setActiveTab("pricing");
                 setStatusFilter("All");
+                setTournamentFilter("All");
+                setLocationFilter("All");
               }}
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -759,6 +814,8 @@ const AdminPanel = () => {
               onClick={() => {
                 setActiveTab("payments");
                 setStatusFilter("All");
+                setTournamentFilter("All");
+                setLocationFilter("All");
               }}
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
                 activeTab === "payments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
