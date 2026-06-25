@@ -564,12 +564,6 @@ const AdminPanel = () => {
             </div>
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={handleResetSeedData}
-                className="px-4 py-2 border border-primary/20 hover:border-primary text-primary hover:bg-primary/10 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
-              >
-                <RefreshCw className="w-3.5 h-3.5" /> Restore Seed Data
-              </button>
-              <button
                 onClick={handleClearAllData}
                 className="px-4 py-2 border border-destructive/30 hover:border-destructive text-destructive hover:bg-destructive/10 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
               >
