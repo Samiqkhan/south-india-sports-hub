@@ -46,6 +46,27 @@ export interface SponsorRegistration {
   date: string;
 }
 
+export interface GameScore {
+  id: string;
+  gameNumber: number;
+  homePlayer: string;
+  awayPlayer: string;
+  winner: string;
+}
+
+export interface ScheduledGame {
+  id: string;
+  tournament: string;
+  category: string;
+  ageCategory: string;
+  homePlayer: string;
+  awayPlayer: string;
+  round?: string;
+  winner?: string;
+  gamesData?: GameScore[];
+  createdAt?: string;
+}
+
 // Dynamically determine the backend base URL
 const getApiBase = (): string => {
   if (import.meta.env.VITE_API_URL) {
@@ -172,6 +193,39 @@ export const clearAllData = async (): Promise<boolean> => {
   return res.ok;
 };
 
+// 7. Scheduled Games APIs
+export const getScheduledGames = async (): Promise<ScheduledGame[]> => {
+  const res = await fetch(`${API_BASE}/games`);
+  if (!res.ok) throw new Error("Failed to fetch scheduled games from database");
+  return await res.json();
+};
+
+export const addScheduledGame = async (game: Omit<ScheduledGame, 'id' | 'createdAt'>): Promise<ScheduledGame | null> => {
+  const res = await fetch(`${API_BASE}/games`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(game)
+  });
+  if (!res.ok) throw new Error("Failed to save scheduled game to database");
+  return await res.json();
+};
+
+export const updateScheduledGame = async (id: string, game: Omit<ScheduledGame, 'id' | 'createdAt'>): Promise<ScheduledGame | null> => {
+  const res = await fetch(`${API_BASE}/games/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(game)
+  });
+  if (!res.ok) throw new Error("Failed to update scheduled game in database");
+  return await res.json();
+};
+
+export const deleteScheduledGame = async (id: string): Promise<boolean> => {
+  const res = await fetch(`${API_BASE}/games/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error("Failed to delete scheduled game from database");
+  return res.ok;
+};
+
 // 5. Razorpay Payment APIs
 export const createRazorpayOrder = async (amount: number): Promise<any> => {
   const res = await fetch(`${API_BASE}/payments/create-order`, {
@@ -204,6 +258,7 @@ export interface GameFee {
   ageCategory: string;
   category: string;
   fee: string;
+  isPublished?: boolean;
 }
 
 // 6. Game Fees API Helpers
@@ -213,11 +268,11 @@ export const getGameFees = async (): Promise<GameFee[]> => {
   return await res.json();
 };
 
-export const updateGameFee = async (id: string, fee: string): Promise<GameFee[]> => {
+export const updateGameFee = async (id: string, fee?: string, isPublished?: boolean): Promise<GameFee[]> => {
   const res = await fetch(`${API_BASE}/game-fees/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fee })
+    body: JSON.stringify({ fee, isPublished })
   });
   if (!res.ok) throw new Error("Failed to update game fee in database");
   return await getGameFees();

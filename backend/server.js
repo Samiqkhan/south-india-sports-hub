@@ -163,6 +163,54 @@ const initDb = async () => {
       )
     `);
 
+    // Create Scheduled Games table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS scheduled_games (
+        id VARCHAR(50) PRIMARY KEY,
+        tournament VARCHAR(150) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        ageCategory VARCHAR(50) DEFAULT '',
+        homePlayer VARCHAR(150) NOT NULL,
+        awayPlayer VARCHAR(150) NOT NULL,
+        createdAt VARCHAR(50) NOT NULL
+      )
+    `);
+
+    try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN ageCategory VARCHAR(50) DEFAULT ""');
+      console.log("Migration: Added ageCategory column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN round VARCHAR(50) DEFAULT ""');
+      console.log("Migration: Added round column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN winner VARCHAR(150) DEFAULT ""');
+      console.log("Migration: Added winner column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN gamesData TEXT DEFAULT "[]"');
+      console.log("Migration: Added gamesData column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE game_fees ADD COLUMN isPublished TINYINT(1) DEFAULT 0');
+      console.log("Migration: Added isPublished column to game_fees table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
     // Create Payment Config table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS payment_config (
@@ -545,10 +593,75 @@ app.get('/api/game-fees', requireDb, async (req, res) => {
 
 app.put('/api/game-fees/:id', requireDb, async (req, res) => {
   const { id } = req.params;
-  const { fee } = req.body;
+  const { fee, isPublished } = req.body;
   try {
-    await pool.query('UPDATE game_fees SET fee = ? WHERE id = ?', [fee, id]);
-    res.json({ success: true, id, fee });
+    if (isPublished !== undefined) {
+      await pool.query('UPDATE game_fees SET fee = ?, isPublished = ? WHERE id = ?', [fee, isPublished ? 1 : 0, id]);
+      res.json({ success: true, id, fee, isPublished });
+    } else {
+      await pool.query('UPDATE game_fees SET fee = ? WHERE id = ?', [fee, id]);
+      res.json({ success: true, id, fee });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- GAMES ENDPOINTS ---
+app.get('/api/games', requireDb, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM scheduled_games ORDER BY createdAt ASC');
+    const parsedRows = rows.map(row => {
+      let parsedGamesData = [];
+      try { parsedGamesData = row.gamesData ? JSON.parse(row.gamesData) : []; } catch(e) {}
+      return { ...row, gamesData: parsedGamesData };
+    });
+    res.json(parsedRows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/games', requireDb, async (req, res) => {
+  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData } = req.body;
+  const id = `game-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const createdAt = new Date().toISOString();
+  const gamesDataStr = JSON.stringify(gamesData || []);
+
+  try {
+    await pool.query(`
+      INSERT INTO scheduled_games 
+      (id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, createdAt) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', createdAt]);
+    
+    res.status(201).json({ id, tournament, category, ageCategory, homePlayer, awayPlayer, round: round || '', winner: winner || '', createdAt });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/games/:id', requireDb, async (req, res) => {
+  const { id } = req.params;
+  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData } = req.body;
+  const gamesDataStr = JSON.stringify(gamesData || []);
+  try {
+    await pool.query(`
+      UPDATE scheduled_games 
+      SET tournament = ?, category = ?, ageCategory = ?, homePlayer = ?, awayPlayer = ?, round = ?, winner = ?
+      WHERE id = ?
+    `, [tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', id]);
+    res.json({ success: true, id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/games/:id', requireDb, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM scheduled_games WHERE id = ?', [id]);
+    res.json({ success: true, id });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -562,6 +675,7 @@ app.post('/api/db/reset', requireDb, async (req, res) => {
     await pool.query('DROP TABLE IF EXISTS sponsor_registrations');
     await pool.query('DROP TABLE IF EXISTS game_fees');
     await pool.query('DROP TABLE IF EXISTS payment_config');
+    await pool.query('DROP TABLE IF EXISTS scheduled_games');
     await initDb();
     res.json({ success: true, message: "Database reinitialized and seeded." });
   } catch (error) {
@@ -575,6 +689,7 @@ app.post('/api/db/clear', requireDb, async (req, res) => {
     await pool.query('TRUNCATE TABLE tournament_applications');
     await pool.query('TRUNCATE TABLE sponsor_registrations');
     await pool.query('TRUNCATE TABLE game_fees');
+    await pool.query('TRUNCATE TABLE scheduled_games');
     res.json({ success: true, message: "Database cleared." });
   } catch (error) {
     res.status(500).json({ error: error.message });
