@@ -141,21 +141,6 @@ const TournamentDetail = () => {
           </motion.div>
         </div>
       </section>
-      {/* Registration */}
-      <RegistrationSection 
-        tournamentTitle={tournament.title}
-        categories={tournament.registrationCategories} 
-        ageCategories={tournament.ageCategories}
-        playerFees={(tournament.playerFees || []).map(pf => {
-          const match = gameFees.find(gf => 
-            gf.tournamentSlug === slug &&
-            gf.ageCategory.toLowerCase() === pf.ageCategory.toLowerCase() &&
-            gf.category.toLowerCase() === pf.category.toLowerCase()
-          );
-          return match ? { ...pf, fee: match.fee } : pf;
-        })} 
-      />
-
       {/* Rewards & Fees */}
       <RewardsSection 
         rewards={tournament.rewards} 
@@ -168,6 +153,21 @@ const TournamentDetail = () => {
             }
           }
           return f;
+        })} 
+      />
+
+      {/* Registration */}
+      <RegistrationSection 
+        tournamentTitle={tournament.title}
+        categories={tournament.registrationCategories} 
+        ageCategories={tournament.ageCategories}
+        playerFees={(tournament.playerFees || []).map(pf => {
+          const match = gameFees.find(gf => 
+            gf.tournamentSlug === slug &&
+            gf.ageCategory.toLowerCase() === pf.ageCategory.toLowerCase() &&
+            gf.category.toLowerCase() === pf.category.toLowerCase()
+          );
+          return match ? { ...pf, fee: match.fee } : pf;
         })} 
       />
 

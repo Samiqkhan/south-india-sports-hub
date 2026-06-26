@@ -74,9 +74,23 @@ const GameForm = ({ game, setGame, onSave, onCancel, onDelete, isSaving, partici
               className="w-full bg-secondary/30 border border-border rounded p-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
             >
               <option value="">Select Match</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                <option key={n} value={`Match ${n}`}>Match {n}</option>
-              ))}
+              {game?.tournament?.toLowerCase().includes("badminton") ? (
+                Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)).flatMap(pool => [
+                  <option key={`Pool ${pool}`} value={`Pool ${pool}`}>Pool {pool}</option>,
+                  <option key={`Pool ${pool} - League Matches`} value={`Pool ${pool} - League Matches`}>Pool {pool} - League Matches</option>,
+                  <option key={`Pool ${pool} - Pool Final`} value={`Pool ${pool} - Pool Final`}>Pool {pool} - Pool Final</option>
+                ]).concat([
+                  <option key="Knockout Stage" value="Knockout Stage">Knockout Stage</option>,
+                  <option key="Round of 16" value="Round of 16">Round of 16</option>,
+                  <option key="Quarter Final" value="Quarter Final">Quarter Final</option>,
+                  <option key="Semi Final" value="Semi Final">Semi Final</option>,
+                  <option key="Final" value="Final">Final</option>
+                ])
+              ) : (
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                  <option key={n} value={`Match ${n}`}>Match {n}</option>
+                ))
+              )}
             </select>
           </div>
         </div>
@@ -209,28 +223,109 @@ const AdminPanel = () => {
   const [expandedMatchNames, setExpandedMatchNames] = useState<string[]>([]);
   const [matchCountToGenerate, setMatchCountToGenerate] = useState(1);
   const [isGeneratingMatches, setIsGeneratingMatches] = useState(false);
+  const [tournamentFormat, setTournamentFormat] = useState<"League" | "Knockout">("League");
+  const [leagueGenerateStage, setLeagueGenerateStage] = useState<"New Pool" | "Semi Finals" | "Final">("New Pool");
+  const [numberOfPools, setNumberOfPools] = useState<number>(1);
+  const [groupMatchCounts, setGroupMatchCounts] = useState<Record<string, number>>({});
+  const [isGeneratingGroupMatches, setIsGeneratingGroupMatches] = useState(false);
+
+  const handleGenerateGroupMatches = async (tournament: string, category: string, ageCategory: string, round: string, count: number) => {
+    if (count < 1) return;
+    setIsGeneratingGroupMatches(true);
+    try {
+      for (let i = 0; i < count; i++) {
+        await addScheduledGame({
+          tournament,
+          category,
+          ageCategory,
+          homePlayer: "TBD",
+          awayPlayer: "TBD",
+          round
+        });
+      }
+      const gData = await getScheduledGames();
+      setScheduledGames(gData);
+      setGroupMatchCounts(prev => ({ ...prev, [round]: 1 }));
+      toast({
+        title: "Matches Generated",
+        description: `Successfully generated ${count} new matches in ${round}.`,
+      });
+    } catch (error) {
+      console.error("Error generating group matches:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate matches.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingGroupMatches(false);
+    }
+  };
 
   const handleGenerateMatches = async () => {
-    if (!selectedGameTournament || !selectedGameAgeCategory || !selectedGameCategory || matchCountToGenerate < 1) return;
+    if (!selectedGameTournament || !selectedGameAgeCategory || !selectedGameCategory) return;
+
+    const isBadminton = selectedGameTournament.toLowerCase().includes("badminton");
+    if (!isBadminton && matchCountToGenerate < 1) return;
 
     setIsGeneratingMatches(true);
     try {
-      const existingMatchNumbers = scheduledGames
-        .filter(g => g.tournament === selectedGameTournament && g.category === selectedGameCategory && g.ageCategory === selectedGameAgeCategory)
-        .map(g => parseInt(g.round?.replace("Match ", "") || "0"))
-        .filter(n => !isNaN(n));
-      const maxExistingMatch = existingMatchNumbers.length > 0 ? Math.max(...existingMatchNumbers) : 0;
+      if (isBadminton) {
+        if (tournamentFormat === "League") {
+          if (leagueGenerateStage === "New Pool") {
+            const pools = Array.from({ length: numberOfPools }, (_, i) => String.fromCharCode(65 + i)); // A, B, C...
+            
+            for (const pool of pools) {
+              // Generate League Matches Placeholder
+              await addScheduledGame({
+                tournament: selectedGameTournament,
+                category: selectedGameCategory,
+                ageCategory: selectedGameAgeCategory,
+                homePlayer: "GROUP_PLACEHOLDER",
+                awayPlayer: "GROUP_PLACEHOLDER",
+                round: `Pool ${pool} - League Matches`
+              });
+            }
+          } else {
+            // Semi Finals or Final
+            await addScheduledGame({
+              tournament: selectedGameTournament,
+              category: selectedGameCategory,
+              ageCategory: selectedGameAgeCategory,
+              homePlayer: "GROUP_PLACEHOLDER",
+              awayPlayer: "GROUP_PLACEHOLDER",
+              round: leagueGenerateStage
+            });
+          }
+        } else if (tournamentFormat === "Knockout") {
+          // Standard placeholder for Knockout matches
+          await addScheduledGame({
+            tournament: selectedGameTournament,
+            category: selectedGameCategory,
+            ageCategory: selectedGameAgeCategory,
+            homePlayer: "GROUP_PLACEHOLDER",
+            awayPlayer: "GROUP_PLACEHOLDER",
+            round: "Knockout Stage"
+          });
+        }
+      } else {
+        const existingMatchNumbers = scheduledGames
+          .filter(g => g.tournament === selectedGameTournament && g.category === selectedGameCategory && g.ageCategory === selectedGameAgeCategory)
+          .map(g => parseInt(g.round?.replace("Match ", "") || "0"))
+          .filter(n => !isNaN(n));
+        const maxExistingMatch = existingMatchNumbers.length > 0 ? Math.max(...existingMatchNumbers) : 0;
 
-      for (let i = 1; i <= matchCountToGenerate; i++) {
-        const matchNum = maxExistingMatch + i;
-        await addScheduledGame({
-          tournament: selectedGameTournament,
-          category: selectedGameCategory,
-          ageCategory: selectedGameAgeCategory,
-          homePlayer: "TBD", // 'TBD' acts as a placeholder
-          awayPlayer: "TBD",
-          round: `Match ${matchNum}`
-        });
+        for (let i = 1; i <= matchCountToGenerate; i++) {
+          const matchNum = maxExistingMatch + i;
+          await addScheduledGame({
+            tournament: selectedGameTournament,
+            category: selectedGameCategory,
+            ageCategory: selectedGameAgeCategory,
+            homePlayer: "TBD",
+            awayPlayer: "TBD",
+            round: `Match ${matchNum}`
+          });
+        }
       }
 
       const gData = await getScheduledGames();
@@ -239,7 +334,7 @@ const AdminPanel = () => {
 
       toast({
         title: "Matches Generated",
-        description: `Successfully generated ${matchCountToGenerate} new matches.`,
+        description: `Successfully generated new matches.`,
       });
     } catch (error) {
       console.error("Error generating matches:", error);
@@ -2145,19 +2240,56 @@ const AdminPanel = () => {
                             return null;
                           })()}
                           <div className="flex items-center gap-3 border-l border-border/50 pl-6">
-                            <input
-                              type="number"
-                              min="1"
-                              value={matchCountToGenerate}
-                              onChange={e => setMatchCountToGenerate(parseInt(e.target.value) || 1)}
-                              className="w-20 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
-                            />
+                            {selectedGameTournament.toLowerCase().includes("badminton") ? (
+                              <>
+                                <select
+                                  value={tournamentFormat}
+                                  onChange={e => setTournamentFormat(e.target.value as "League" | "Knockout")}
+                                  className="w-28 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                                >
+                                  <option value="League">League</option>
+                                  <option value="Knockout">Knockout</option>
+                                </select>
+                                {tournamentFormat === "League" && (
+                                  <>
+                                    <select
+                                      value={leagueGenerateStage}
+                                      onChange={e => setLeagueGenerateStage(e.target.value as any)}
+                                      className="w-32 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                                    >
+                                      <option value="New Pool">New Pool</option>
+                                      <option value="Semi Finals">Semi Finals</option>
+                                      <option value="Final">Final</option>
+                                    </select>
+                                    {leagueGenerateStage === "New Pool" && (
+                                      <input
+                                        type="number"
+                                        min="1"
+                                        value={numberOfPools}
+                                        onChange={e => setNumberOfPools(parseInt(e.target.value) || 1)}
+                                        className="w-20 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
+                                        title="Number of Pools"
+                                        placeholder="Pools"
+                                      />
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            ) : (
+                              <input
+                                type="number"
+                                min="1"
+                                value={matchCountToGenerate}
+                                onChange={e => setMatchCountToGenerate(parseInt(e.target.value) || 1)}
+                                className="w-20 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
+                              />
+                            )}
                             <button
                               onClick={handleGenerateMatches}
                               disabled={isGeneratingMatches}
                               className="px-4 py-2 bg-primary text-primary-foreground font-bold uppercase tracking-wider rounded-lg text-xs glow-primary hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
                             >
-                              {isGeneratingMatches ? "Generating..." : "Generate Matches"}
+                              {isGeneratingMatches ? "Generating..." : "Generate"}
                             </button>
                           </div>
                         </div>
@@ -2168,9 +2300,15 @@ const AdminPanel = () => {
                       {(() => {
                         const groupedByTournament = filteredScheduledGames.reduce((acc, game) => {
                           if (!acc[game.tournament]) acc[game.tournament] = {};
-                          const matchName = game.round || "Unassigned Match";
-                          if (!acc[game.tournament][matchName]) acc[game.tournament][matchName] = [];
-                          acc[game.tournament][matchName].push(game);
+                          
+                          let matchGroupKey = game.round || "Unassigned Match";
+                          const poolMatch = matchGroupKey.match(/^(Pool [A-Z])/i);
+                          if (poolMatch) {
+                            matchGroupKey = poolMatch[1].toUpperCase(); // "POOL A"
+                          }
+                          
+                          if (!acc[game.tournament][matchGroupKey]) acc[game.tournament][matchGroupKey] = [];
+                          acc[game.tournament][matchGroupKey].push(game);
                           return acc;
                         }, {} as Record<string, Record<string, typeof filteredScheduledGames>>);
 
@@ -2202,7 +2340,7 @@ const AdminPanel = () => {
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
                                     const isMatchExpanded = expandedMatchNames.includes(matchKey);
-                                    const visibleGames = games.filter(g => (g.homePlayer && g.homePlayer !== "TBD") || editingGame?.id === g.id);
+                                    const visibleGames = games.filter(g => g.homePlayer !== "GROUP_PLACEHOLDER" || editingGame?.id === g.id);
 
                                     return (
                                       <div key={matchName} className="space-y-3">
@@ -2226,10 +2364,38 @@ const AdminPanel = () => {
                                             </span>
                                           </div>
                                           <div className="flex items-center gap-4">
+                                            <div className="flex items-center gap-2 border-r border-border/50 pr-4 mr-2" onClick={(e) => e.stopPropagation()}>
+                                              <input
+                                                type="number"
+                                                min="1"
+                                                value={groupMatchCounts[matchName] || 1}
+                                                onChange={e => setGroupMatchCounts(prev => ({ ...prev, [matchName]: parseInt(e.target.value) || 1 }))}
+                                                className="w-16 bg-secondary/30 border border-border rounded p-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
+                                              />
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleGenerateGroupMatches(
+                                                    selectedGameTournament,
+                                                    selectedGameCategory,
+                                                    selectedGameAgeCategory,
+                                                    matchName,
+                                                    groupMatchCounts[matchName] || 1
+                                                  );
+                                                  if (!isMatchExpanded) {
+                                                    setExpandedMatchNames(prev => [...prev, matchKey]);
+                                                  }
+                                                }}
+                                                disabled={isGeneratingGroupMatches}
+                                                className="text-xs px-2 py-1 bg-primary/20 text-primary hover:bg-primary/30 rounded font-semibold transition-all disabled:opacity-50"
+                                              >
+                                                Generate
+                                              </button>
+                                            </div>
                                             <button
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                const placeholder = games.find(g => g.homePlayer === "TBD");
+                                                const placeholder = games.find(g => g.homePlayer === "GROUP_PLACEHOLDER" || g.homePlayer === "TBD");
                                                 setEditingGame({
                                                   id: placeholder?.id,
                                                   tournament: selectedGameTournament,
@@ -2260,8 +2426,20 @@ const AdminPanel = () => {
                                         </div>
                                         {isMatchExpanded && (
                                           <div className="space-y-3 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-2">
-                                            {visibleGames.map((game, index) => (
-                                              <div key={game.id} className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                                            {visibleGames.map((game, index) => {
+                                              const prevGame = index > 0 ? visibleGames[index - 1] : null;
+                                              const isNewSection = !prevGame || prevGame.round !== game.round;
+
+                                              return (
+                                                <div key={game.id} className="space-y-3">
+                                                  {isNewSection && game.round && (
+                                                    <div className="flex items-center gap-4 py-3">
+                                                      <div className="h-px bg-border/50 flex-1"></div>
+                                                      <span className="text-xs font-bold text-primary uppercase tracking-wider">{game.round}</span>
+                                                      <div className="h-px bg-border/50 flex-1"></div>
+                                                    </div>
+                                                  )}
+                                                  <div className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
                                                 {editingGame?.id === game.id ? (
                                                   <GameForm
                                                     game={editingGame}
@@ -2276,19 +2454,24 @@ const AdminPanel = () => {
                                                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                                     <div className="space-y-2">
                                                       <div className="flex items-center gap-3">
-                                                        <p className="text-sm font-semibold text-primary">Fix {index + 1}</p>
+                                                        <p className="text-sm font-semibold text-primary">
+                                                          Fix {index + 1}
+                                                          {game.round && game.round !== matchName && (
+                                                            <span className="text-xs text-muted-foreground ml-2 font-normal">({game.round.replace(matchName + ' - ', '').replace(matchName, '').trim()})</span>
+                                                          )}
+                                                        </p>
                                                       </div>
                                                       <div className="flex items-center gap-6">
                                                         <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
-                                                          <span className={game.winner === game.homePlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.homePlayer} 
-                                                            {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                          <span className={game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
+                                                            {game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer} 
+                                                            {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
                                                             {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
                                                           <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
-                                                          <span className={game.winner === game.awayPlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.awayPlayer} 
-                                                            {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                          <span className={game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
+                                                            {game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer} 
+                                                            {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
                                                             {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
                                                         </div>
@@ -2302,24 +2485,56 @@ const AdminPanel = () => {
                                                         onClick={() => setEditingGame(game)}
                                                         className="text-primary hover:underline text-sm font-semibold cursor-pointer"
                                                       >
-                                                        Edit
+                                                        {game.homePlayer === "TBD" ? "+ Add Fix" : "Edit"}
                                                       </button>
+                                                      </div>
                                                     </div>
-                                                  </div>
-                                                )}
+                                                  )}
+                                                </div>
+                                                </div>
+                                              );
+                                            })}
+                                            {matchName.startsWith("POOL ") && (
+                                              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/10">
+                                                <span className="text-xs font-bold text-muted-foreground self-center uppercase tracking-wider mr-2">Add Stage:</span>
+                                                {["Quarter Final"].map(stage => {
+                                                  const prefix = matchName.includes(" - ") ? matchName.split(" - ")[0] : matchName;
+                                                  const newRoundName = `${prefix} - ${stage}`;
+                                                  return (
+                                                    <button
+                                                      key={stage}
+                                                      onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        await addScheduledGame({
+                                                          tournament: selectedGameTournament,
+                                                          category: selectedGameCategory,
+                                                          ageCategory: selectedGameAgeCategory,
+                                                          homePlayer: "TBD",
+                                                          awayPlayer: "TBD",
+                                                          round: newRoundName
+                                                        });
+                                                        const gData = await getScheduledGames();
+                                                        setScheduledGames(gData);
+                                                      }}
+                                                      className="text-xs px-3 py-1.5 bg-secondary/30 text-foreground hover:bg-secondary/60 hover:text-primary rounded font-semibold transition-all border border-border/50"
+                                                    >
+                                                      + {stage}
+                                                    </button>
+                                                  );
+                                                })}
                                               </div>
-                                            ))}
+                                            )}
                                           </div>
                                         )}
                                       </div>
                                     );
                                   })}
-                                </div>
-                              )}
-                            </div>
-                          ))
-                        ) : null;
-                      })()}
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : null;
+                        })()}
 
                       {editingGame && !editingGame.id && (
                         <div className="glass-card p-6 border border-primary/50 rounded-xl bg-primary/5">

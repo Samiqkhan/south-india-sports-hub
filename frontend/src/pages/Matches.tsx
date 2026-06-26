@@ -283,7 +283,7 @@ const Matches = () => {
                                 {expandedGameTournaments.includes(tournamentName) && (
                                   <div className="p-2 sm:p-4 space-y-4 sm:space-y-6 bg-background/30">
                                     {Object.entries(matchGroups).map(([matchName, games]) => {
-                                      const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD");
+                                      const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD" && g.homePlayer !== "GROUP_PLACEHOLDER");
                                       if (validGames.length === 0) return null;
                                       
                                       const matchKey = `${tournamentName}-${matchName}`;

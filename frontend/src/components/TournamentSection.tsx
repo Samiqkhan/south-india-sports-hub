@@ -38,7 +38,7 @@ const TournamentSection = () => {
               ? "bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600"
               : "bg-clip-text text-transparent bg-gradient-to-r from-primary via-electric to-blue-400";
             const iconClass = isChess ? "text-amber-500" : "text-electric";
-            const linkTextClass = isChess ? "text-amber-400 group-hover:text-amber-300" : "text-primary group-hover:text-primary-foreground";
+            const linkTextClass = isChess ? "text-amber-400" : "text-primary";
             const arrowIconClass = isChess ? "text-amber-400" : "text-primary";
             const watermarkEmoji = isChess ? "♞" : "🏸";
             const watermarkColor = isChess ? "text-amber-500/5" : "text-primary/5";
