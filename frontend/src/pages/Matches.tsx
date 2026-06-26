@@ -151,7 +151,7 @@ const Matches = () => {
                 </div>
 
                 {selectedGameTournament && selectedGameAgeCategory && selectedGameCategory ? (
-                  <div className="space-y-12 pt-6 border-t border-border/50">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6 border-t border-border/50">
                     
                     {/* Participants Section */}
                     <div className="space-y-4">
@@ -206,7 +206,7 @@ const Matches = () => {
                     </div>
 
                     {/* Matches Section */}
-                    <div className="space-y-4 pt-6 border-t border-border/50">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-3 mb-4">
                         <Trophy className="text-primary w-5 h-5" />
                         <h4 className="font-display font-bold text-lg uppercase text-primary">
@@ -252,7 +252,7 @@ const Matches = () => {
                                     {Object.entries(matchGroups).map(([matchName, games]) => (
                                       <div key={matchName} className="space-y-3">
                                         <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
                                           {games.map((g, idx) => (
                                             <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 border border-border flex flex-col justify-between">
                                               <div className="flex justify-between items-center text-sm font-bold">
