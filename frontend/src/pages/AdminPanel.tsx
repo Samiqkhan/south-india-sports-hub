@@ -32,6 +32,7 @@ import {
   getTournamentApplications, 
   getSponsorRegistrations,
   deletePlayerRegistration,
+  updatePlayerRegistration,
   deleteTournamentApplication,
   deleteSponsorRegistration,
   updatePlayerStatus,
@@ -193,6 +194,15 @@ const AdminPanel = () => {
   const [manualPlayerPhone, setManualPlayerPhone] = useState("");
   const [manualPartnerName, setManualPartnerName] = useState("");
   const [manualPaymentStatus, setManualPaymentStatus] = useState("Paid");
+  
+  // Edit Participant State
+  const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null);
+  const [editParticipantName, setEditParticipantName] = useState("");
+  const [editParticipantPhone, setEditParticipantPhone] = useState("");
+  const [editParticipantCategory, setEditParticipantCategory] = useState("");
+  const [editParticipantEventType, setEditParticipantEventType] = useState("");
+  const [editParticipantStatus, setEditParticipantStatus] = useState("Paid");
+  
   const [isSavingFee, setIsSavingFee] = useState(false);
   const [expandedTournaments, setExpandedTournaments] = useState<string[]>([]);
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
@@ -387,6 +397,27 @@ const AdminPanel = () => {
       toast({ title: "Success", description: "Participant added manually" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to add participant", variant: "destructive" });
+    } finally {
+      setIsSavingParticipant(false);
+    }
+  };
+
+  const handleUpdateParticipant = async () => {
+    if (!editingParticipantId) return;
+    setIsSavingParticipant(true);
+    try {
+      const updated = await updatePlayerRegistration(editingParticipantId, {
+        playerName: editParticipantName,
+        phone: editParticipantPhone,
+        ageCategory: editParticipantCategory,
+        category: editParticipantEventType,
+        status: editParticipantStatus as any
+      });
+      setPlayers(updated);
+      setEditingParticipantId(null);
+      toast({ title: "Success", description: "Participant updated successfully" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Failed to update participant", variant: "destructive" });
     } finally {
       setIsSavingParticipant(false);
     }
@@ -1946,40 +1977,95 @@ const AdminPanel = () => {
                                 <th className="p-3 font-semibold">Event Type</th>
                                 <th className="p-3 font-semibold text-center">Payment Status</th>
                                 <th className="p-3 font-semibold text-center">Points</th>
+                                <th className="p-3 font-semibold text-center">Actions</th>
                               </tr>
                             </thead>
                             <tbody className="text-sm">
                               {gameParticipants.map(p => (
                                 <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
-                                  <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
-                                  <td className="p-3 text-muted-foreground">{p.phone}</td>
-                                  <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
-                                  <td className="p-3 text-muted-foreground">{p.category}</td>
-                                  <td className="p-3 text-center">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                      p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
-                                      p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
-                                      'bg-yellow-500/20 text-yellow-500'
-                                    }`}>
-                                      {p.status || 'Pending'}
-                                    </span>
-                                  </td>
-                                  <td className="p-3 font-bold text-primary text-center">
-                                    {(() => {
-                                      const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
-                                      let points = 0;
-                                      filteredScheduledGames.forEach(g => {
-                                        if (g.winner === playerName) points += 1;
-                                        else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
-                                      });
-                                      return points;
-                                    })()}
-                                  </td>
+                                  {editingParticipantId === p.id ? (
+                                    <>
+                                      <td className="p-3">
+                                        <input type="text" value={editParticipantName} onChange={e => setEditParticipantName(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                      </td>
+                                      <td className="p-3">
+                                        <input type="text" value={editParticipantPhone} onChange={e => setEditParticipantPhone(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                      </td>
+                                      <td className="p-3">
+                                        <input type="text" value={editParticipantCategory} onChange={e => setEditParticipantCategory(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                      </td>
+                                      <td className="p-3">
+                                        <input type="text" value={editParticipantEventType} onChange={e => setEditParticipantEventType(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                      </td>
+                                      <td className="p-3 text-center">
+                                        <select value={editParticipantStatus} onChange={e => setEditParticipantStatus(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none">
+                                          <option value="Paid">Paid</option>
+                                          <option value="Pending">Pending</option>
+                                          <option value="Refunded">Refunded</option>
+                                        </select>
+                                      </td>
+                                      <td className="p-3 text-center text-muted-foreground">-</td>
+                                      <td className="p-3 flex justify-center gap-2">
+                                        <button onClick={handleUpdateParticipant} className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:brightness-110">Save</button>
+                                        <button onClick={() => setEditingParticipantId(null)} className="px-2 py-1 bg-secondary text-foreground text-xs rounded hover:brightness-110">Cancel</button>
+                                      </td>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
+                                      <td className="p-3 text-muted-foreground">{p.phone}</td>
+                                      <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
+                                      <td className="p-3 text-muted-foreground">{p.category}</td>
+                                      <td className="p-3 text-center">
+                                        <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                          p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
+                                          p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
+                                          'bg-yellow-500/20 text-yellow-500'
+                                        }`}>
+                                          {p.status || 'Pending'}
+                                        </span>
+                                      </td>
+                                      <td className="p-3 font-bold text-primary text-center">
+                                        {(() => {
+                                          const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
+                                          let points = 0;
+                                          filteredScheduledGames.forEach(g => {
+                                            if (g.winner === playerName) points += 1;
+                                            else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
+                                          });
+                                          return points;
+                                        })()}
+                                      </td>
+                                      <td className="p-3 flex justify-center gap-3">
+                                        <button 
+                                          onClick={() => {
+                                            setEditingParticipantId(p.id);
+                                            setEditParticipantName(p.playerName);
+                                            setEditParticipantPhone(p.phone);
+                                            setEditParticipantCategory(p.ageCategory);
+                                            setEditParticipantEventType(p.category);
+                                            setEditParticipantStatus(p.status || "Paid");
+                                          }}
+                                          className="text-muted-foreground hover:text-primary transition-colors"
+                                          title="Edit Player"
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        </button>
+                                        <button 
+                                          onClick={() => handleDeletePlayer(p.id)}
+                                          className="text-muted-foreground hover:text-destructive transition-colors"
+                                          title="Delete Player"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </td>
+                                    </>
+                                  )}
                                 </tr>
                               ))}
                               {gameParticipants.length === 0 && (
                                 <tr>
-                                  <td colSpan={6} className="p-4 text-center text-muted-foreground">No participants found for this category.</td>
+                                  <td colSpan={7} className="p-4 text-center text-muted-foreground">No participants found for this category.</td>
                                 </tr>
                               )}
                             </tbody>

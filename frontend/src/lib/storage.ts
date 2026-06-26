@@ -108,6 +108,16 @@ export const deletePlayerRegistration = async (id: string): Promise<PlayerRegist
   return await getPlayerRegistrations();
 };
 
+export const updatePlayerRegistration = async (id: string, data: Partial<PlayerRegistration>): Promise<PlayerRegistration[]> => {
+  const res = await fetch(`${API_BASE}/players/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error("Failed to update player in database");
+  return await getPlayerRegistrations();
+};
+
 export const updatePlayerStatus = async (id: string, status: PlayerRegistration['status']): Promise<PlayerRegistration[]> => {
   const res = await fetch(`${API_BASE}/players/${id}/status`, {
     method: 'PUT',

@@ -353,6 +353,21 @@ app.put('/api/players/:id/status', requireDb, async (req, res) => {
   }
 });
 
+app.put('/api/players/:id', requireDb, async (req, res) => {
+  const { id } = req.params;
+  const { playerName, phone, ageCategory, category, status } = req.body;
+  try {
+    await pool.query(`
+      UPDATE player_registrations 
+      SET playerName = ?, phone = ?, ageCategory = ?, category = ?, status = ?
+      WHERE id = ?
+    `, [playerName, phone, ageCategory, category, status, id]);
+    res.json({ success: true, id, playerName, phone, ageCategory, category, status });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.delete('/api/players/:id', requireDb, async (req, res) => {
   const { id } = req.params;
   try {
