@@ -243,25 +243,25 @@ const Matches = () => {
                                           </div>
                                           
                                           {isMatchExpanded && (
-                                            <div className="grid grid-cols-1 gap-4 pl-3 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-3">
+                                              <div className="grid grid-cols-1 gap-4 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-3">
                                               {validGames.map((g, idx) => (
                                                 <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 sm:p-5 border border-border flex flex-col justify-between w-full">
                                                   <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
                                                     <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                   </div>
                                                   <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2 md:max-w-lg lg:max-w-xl md:mx-auto w-full">
-                                                    <span className={`flex-1 text-left flex items-center flex-wrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
-                                                      {g.homePlayer} 
-                                                      {g.winner && g.homeScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{g.homeScore}</span>}
-                                                      {g.winner === g.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
-                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold ml-1">( DRAW )</span>}
+                                                    <span className={`flex-1 text-left flex items-center flex-nowrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
+                                                      <span className="truncate">{g.homePlayer}</span> 
+                                                      {g.winner && g.homeScore !== undefined && <span className="ml-1 sm:ml-2 text-sm bg-secondary px-1.5 sm:px-2 py-0.5 rounded border border-border font-mono shrink-0">{g.homeScore}</span>}
+                                                      {g.winner === g.homePlayer && <Trophy className="w-4 h-4 text-primary shrink-0" />}
+                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold ml-1 shrink-0">( DRAW )</span>}
                                                     </span>
                                                     <span className="text-muted-foreground text-[10px] sm:text-xs border px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
-                                                    <span className={`flex-1 text-right flex items-center justify-end flex-wrap gap-1 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>
-                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold mr-1">( DRAW )</span>}
-                                                      {g.winner === g.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
-                                                      {g.winner && g.awayScore !== undefined && <span className="mr-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{g.awayScore}</span>}
-                                                      {g.awayPlayer}
+                                                    <span className={`flex-1 text-right flex items-center justify-end flex-nowrap gap-1 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>
+                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold mr-1 shrink-0">( DRAW )</span>}
+                                                      {g.winner === g.awayPlayer && <Trophy className="w-4 h-4 text-primary shrink-0" />}
+                                                      {g.winner && g.awayScore !== undefined && <span className="mr-1 sm:mr-2 text-sm bg-secondary px-1.5 sm:px-2 py-0.5 rounded border border-border font-mono shrink-0">{g.awayScore}</span>}
+                                                      <span className="truncate">{g.awayPlayer}</span>
                                                     </span>
                                                   </div>
                                                   

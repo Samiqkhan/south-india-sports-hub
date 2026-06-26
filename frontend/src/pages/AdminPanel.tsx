@@ -2344,32 +2344,19 @@ const AdminPanel = () => {
                               <div className="p-3 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
-                                    const isMatchExpanded = expandedMatchNames.includes(matchKey);
                                     const visibleGames = games.filter(g => g.homePlayer !== "GROUP_PLACEHOLDER" || editingGame?.id === g.id);
 
                                     return (
                                       <div key={matchName} className="space-y-3">
-                                        <div className="flex flex-wrap justify-between items-center gap-4 sm:gap-0 bg-secondary/10 hover:bg-secondary/20 p-2 sm:p-3 rounded-lg transition-colors border border-border/10">
-                                          <div 
-                                            className="flex items-center gap-2 cursor-pointer flex-1"
-                                            onClick={() => {
-                                              setExpandedMatchNames(prev => 
-                                                prev.includes(matchKey) ? prev.filter(k => k !== matchKey) : [...prev, matchKey]
-                                              );
-                                            }}
-                                          >
-                                            {isMatchExpanded ? (
-                                              <ChevronDown className="w-4 h-4 text-primary" />
-                                            ) : (
-                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                            )}
+                                        <div className="flex flex-wrap justify-between items-center gap-4 sm:gap-0 bg-secondary/10 p-2 sm:p-3 rounded-lg border border-border/10">
+                                          <div className="flex items-center gap-2 flex-1">
                                             <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
                                             <span className="ml-2 text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full border border-border/50">
                                               {visibleGames.length} {visibleGames.length === 1 ? 'Fix' : 'Fixes'}
                                             </span>
                                           </div>
                                           <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto ml-1 sm:ml-0">
-                                            <div className="flex items-center gap-2 border-r border-border/50 pr-2 sm:pr-4 mr-1 sm:mr-2" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex items-center gap-2 border-r border-border/50 pr-2 sm:pr-4 mr-1 sm:mr-2">
                                               <input
                                                 type="number"
                                                 min="1"
@@ -2378,26 +2365,19 @@ const AdminPanel = () => {
                                                 className="w-16 bg-secondary/30 border border-border rounded p-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
                                               />
                                               <button
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handleGenerateGroupMatches(
-                                                    selectedGameTournament,
-                                                    selectedGameCategory,
-                                                    selectedGameAgeCategory,
-                                                    matchName,
-                                                    groupMatchCounts[matchName] || 1
-                                                  );
-                                                  if (!isMatchExpanded) {
-                                                    setExpandedMatchNames(prev => [...prev, matchKey]);
-                                                  }
-                                                }}
+                                                onClick={() => handleGenerateGroupMatches(
+                                                  selectedGameTournament,
+                                                  selectedGameCategory,
+                                                  selectedGameAgeCategory,
+                                                  matchName,
+                                                  groupMatchCounts[matchName] || 1
+                                                )}
                                                 disabled={isGeneratingGroupMatches}
                                                 className="text-xs px-2 py-1 bg-primary/20 text-primary hover:bg-primary/30 rounded font-semibold transition-all disabled:opacity-50"
                                               >
                                                 Generate
                                               </button>
                                             </div>
-
                                             <button
                                               onClick={(e) => {
                                                 e.stopPropagation();
@@ -2410,7 +2390,7 @@ const AdminPanel = () => {
                                           </div>
                                         </div>
                                         {isMatchExpanded && (
-                                          <div className="space-y-6 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 sm:ml-2 mt-2 pb-2">
+                                          <div className="space-y-6 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2 pb-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2524,7 +2504,6 @@ const AdminPanel = () => {
                                               </div>
                                             )}
                                           </div>
-                                        )}
                                       </div>
                                     );
                                   })}
@@ -2532,6 +2511,7 @@ const AdminPanel = () => {
                               </div>
                             ))
                           ) : null;
+                        })()}
                       {editingGame && !editingGame.id && (
                         <div className="glass-card p-6 border border-primary/50 rounded-xl bg-primary/5">
                           <p className="text-sm font-semibold text-primary mb-4">New Match</p>
