@@ -125,7 +125,7 @@ const Matches = () => {
                 <p>Loading data...</p>
               </div>
             ) : (
-              <div className="glass-card p-6 md:p-8 rounded-xl border border-border/50 space-y-8">
+              <div className="glass-card p-3 sm:p-6 md:p-8 rounded-xl border border-border/50 space-y-8">
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1 space-y-2">
                     <label className="block text-sm font-bold text-foreground">Select Tournament</label>
@@ -280,7 +280,7 @@ const Matches = () => {
                                 </div>
                                 
                                 {expandedGameTournaments.includes(tournamentName) && (
-                                  <div className="p-4 space-y-6 bg-background/30">
+                                  <div className="p-2 sm:p-4 space-y-4 sm:space-y-6 bg-background/30">
                                     {Object.entries(matchGroups).map(([matchName, games]) => {
                                       const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD");
                                       if (validGames.length === 0) return null;
@@ -290,18 +290,18 @@ const Matches = () => {
                                           <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
                                           <div className="grid grid-cols-1 gap-4">
                                             {validGames.map((g, idx) => (
-                                              <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-5 border border-border flex flex-col justify-between w-full">
-                                                <div className="mb-4 pb-2 border-b border-border/20">
+                                              <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-3 sm:p-5 border border-border flex flex-col justify-between w-full">
+                                                <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
                                                   <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                 </div>
-                                                <div className="flex justify-between items-center text-base md:text-lg font-bold gap-2">
-                                                  <span className={`flex-1 text-left break-words min-w-0 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
-                                                  <span className="text-muted-foreground text-xs border px-3 py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
-                                                  <span className={`flex-1 text-right break-words min-w-0 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
+                                                <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
+                                                  <span className={`flex-1 text-left ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
+                                                  <span className="text-muted-foreground text-[10px] sm:text-xs border px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
+                                                  <span className={`flex-1 text-right ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
                                                 </div>
                                                 
-                                                <div className="mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
-                                                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
+                                                <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-5 -mb-3 sm:-mb-5 px-3 sm:px-5 py-2 sm:py-3 rounded-b-lg">
+                                                  <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
                                                   <span className={`text-sm font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
                                                     {g.winner || "Not Played"}
                                                   </span>
