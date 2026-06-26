@@ -2389,7 +2389,7 @@ const AdminPanel = () => {
                                             </button>
                                           </div>
                                         </div>
-                                        <div className="space-y-6 mt-3 pb-2">
+                                        <div className="space-y-6 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2 pb-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
