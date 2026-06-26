@@ -62,6 +62,12 @@ const GAME_CATEGORIES = [
 ];
 
 const GameForm = ({ game, setGame, onSave, onCancel, onDelete, isSaving, participants }: any) => {
+  useEffect(() => {
+    if (game?.round && /^Pool [A-Z]$/i.test(game.round)) {
+      setGame({ ...game, round: `${game.round} - League Matches` });
+    }
+  }, [game?.round]);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -75,17 +81,25 @@ const GameForm = ({ game, setGame, onSave, onCancel, onDelete, isSaving, partici
             >
               <option value="">Select Match</option>
               {game?.tournament?.toLowerCase().includes("badminton") ? (
-                Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)).flatMap(pool => [
-                  <option key={`Pool ${pool}`} value={`Pool ${pool}`}>Pool {pool}</option>,
-                  <option key={`Pool ${pool} - League Matches`} value={`Pool ${pool} - League Matches`}>Pool {pool} - League Matches</option>,
-                  <option key={`Pool ${pool} - Pool Final`} value={`Pool ${pool} - Pool Final`}>Pool {pool} - Pool Final</option>
-                ]).concat([
-                  <option key="Knockout Stage" value="Knockout Stage">Knockout Stage</option>,
-                  <option key="Round of 16" value="Round of 16">Round of 16</option>,
-                  <option key="Quarter Final" value="Quarter Final">Quarter Final</option>,
-                  <option key="Semi Final" value="Semi Final">Semi Final</option>,
-                  <option key="Final" value="Final">Final</option>
-                ])
+                (() => {
+                  const poolMatch = game.round?.match(/^Pool ([A-Z])/i);
+                  if (poolMatch) {
+                    const p = poolMatch[1].toUpperCase();
+                    return (
+                      <option value={`Pool ${p} - League Matches`}>Pool {p} - League Matches</option>
+                    );
+                  }
+                  return Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)).flatMap(pool => [
+                    <option key={`Pool ${pool} - League Matches`} value={`Pool ${pool} - League Matches`}>Pool {pool} - League Matches</option>,
+                    <option key={`Pool ${pool} - Pool Final`} value={`Pool ${pool} - Pool Final`}>Pool {pool} - Pool Final</option>
+                  ]).concat([
+                    <option key="Knockout Stage" value="Knockout Stage">Knockout Stage</option>,
+                    <option key="Round of 16" value="Round of 16">Round of 16</option>,
+                    <option key="Quarter Final" value="Quarter Final">Quarter Final</option>,
+                    <option key="Semi Final" value="Semi Final">Semi Final</option>,
+                    <option key="Final" value="Final">Final</option>
+                  ]);
+                })()
               ) : (
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                   <option key={n} value={`Match ${n}`}>Match {n}</option>
@@ -421,7 +435,7 @@ const AdminPanel = () => {
   const loadData = async () => {
     try {
       const pData = await getPlayerRegistrations();
-      setPlayers(pData);
+      setPlayers(pData.reverse());
     } catch (error) {
       console.error("Error loading players:", error);
     }
@@ -2440,7 +2454,7 @@ const AdminPanel = () => {
                                                           )}
                                                         </p>
                                                       </div>
-                                                      <div className="flex w-full mt-2 sm:mt-0 pr-2">
+                                                      <div className="flex w-full mt-2 sm:mt-0 pr-2 md:max-w-lg lg:max-w-xl">
                                                         <div className="text-foreground font-display font-bold text-base sm:text-lg flex justify-between items-center w-full flex-nowrap gap-2">
                                                           <span className={`flex-1 text-left flex items-center gap-1 ${game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary" : ""}`}>
                                                             <span className="truncate">{game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer}</span> 

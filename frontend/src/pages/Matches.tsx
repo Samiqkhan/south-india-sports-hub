@@ -258,7 +258,7 @@ const Matches = () => {
                                                   <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
                                                     <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                   </div>
-                                                  <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
+                                                  <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2 md:max-w-lg lg:max-w-xl md:mx-auto w-full">
                                                     <span className={`flex-1 text-left flex items-center flex-wrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
                                                       {g.homePlayer} 
                                                       {g.winner && g.homeScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{g.homeScore}</span>}
