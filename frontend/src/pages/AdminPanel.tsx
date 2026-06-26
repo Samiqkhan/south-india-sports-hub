@@ -2344,7 +2344,7 @@ const AdminPanel = () => {
 
                                     return (
                                       <div key={matchName} className="space-y-3">
-                                        <div className="flex justify-between items-center bg-secondary/10 hover:bg-secondary/20 p-1.5 sm:p-2 rounded-lg transition-colors border border-border/10">
+                                        <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-0 bg-secondary/10 hover:bg-secondary/20 p-1.5 sm:p-2 rounded-lg transition-colors border border-border/10">
                                           <div 
                                             className="flex items-center gap-2 cursor-pointer flex-1"
                                             onClick={() => {
@@ -2363,8 +2363,8 @@ const AdminPanel = () => {
                                               {visibleGames.length} {visibleGames.length === 1 ? 'Fix' : 'Fixes'}
                                             </span>
                                           </div>
-                                          <div className="flex items-center gap-4">
-                                            <div className="flex items-center gap-2 border-r border-border/50 pr-4 mr-2" onClick={(e) => e.stopPropagation()}>
+                                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto ml-1 sm:ml-0">
+                                            <div className="flex items-center gap-2 border-r border-border/50 pr-2 sm:pr-4 mr-1 sm:mr-2" onClick={(e) => e.stopPropagation()}>
                                               <input
                                                 type="number"
                                                 min="1"
