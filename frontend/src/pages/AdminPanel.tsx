@@ -1231,7 +1231,7 @@ const AdminPanel = () => {
               className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "games" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
             >
-              Games ({scheduledGames.length})
+              Match fixtures
               {activeTab === "games" && (
                 <motion.div
                   layoutId="activeTabUnderline"
