@@ -223,29 +223,16 @@ const Matches = () => {
 
                                       return (
                                         <div key={matchName} className="space-y-3">
-                                          <div 
-                                            className="flex items-center gap-2 cursor-pointer bg-secondary/10 hover:bg-secondary/20 p-3 sm:p-4 rounded-lg transition-colors border border-border/10"
-                                            onClick={() => {
-                                              setExpandedMatchNames(prev => 
-                                                prev.includes(matchKey) ? prev.filter(k => k !== matchKey) : [...prev, matchKey]
-                                              );
-                                            }}
-                                          >
-                                            {isMatchExpanded ? (
-                                              <ChevronDown className="w-4 h-4 text-primary" />
-                                            ) : (
-                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                            )}
+                                          <div className="flex items-center gap-2 bg-secondary/10 p-2 sm:p-3 rounded-lg border border-border/10">
                                             <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
                                             <span className="ml-auto text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full border border-border/50">
                                               {validGames.length} {validGames.length === 1 ? 'Fix' : 'Fixes'}
                                             </span>
                                           </div>
                                           
-                                          {isMatchExpanded && (
-                                              <div className="grid grid-cols-1 gap-4 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-3">
+                                          <div className="grid grid-cols-1 gap-4 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-3">
                                               {validGames.map((g, idx) => (
-                                                <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 sm:p-5 border border-border flex flex-col justify-between w-full">
+                                                <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-3 sm:p-4 border border-border flex flex-col justify-between w-full">
                                                   <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
                                                     <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                   </div>
@@ -265,7 +252,7 @@ const Matches = () => {
                                                     </span>
                                                   </div>
                                                   
-                                                  <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-5 -mb-3 sm:-mb-5 px-3 sm:px-5 py-2 sm:py-3 rounded-b-lg">
+                                                  <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-4 -mb-3 sm:-mb-4 px-3 sm:px-4 py-2 sm:py-3 rounded-b-lg">
                                                     <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
                                                     <span className={`text-sm font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
                                                       {g.winner || "Not Played"}
@@ -274,7 +261,6 @@ const Matches = () => {
                                                 </div>
                                               ))}
                                             </div>
-                                          )}
                                         </div>
                                       );
                                     })}
