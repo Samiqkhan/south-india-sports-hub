@@ -432,6 +432,23 @@ const AdminPanel = () => {
     }
   };
 
+  const handleDeleteMatchEntry = async (gamesToDelete: ScheduledGame[]) => {
+    if (window.confirm("Are you sure you want to delete this match entry and all its fixes?")) {
+      try {
+        // Delete all games associated with this match entry
+        for (const game of gamesToDelete) {
+          await deleteScheduledGame(game.id);
+        }
+        const gData = await getScheduledGames();
+        setScheduledGames(gData);
+        toast({ title: "Match Deleted", description: "The match entry has been removed." });
+      } catch (error) {
+        console.error(error);
+        toast({ title: "Delete Failed", description: "Could not delete the match entry.", variant: "destructive" });
+      }
+    }
+  };
+
   // Handlers for Deletion
   const handleDeletePlayer = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this player registration?")) {
@@ -2061,19 +2078,27 @@ const AdminPanel = () => {
                                     <div key={matchName} className="space-y-3">
                                       <div className="flex justify-between items-center">
                                         <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
-                                        <button
-                                          onClick={() => setEditingGame({
-                                            tournament: selectedGameTournament,
-                                            ageCategory: selectedGameAgeCategory,
-                                            category: selectedGameCategory,
-                                            homePlayer: "",
-                                            awayPlayer: "",
-                                            round: matchName
-                                          })}
-                                          className="text-xs text-primary font-bold hover:underline"
-                                        >
-                                          + Add Fix
-                                        </button>
+                                        <div className="flex items-center gap-4">
+                                          <button
+                                            onClick={() => setEditingGame({
+                                              tournament: selectedGameTournament,
+                                              ageCategory: selectedGameAgeCategory,
+                                              category: selectedGameCategory,
+                                              homePlayer: "",
+                                              awayPlayer: "",
+                                              round: matchName
+                                            })}
+                                            className="text-xs text-primary font-bold hover:underline"
+                                          >
+                                            + Add Fix
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteMatchEntry(games)}
+                                            className="text-xs text-destructive font-bold hover:underline"
+                                          >
+                                            Delete
+                                          </button>
+                                        </div>
                                       </div>
                                       <div className="space-y-3 pl-2 border-l-2 border-primary/20">
                                         {games.filter(g => g.homePlayer && g.homePlayer !== "TBD").map((game, index) => (
