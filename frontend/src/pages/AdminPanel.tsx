@@ -1947,7 +1947,7 @@ const AdminPanel = () => {
               )}
 
               {activeTab === "games" && (
-                <div className="p-6 md:p-8 space-y-8 bg-background/50">
+                <div className="p-3 sm:p-6 md:p-8 space-y-8 bg-background/50">
                   <div className="flex flex-col gap-1 pb-4 border-b border-border/50">
                     <h3 className="font-display font-bold text-lg uppercase">Match Scheduling</h3>
                     <p className="text-muted-foreground text-xs">
@@ -2336,7 +2336,7 @@ const AdminPanel = () => {
                               </div>
 
                               {expandedGameTournaments.includes(tournamentName) && (
-                                <div className="p-4 space-y-6 bg-background/30">
+                                <div className="p-2 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
                                     const isMatchExpanded = expandedMatchNames.includes(matchKey);
@@ -2425,7 +2425,7 @@ const AdminPanel = () => {
                                           </div>
                                         </div>
                                         {isMatchExpanded && (
-                                          <div className="space-y-3 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-2">
+                                          <div className="space-y-3 pl-1 sm:pl-6 border-l sm:border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2439,7 +2439,7 @@ const AdminPanel = () => {
                                                       <div className="h-px bg-border/50 flex-1"></div>
                                                     </div>
                                                   )}
-                                                  <div className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                                                  <div className="p-2 sm:p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
                                                 {editingGame?.id === game.id ? (
                                                   <GameForm
                                                     game={editingGame}
@@ -2461,14 +2461,14 @@ const AdminPanel = () => {
                                                           )}
                                                         </p>
                                                       </div>
-                                                      <div className="flex items-center gap-6">
-                                                        <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
+                                                      <div className="flex items-center gap-2 sm:gap-6 mt-1 sm:mt-0">
+                                                        <div className="text-foreground font-display font-bold text-base sm:text-lg flex items-center flex-wrap">
                                                           <span className={game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                             {game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer} 
                                                             {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
                                                             {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
-                                                          <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
+                                                          <span className="text-muted-foreground font-body text-xs sm:text-sm mx-1 sm:mx-3 self-center">vs</span>
                                                           <span className={game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                             {game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer} 
                                                             {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
