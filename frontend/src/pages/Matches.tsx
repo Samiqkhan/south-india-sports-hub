@@ -22,6 +22,7 @@ const Matches = () => {
   const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_matchesAge") || "");
   const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_matchesCategory") || "");
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
+  const [expandedMatchNames, setExpandedMatchNames] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'participants' | 'matches'>(() => (localStorage.getItem("sisa_matchesTab") as any) || 'participants');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -285,30 +286,53 @@ const Matches = () => {
                                       const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD");
                                       if (validGames.length === 0) return null;
                                       
+                                      const matchKey = `${tournamentName}-${matchName}`;
+                                      const isMatchExpanded = expandedMatchNames.includes(matchKey);
+
                                       return (
-                                        <div key={matchName} className="space-y-4">
-                                          <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
-                                          <div className="grid grid-cols-1 gap-4">
-                                            {validGames.map((g, idx) => (
-                                              <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-3 sm:p-5 border border-border flex flex-col justify-between w-full">
-                                                <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
-                                                  <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
-                                                </div>
-                                                <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
-                                                  <span className={`flex-1 text-left ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
-                                                  <span className="text-muted-foreground text-[10px] sm:text-xs border px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
-                                                  <span className={`flex-1 text-right ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
-                                                </div>
-                                                
-                                                <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-5 -mb-3 sm:-mb-5 px-3 sm:px-5 py-2 sm:py-3 rounded-b-lg">
-                                                  <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
-                                                  <span className={`text-sm font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
-                                                    {g.winner || "Not Played"}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            ))}
+                                        <div key={matchName} className="space-y-3">
+                                          <div 
+                                            className="flex items-center gap-2 cursor-pointer bg-secondary/10 hover:bg-secondary/20 p-2 rounded-lg transition-colors border border-border/10"
+                                            onClick={() => {
+                                              setExpandedMatchNames(prev => 
+                                                prev.includes(matchKey) ? prev.filter(k => k !== matchKey) : [...prev, matchKey]
+                                              );
+                                            }}
+                                          >
+                                            {isMatchExpanded ? (
+                                              <ChevronDown className="w-4 h-4 text-primary" />
+                                            ) : (
+                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                            )}
+                                            <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
+                                            <span className="ml-auto text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full border border-border/50">
+                                              {validGames.length} {validGames.length === 1 ? 'Fix' : 'Fixes'}
+                                            </span>
                                           </div>
+                                          
+                                          {isMatchExpanded && (
+                                            <div className="grid grid-cols-1 gap-4 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-2">
+                                              {validGames.map((g, idx) => (
+                                                <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-3 sm:p-5 border border-border flex flex-col justify-between w-full">
+                                                  <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
+                                                    <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
+                                                  </div>
+                                                  <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
+                                                    <span className={`flex-1 text-left ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
+                                                    <span className="text-muted-foreground text-[10px] sm:text-xs border px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
+                                                    <span className={`flex-1 text-right ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
+                                                  </div>
+                                                  
+                                                  <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-5 -mb-3 sm:-mb-5 px-3 sm:px-5 py-2 sm:py-3 rounded-b-lg">
+                                                    <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
+                                                    <span className={`text-sm font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
+                                                      {g.winner || "Not Played"}
+                                                    </span>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
                                         </div>
                                       );
                                     })}

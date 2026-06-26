@@ -206,6 +206,7 @@ const AdminPanel = () => {
   const [isSavingFee, setIsSavingFee] = useState(false);
   const [expandedTournaments, setExpandedTournaments] = useState<string[]>([]);
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
+  const [expandedMatchNames, setExpandedMatchNames] = useState<string[]>([]);
   const [matchCountToGenerate, setMatchCountToGenerate] = useState(1);
   const [isGeneratingMatches, setIsGeneratingMatches] = useState(false);
 
@@ -2198,85 +2199,117 @@ const AdminPanel = () => {
 
                               {expandedGameTournaments.includes(tournamentName) && (
                                 <div className="p-4 space-y-6 bg-background/30">
-                                  {Object.entries(matchGroups).map(([matchName, games]) => (
-                                    <div key={matchName} className="space-y-3">
-                                      <div className="flex justify-between items-center">
-                                        <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
-                                        <div className="flex items-center gap-4">
-                                          <button
+                                  {Object.entries(matchGroups).map(([matchName, games]) => {
+                                    const matchKey = `${tournamentName}-${matchName}`;
+                                    const isMatchExpanded = expandedMatchNames.includes(matchKey);
+                                    const visibleGames = games.filter(g => (g.homePlayer && g.homePlayer !== "TBD") || editingGame?.id === g.id);
+
+                                    return (
+                                      <div key={matchName} className="space-y-3">
+                                        <div className="flex justify-between items-center bg-secondary/10 hover:bg-secondary/20 p-2 rounded-lg transition-colors border border-border/10">
+                                          <div 
+                                            className="flex items-center gap-2 cursor-pointer flex-1"
                                             onClick={() => {
-                                              const placeholder = games.find(g => g.homePlayer === "TBD");
-                                              setEditingGame({
-                                                id: placeholder?.id,
-                                                tournament: selectedGameTournament,
-                                                ageCategory: selectedGameAgeCategory,
-                                                category: selectedGameCategory,
-                                                homePlayer: "",
-                                                awayPlayer: "",
-                                                round: matchName
-                                              });
+                                              setExpandedMatchNames(prev => 
+                                                prev.includes(matchKey) ? prev.filter(k => k !== matchKey) : [...prev, matchKey]
+                                              );
                                             }}
-                                            className="text-xs text-primary font-bold hover:underline"
                                           >
-                                            + Add Fix
-                                          </button>
-                                          <button
-                                            onClick={() => handleDeleteMatchEntry(games)}
-                                            className="text-xs text-destructive font-bold hover:underline"
-                                          >
-                                            Delete
-                                          </button>
-                                        </div>
-                                      </div>
-                                      <div className="space-y-3 pl-2 border-l-2 border-primary/20">
-                                        {games.filter(g => (g.homePlayer && g.homePlayer !== "TBD") || editingGame?.id === g.id).map((game, index) => (
-                                          <div key={game.id} className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                                            {editingGame?.id === game.id ? (
-                                              <GameForm
-                                                game={editingGame}
-                                                setGame={setEditingGame}
-                                                onSave={handleSaveGame}
-                                                onCancel={() => setEditingGame(null)}
-                                                onDelete={() => handleDeleteGame(game.id)}
-                                                isSaving={isSavingGame}
-                                                participants={gameParticipants}
-                                              />
+                                            {isMatchExpanded ? (
+                                              <ChevronDown className="w-4 h-4 text-primary" />
                                             ) : (
-                                              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                                <div className="space-y-2">
-                                                  <div className="flex items-center gap-3">
-                                                    <p className="text-sm font-semibold text-primary">Fix {index + 1}</p>
-                                                  </div>
-                                                  <div className="flex items-center gap-6">
-                                                    <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
-                                                      <span className={game.winner === game.homePlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                        {game.homePlayer} {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
-                                                      </span>
-                                                      <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
-                                                      <span className={game.winner === game.awayPlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                        {game.awayPlayer} {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
-                                                      </span>
+                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                            )}
+                                            <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
+                                            <span className="ml-2 text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full border border-border/50">
+                                              {visibleGames.length} {visibleGames.length === 1 ? 'Fix' : 'Fixes'}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-4">
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                const placeholder = games.find(g => g.homePlayer === "TBD");
+                                                setEditingGame({
+                                                  id: placeholder?.id,
+                                                  tournament: selectedGameTournament,
+                                                  ageCategory: selectedGameAgeCategory,
+                                                  category: selectedGameCategory,
+                                                  homePlayer: "",
+                                                  awayPlayer: "",
+                                                  round: matchName
+                                                });
+                                                if (!isMatchExpanded) {
+                                                  setExpandedMatchNames(prev => [...prev, matchKey]);
+                                                }
+                                              }}
+                                              className="text-xs text-primary font-bold hover:underline"
+                                            >
+                                              + Add Fix
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteMatchEntry(games);
+                                              }}
+                                              className="text-xs text-destructive font-bold hover:underline"
+                                            >
+                                              Delete
+                                            </button>
+                                          </div>
+                                        </div>
+                                        {isMatchExpanded && (
+                                          <div className="space-y-3 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-2">
+                                            {visibleGames.map((game, index) => (
+                                              <div key={game.id} className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                                                {editingGame?.id === game.id ? (
+                                                  <GameForm
+                                                    game={editingGame}
+                                                    setGame={setEditingGame}
+                                                    onSave={handleSaveGame}
+                                                    onCancel={() => setEditingGame(null)}
+                                                    onDelete={() => handleDeleteGame(game.id)}
+                                                    isSaving={isSavingGame}
+                                                    participants={gameParticipants}
+                                                  />
+                                                ) : (
+                                                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                                    <div className="space-y-2">
+                                                      <div className="flex items-center gap-3">
+                                                        <p className="text-sm font-semibold text-primary">Fix {index + 1}</p>
+                                                      </div>
+                                                      <div className="flex items-center gap-6">
+                                                        <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
+                                                          <span className={game.winner === game.homePlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
+                                                            {game.homePlayer} {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                          </span>
+                                                          <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
+                                                          <span className={game.winner === game.awayPlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
+                                                            {game.awayPlayer} {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                          </span>
+                                                        </div>
+                                                      </div>
+                                                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-2">
+                                                        <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
+                                                      </div>
+                                                    </div>
+                                                    <div className="flex gap-3">
+                                                      <button
+                                                        onClick={() => setEditingGame(game)}
+                                                        className="text-primary hover:underline text-sm font-semibold cursor-pointer"
+                                                      >
+                                                        Edit
+                                                      </button>
                                                     </div>
                                                   </div>
-                                                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-2">
-                                                    <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
-                                                  </div>
-                                                </div>
-                                                <div className="flex gap-3">
-                                                  <button
-                                                    onClick={() => setEditingGame(game)}
-                                                    className="text-primary hover:underline text-sm font-semibold cursor-pointer"
-                                                  >
-                                                    Edit
-                                                  </button>
-                                                </div>
+                                                )}
                                               </div>
-                                            )}
+                                            ))}
                                           </div>
-                                        ))}
+                                        )}
                                       </div>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
