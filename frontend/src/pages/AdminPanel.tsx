@@ -2348,7 +2348,7 @@ const AdminPanel = () => {
 
                                     return (
                                       <div key={matchName} className="space-y-3">
-                                        <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-0 bg-secondary/10 hover:bg-secondary/20 p-1.5 sm:p-2 rounded-lg transition-colors border border-border/10">
+                                        <div className="flex flex-wrap justify-between items-center gap-4 sm:gap-0 bg-secondary/10 hover:bg-secondary/20 p-2 sm:p-3 rounded-lg transition-colors border border-border/10">
                                           <div 
                                             className="flex items-center gap-2 cursor-pointer flex-1"
                                             onClick={() => {
@@ -2409,7 +2409,7 @@ const AdminPanel = () => {
                                           </div>
                                         </div>
                                         {isMatchExpanded && (
-                                          <div className="space-y-3 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 sm:ml-2 mt-2">
+                                          <div className="space-y-6 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 sm:ml-2 mt-2 pb-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2435,8 +2435,8 @@ const AdminPanel = () => {
                                                     participants={gameParticipants}
                                                   />
                                                 ) : (
-                                                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                                    <div className="space-y-2">
+                                                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
+                                                    <div className="space-y-2 w-full">
                                                       <div className="flex items-center gap-3">
                                                         <p className="text-sm font-semibold text-primary">
                                                           Fix {index + 1}
@@ -2445,20 +2445,20 @@ const AdminPanel = () => {
                                                           )}
                                                         </p>
                                                       </div>
-                                                      <div className="flex items-center gap-2 sm:gap-6 mt-1 sm:mt-0">
-                                                        <div className="text-foreground font-display font-bold text-base sm:text-lg flex items-center flex-wrap">
-                                                          <span className={game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer} 
-                                                            {game.winner && game.homeScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{game.homeScore}</span>}
-                                                            {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
-                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
+                                                      <div className="flex w-full mt-2 sm:mt-0 pr-2">
+                                                        <div className="text-foreground font-display font-bold text-base sm:text-lg flex justify-between items-center w-full flex-nowrap gap-2">
+                                                          <span className={`flex-1 text-left flex items-center gap-1 ${game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary" : ""}`}>
+                                                            <span className="truncate">{game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer}</span> 
+                                                            {game.winner && game.homeScore !== undefined && <span className="ml-1 text-sm bg-secondary px-1.5 py-0.5 rounded border border-border font-mono shrink-0">{game.homeScore}</span>}
+                                                            {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0" />}
+                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold ml-1 shrink-0">(DRAW)</span>}
                                                           </span>
-                                                          <span className="text-muted-foreground font-body text-xs sm:text-sm mx-1 sm:mx-3 self-center">vs</span>
-                                                          <span className={game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer} 
-                                                            {game.winner && game.awayScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{game.awayScore}</span>}
-                                                            {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
-                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
+                                                          <span className="text-muted-foreground font-body text-xs sm:text-sm shrink-0">vs</span>
+                                                          <span className={`flex-1 text-right flex justify-end items-center gap-1 ${game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary" : ""}`}>
+                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold mr-1 shrink-0">(DRAW)</span>}
+                                                            {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0 mr-1" />}
+                                                            {game.winner && game.awayScore !== undefined && <span className="mr-1 text-sm bg-secondary px-1.5 py-0.5 rounded border border-border font-mono shrink-0">{game.awayScore}</span>}
+                                                            <span className="truncate">{game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer}</span> 
                                                           </span>
                                                         </div>
                                                       </div>
@@ -2466,7 +2466,7 @@ const AdminPanel = () => {
                                                         <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
                                                       </div>
                                                     </div>
-                                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                                    <div className="flex flex-row justify-between w-full mt-3 sm:mt-0 sm:w-auto">
                                                       <button
                                                         onClick={() => setEditingGame(game)}
                                                         className="text-primary hover:underline text-sm font-semibold cursor-pointer"
