@@ -656,6 +656,7 @@ const AdminPanel = () => {
 
   // Filtered Lists based on search query and status filter
   const filteredPlayers = players.filter(p => {
+    if (p.email === "manual@example.com") return false;
     const matchesSearch = 
       p.playerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
