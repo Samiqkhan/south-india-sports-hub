@@ -2216,14 +2216,18 @@ const AdminPanel = () => {
                                         <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
                                         <div className="flex items-center gap-4">
                                           <button
-                                            onClick={() => setEditingGame({
-                                              tournament: selectedGameTournament,
-                                              ageCategory: selectedGameAgeCategory,
-                                              category: selectedGameCategory,
-                                              homePlayer: "",
-                                              awayPlayer: "",
-                                              round: matchName
-                                            })}
+                                            onClick={() => {
+                                              const placeholder = games.find(g => g.homePlayer === "TBD");
+                                              setEditingGame({
+                                                id: placeholder?.id,
+                                                tournament: selectedGameTournament,
+                                                ageCategory: selectedGameAgeCategory,
+                                                category: selectedGameCategory,
+                                                homePlayer: "",
+                                                awayPlayer: "",
+                                                round: matchName
+                                              });
+                                            }}
                                             className="text-xs text-primary font-bold hover:underline"
                                           >
                                             + Add Fix

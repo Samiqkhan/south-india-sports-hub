@@ -294,10 +294,10 @@ const Matches = () => {
                                                 <div className="mb-4 pb-2 border-b border-border/20">
                                                   <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                 </div>
-                                                <div className="flex justify-between items-center text-base md:text-lg font-bold">
-                                                  <span className={g.winner === g.homePlayer ? "text-primary" : "text-foreground"}>{g.homePlayer}</span>
-                                                  <span className="text-muted-foreground text-xs mx-4 border px-3 py-1 rounded-full border-border bg-background/50">VS</span>
-                                                  <span className={g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}>{g.awayPlayer}</span>
+                                                <div className="flex justify-between items-center text-base md:text-lg font-bold gap-2">
+                                                  <span className={`flex-1 text-left break-words min-w-0 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
+                                                  <span className="text-muted-foreground text-xs border px-3 py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
+                                                  <span className={`flex-1 text-right break-words min-w-0 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
                                                 </div>
                                                 
                                                 <div className="mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
