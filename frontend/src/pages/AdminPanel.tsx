@@ -181,9 +181,9 @@ const AdminPanel = () => {
   const [scheduledGames, setScheduledGames] = useState<ScheduledGame[]>([]);
   const [editingGame, setEditingGame] = useState<Partial<ScheduledGame> | null>(null);
   const [isSavingGame, setIsSavingGame] = useState(false);
-  const [selectedGameTournament, setSelectedGameTournament] = useState<string>("");
-  const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>("");
-  const [selectedGameCategory, setSelectedGameCategory] = useState<string>("");
+  const [selectedGameTournament, setSelectedGameTournament] = useState<string>(() => localStorage.getItem("sisa_adminTournament") || "");
+  const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_adminAge") || "");
+  const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_adminCategory") || "");
   const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
   const [editFeeValue, setEditFeeValue] = useState("");
   
@@ -646,6 +646,18 @@ const AdminPanel = () => {
       }
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("sisa_adminTournament", selectedGameTournament);
+  }, [selectedGameTournament]);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_adminAge", selectedGameAgeCategory);
+  }, [selectedGameAgeCategory]);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_adminCategory", selectedGameCategory);
+  }, [selectedGameCategory]);
 
   const handleClearAllData = async () => {
     if (window.confirm("Are you absolutely sure you want to clear ALL registrations? This cannot be undone.")) {

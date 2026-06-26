@@ -18,11 +18,11 @@ const Matches = () => {
   
   const [players, setPlayers] = useState<PlayerRegistration[]>([]);
   const [scheduledGames, setScheduledGames] = useState<ScheduledGame[]>([]);
-  const [selectedGameTournament, setSelectedGameTournament] = useState<string>("");
-  const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>("");
-  const [selectedGameCategory, setSelectedGameCategory] = useState<string>("");
+  const [selectedGameTournament, setSelectedGameTournament] = useState<string>(() => localStorage.getItem("sisa_matchesTournament") || "");
+  const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_matchesAge") || "");
+  const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_matchesCategory") || "");
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'participants' | 'matches'>('participants');
+  const [activeTab, setActiveTab] = useState<'participants' | 'matches'>(() => (localStorage.getItem("sisa_matchesTab") as any) || 'participants');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -47,6 +47,22 @@ const Matches = () => {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_matchesTournament", selectedGameTournament);
+  }, [selectedGameTournament]);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_matchesAge", selectedGameAgeCategory);
+  }, [selectedGameAgeCategory]);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_matchesCategory", selectedGameCategory);
+  }, [selectedGameCategory]);
+
+  useEffect(() => {
+    localStorage.setItem("sisa_matchesTab", activeTab);
+  }, [activeTab]);
 
   const gameTournaments = Array.from(new Set(players.map(p => p.tournamentTitle).filter(Boolean))).sort();
   
