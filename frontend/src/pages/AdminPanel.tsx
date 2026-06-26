@@ -28,6 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { tournaments as staticTournaments } from "@/data/tournaments";
 import { 
   getPlayerRegistrations, 
+  addPlayerRegistration,
   getTournamentApplications, 
   getSponsorRegistrations,
   deletePlayerRegistration,
