@@ -217,7 +217,6 @@ const AdminPanel = () => {
   const [selectedGameTournament, setSelectedGameTournament] = useState<string>(() => localStorage.getItem("sisa_adminTournament") || "");
   const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_adminAge") || "");
   const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_adminCategory") || "");
-  const [expandedMatchNames, setExpandedMatchNames] = useState<string[]>([]);
   const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
   const [editFeeValue, setEditFeeValue] = useState("");
 
@@ -2545,9 +2544,8 @@ const AdminPanel = () => {
                                               </div>
                                             )}
                                           </div>
-                                      </div>
-                                    );
-                                  })}
+                                      );
+                                    })}
                                   </div>
                               </div>
                             ))
