@@ -165,22 +165,20 @@ const Matches = () => {
                       <div className="overflow-x-auto rounded-xl border border-border/50">
                         <table className="w-full text-left border-collapse bg-background">
                           <thead>
-                            <tr className="border-b border-border/50 bg-secondary/20 text-muted-foreground text-xs uppercase tracking-wider">
-                              <th className="p-3 font-semibold">Name</th>
-                              <th className="p-3 font-semibold">Phone</th>
-                              <th className="p-3 font-semibold">Category</th>
-                              <th className="p-3 font-semibold">Event Type</th>
-                              <th className="p-3 font-semibold text-center">Points</th>
+                            <tr className="border-b border-border/50 bg-secondary/20 text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+                              <th className="px-2 py-3 font-semibold">Name</th>
+                              <th className="px-2 py-3 font-semibold">Category</th>
+                              <th className="px-2 py-3 font-semibold">Event</th>
+                              <th className="px-2 py-3 font-semibold text-center">Points</th>
                             </tr>
                           </thead>
                           <tbody className="text-sm">
                             {gameParticipants.map(p => (
                               <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
-                                <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
-                                <td className="p-3 text-muted-foreground">{p.phone}</td>
-                                <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
-                                <td className="p-3 text-muted-foreground">{p.category}</td>
-                                <td className="p-3 font-bold text-primary text-center">
+                                <td className="px-2 py-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
+                                <td className="px-2 py-3 text-muted-foreground">{p.ageCategory}</td>
+                                <td className="px-2 py-3 text-muted-foreground">{p.category}</td>
+                                <td className="px-2 py-3 font-bold text-primary text-center">
                                   {(() => {
                                     const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
                                     let points = 0;
@@ -195,7 +193,7 @@ const Matches = () => {
                             ))}
                             {gameParticipants.length === 0 && (
                               <tr>
-                                <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                                <td colSpan={4} className="p-6 text-center text-muted-foreground">
                                   No participants found for this category.
                                 </td>
                               </tr>
