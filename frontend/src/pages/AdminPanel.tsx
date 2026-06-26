@@ -625,9 +625,10 @@ const AdminPanel = () => {
   };
 
   // Calculation of Stats
-  const totalPlayers = players.length;
+  const webPlayers = players.filter(p => p.email !== "manual@example.com");
+  const totalPlayers = webPlayers.length;
   
-  const totalRevenue = players
+  const totalRevenue = webPlayers
     .filter(p => p.status === "Paid")
     .reduce((sum, p) => {
       const val = parseInt(p.amountPaid.replace(/[^\d]/g, ""), 10);
