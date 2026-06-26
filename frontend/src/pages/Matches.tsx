@@ -281,29 +281,37 @@ const Matches = () => {
                                 
                                 {expandedGameTournaments.includes(tournamentName) && (
                                   <div className="p-4 space-y-6 bg-background/30">
-                                    {Object.entries(matchGroups).map(([matchName, games]) => (
-                                      <div key={matchName} className="space-y-3">
-                                        <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
-                                        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                                          {games.map((g, idx) => (
-                                            <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 border border-border flex flex-col justify-between">
-                                              <div className="flex justify-between items-center text-sm font-bold">
-                                                <span className={g.winner === g.homePlayer ? "text-primary" : "text-foreground"}>{g.homePlayer}</span>
-                                                <span className="text-muted-foreground text-xs mx-2 border px-2 py-0.5 rounded-full border-border">VS</span>
-                                                <span className={g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}>{g.awayPlayer}</span>
+                                    {Object.entries(matchGroups).map(([matchName, games]) => {
+                                      const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD");
+                                      if (validGames.length === 0) return null;
+                                      
+                                      return (
+                                        <div key={matchName} className="space-y-4">
+                                          <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
+                                          <div className="grid grid-cols-1 gap-4">
+                                            {validGames.map((g, idx) => (
+                                              <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-5 border border-border flex flex-col justify-between w-full">
+                                                <div className="mb-4 pb-2 border-b border-border/20">
+                                                  <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
+                                                </div>
+                                                <div className="flex justify-between items-center text-base md:text-lg font-bold">
+                                                  <span className={g.winner === g.homePlayer ? "text-primary" : "text-foreground"}>{g.homePlayer}</span>
+                                                  <span className="text-muted-foreground text-xs mx-4 border px-3 py-1 rounded-full border-border bg-background/50">VS</span>
+                                                  <span className={g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}>{g.awayPlayer}</span>
+                                                </div>
+                                                
+                                                <div className="mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
+                                                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
+                                                  <span className={`text-sm font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
+                                                    {g.winner || "Not Played"}
+                                                  </span>
+                                                </div>
                                               </div>
-                                              
-                                              <div className="mt-4 pt-3 border-t border-border/50 flex justify-between items-center">
-                                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Winner</span>
-                                                <span className={`text-xs font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
-                                                  {g.winner || "Not Played"}
-                                                </span>
-                                              </div>
-                                            </div>
-                                          ))}
+                                            ))}
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </div>
