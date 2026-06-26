@@ -186,7 +186,7 @@ const Matches = () => {
                         onClick={() => setActiveTab('participants')}
                         className={`flex-1 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-md transition-colors ${activeTab === 'participants' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}
                       >
-                        Registered Players
+                        Score Board
                       </button>
                       <button
                         onClick={() => setActiveTab('matches')}
