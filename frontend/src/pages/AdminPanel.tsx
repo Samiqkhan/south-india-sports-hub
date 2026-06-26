@@ -1,16 +1,16 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  ArrowLeft, 
-  Users, 
-  Trophy, 
-  MapPin, 
-  Briefcase, 
-  Search, 
-  Download, 
-  Trash2, 
-  RefreshCw, 
+import {
+  ArrowLeft,
+  Users,
+  Trophy,
+  MapPin,
+  Briefcase,
+  Search,
+  Download,
+  Trash2,
+  RefreshCw,
   Sparkles,
   UserCheck,
   TrendingUp,
@@ -26,10 +26,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { tournaments as staticTournaments } from "@/data/tournaments";
-import { 
-  getPlayerRegistrations, 
+import {
+  getPlayerRegistrations,
   addPlayerRegistration,
-  getTournamentApplications, 
+  getTournamentApplications,
   getSponsorRegistrations,
   deletePlayerRegistration,
   updatePlayerRegistration,
@@ -57,7 +57,7 @@ import {
 } from "@/lib/storage";
 
 const GAME_CATEGORIES = [
-  "Men's Singles", "Women's Singles", "Men's Doubles", "Women's Doubles", "Mixed Doubles", 
+  "Men's Singles", "Women's Singles", "Men's Doubles", "Women's Doubles", "Mixed Doubles",
   "Boys U-19", "Girls U-19", "Boys U-17", "Girls U-17", "Boys U-15", "Girls U-15", "Open"
 ];
 
@@ -172,7 +172,7 @@ const AdminPanel = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [tournamentFilter, setTournamentFilter] = useState("All");
   const [locationFilter, setLocationFilter] = useState("All");
-  
+
   // Data States
   const [players, setPlayers] = useState<PlayerRegistration[]>([]);
   const [tournaments, setTournaments] = useState<TournamentApplication[]>([]);
@@ -186,7 +186,7 @@ const AdminPanel = () => {
   const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_adminCategory") || "");
   const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
   const [editFeeValue, setEditFeeValue] = useState("");
-  
+
   // Manual Participant States
   const [isAddingParticipant, setIsAddingParticipant] = useState(false);
   const [isSavingParticipant, setIsSavingParticipant] = useState(false);
@@ -194,7 +194,7 @@ const AdminPanel = () => {
   const [manualPlayerPhone, setManualPlayerPhone] = useState("");
   const [manualPartnerName, setManualPartnerName] = useState("");
   const [manualPaymentStatus, setManualPaymentStatus] = useState("Paid");
-  
+
   // Edit Participant State
   const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null);
   const [editParticipantName, setEditParticipantName] = useState("");
@@ -202,7 +202,7 @@ const AdminPanel = () => {
   const [editParticipantCategory, setEditParticipantCategory] = useState("");
   const [editParticipantEventType, setEditParticipantEventType] = useState("");
   const [editParticipantStatus, setEditParticipantStatus] = useState("Paid");
-  
+
   const [isSavingFee, setIsSavingFee] = useState(false);
   const [expandedTournaments, setExpandedTournaments] = useState<string[]>([]);
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
@@ -211,7 +211,7 @@ const AdminPanel = () => {
 
   const handleGenerateMatches = async () => {
     if (!selectedGameTournament || !selectedGameAgeCategory || !selectedGameCategory || matchCountToGenerate < 1) return;
-    
+
     setIsGeneratingMatches(true);
     try {
       const existingMatchNumbers = scheduledGames
@@ -231,11 +231,11 @@ const AdminPanel = () => {
           round: `Match ${matchNum}`
         });
       }
-      
+
       const gData = await getScheduledGames();
       setScheduledGames(gData);
       setMatchCountToGenerate(1);
-      
+
       toast({
         title: "Matches Generated",
         description: `Successfully generated ${matchCountToGenerate} new matches.`,
@@ -260,10 +260,10 @@ const AdminPanel = () => {
     try {
       const isCurrentlyPublished = !!selectedFee.isPublished;
       await updateGameFee(selectedFee.id, selectedFee.fee, !isCurrentlyPublished);
-      
+
       const newFees = await getGameFees();
       setGameFees(newFees);
-      
+
       toast({
         title: "Visibility Updated",
         description: `Schedule is now ${!isCurrentlyPublished ? "published to" : "hidden from"} public site.`,
@@ -687,7 +687,7 @@ const AdminPanel = () => {
   // Calculation of Stats
   const webPlayers = players.filter(p => p.email !== "manual@example.com");
   const totalPlayers = webPlayers.length;
-  
+
   const totalRevenue = webPlayers
     .filter(p => p.status === "Paid")
     .reduce((sum, p) => {
@@ -711,14 +711,14 @@ const AdminPanel = () => {
     let list: string[] = [];
     if (activeTab === "players") list = players.map(p => p.tournamentTitle);
     else if (activeTab === "tournaments") list = tournaments.map(t => t.tournamentTitle);
-    else if (activeTab === "sponsors") list = sponsors.flatMap(s => s.interestedTournaments ? s.interestedTournaments.split(',').map(x=>x.trim()) : []);
+    else if (activeTab === "sponsors") list = sponsors.flatMap(s => s.interestedTournaments ? s.interestedTournaments.split(',').map(x => x.trim()) : []);
     return Array.from(new Set(list.filter(Boolean))).sort();
   };
 
   // Filtered Lists based on search query and status filter
   const filteredPlayers = players.filter(p => {
     if (p.email === "manual@example.com") return false;
-    const matchesSearch = 
+    const matchesSearch =
       p.playerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.phone.includes(searchQuery) ||
@@ -731,7 +731,7 @@ const AdminPanel = () => {
   });
 
   const filteredTournaments = tournaments.filter(t => {
-    const matchesSearch = 
+    const matchesSearch =
       t.organizerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.tournamentTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.sport.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -744,7 +744,7 @@ const AdminPanel = () => {
   });
 
   const filteredSponsors = sponsors.filter(s => {
-    const matchesSearch = 
+    const matchesSearch =
       s.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.sponsorshipLevel.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -757,7 +757,7 @@ const AdminPanel = () => {
   });
 
   const filteredGameFees = gameFees.filter(fee => {
-    const matchesSearch = 
+    const matchesSearch =
       fee.tournamentSlug.toLowerCase().includes(searchQuery.toLowerCase()) ||
       fee.ageCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
       fee.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -813,11 +813,11 @@ const AdminPanel = () => {
   };
 
   const gameTournaments = Array.from(new Set(players.map(p => p.tournamentTitle).filter(Boolean))).sort();
-  
+
   const selectedTournamentData = staticTournaments.find(t => t.title === selectedGameTournament);
   const selectedTournamentSlug = selectedTournamentData?.slug || "";
 
-  const gameAgeCategoriesForTournament = selectedTournamentSlug 
+  const gameAgeCategoriesForTournament = selectedTournamentSlug
     ? Array.from(new Set(gameFees.filter(f => f.tournamentSlug === selectedTournamentSlug).map(f => f.ageCategory).filter(Boolean))).sort()
     : [];
 
@@ -829,13 +829,13 @@ const AdminPanel = () => {
     ? Array.from(new Set(gameFees.filter(f => f.tournamentSlug === selectedTournamentSlug && f.ageCategory === editParticipantCategory).map(f => f.category).filter(Boolean))).sort()
     : [];
 
-  const gameParticipants = players.filter(p => 
-    p.tournamentTitle === selectedGameTournament && 
+  const gameParticipants = players.filter(p =>
+    p.tournamentTitle === selectedGameTournament &&
     p.ageCategory === selectedGameAgeCategory &&
     p.category === selectedGameCategory &&
     p.email === "manual@example.com"
   );
-  
+
   const filteredScheduledGames = scheduledGames.filter(g => {
     if (selectedGameTournament && g.tournament !== selectedGameTournament) return false;
     if (selectedGameAgeCategory && g.ageCategory !== selectedGameAgeCategory) return false;
@@ -869,7 +869,7 @@ const AdminPanel = () => {
     return (
       <div className="min-h-screen bg-background text-foreground font-body flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -927,7 +927,7 @@ const AdminPanel = () => {
             >
               Sign In
             </button>
-            
+
             <div className="text-center mt-6">
               <Link
                 to="/"
@@ -1137,9 +1137,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "players" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "players" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Player Registrations ({filteredPlayers.length})
               {activeTab === "players" && (
@@ -1156,9 +1155,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "tournaments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "tournaments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Hosting Applications ({filteredTournaments.length})
               {activeTab === "tournaments" && (
@@ -1175,9 +1173,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "sponsors" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "sponsors" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Sponsorship Leads ({filteredSponsors.length})
               {activeTab === "sponsors" && (
@@ -1194,9 +1191,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "pricing" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Game Pricing ({filteredGameFees.length})
               {activeTab === "pricing" && (
@@ -1213,9 +1209,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "payments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "payments" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Payment Settings
               {activeTab === "payments" && (
@@ -1232,9 +1227,8 @@ const AdminPanel = () => {
                 setTournamentFilter("All");
                 setLocationFilter("All");
               }}
-              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${
-                activeTab === "games" ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`pb-4 px-6 font-display font-semibold uppercase tracking-widest text-sm relative transition-all flex-shrink-0 ${activeTab === "games" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               Games ({scheduledGames.length})
               {activeTab === "games" && (
@@ -1310,13 +1304,12 @@ const AdminPanel = () => {
                             <select
                               value={player.status}
                               onChange={(e) => handlePlayerStatusChange(player.id, e.target.value as PlayerRegistration["status"])}
-                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${
-                                player.status === "Paid" 
-                                  ? "bg-primary/10 border-primary/30 text-primary" 
-                                  : player.status === "Pending" 
-                                    ? "bg-accent/10 border-accent/30 text-accent" 
+                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${player.status === "Paid"
+                                  ? "bg-primary/10 border-primary/30 text-primary"
+                                  : player.status === "Pending"
+                                    ? "bg-accent/10 border-accent/30 text-accent"
                                     : "bg-destructive/10 border-destructive/30 text-destructive"
-                              }`}
+                                }`}
                             >
                               <option value="Paid" className="bg-card text-foreground">Paid</option>
                               <option value="Pending" className="bg-card text-foreground">Pending</option>
@@ -1402,13 +1395,12 @@ const AdminPanel = () => {
                             <select
                               value={tournament.status}
                               onChange={(e) => handleTournamentStatusChange(tournament.id, e.target.value as TournamentApplication["status"])}
-                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${
-                                tournament.status === "Approved" 
-                                  ? "bg-primary/10 border-primary/30 text-primary" 
-                                  : tournament.status === "Pending" 
-                                    ? "bg-accent/10 border-accent/30 text-accent" 
+                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${tournament.status === "Approved"
+                                  ? "bg-primary/10 border-primary/30 text-primary"
+                                  : tournament.status === "Pending"
+                                    ? "bg-accent/10 border-accent/30 text-accent"
                                     : "bg-destructive/10 border-destructive/30 text-destructive"
-                              }`}
+                                }`}
                             >
                               <option value="Pending" className="bg-card text-foreground">Pending</option>
                               <option value="Approved" className="bg-card text-foreground">Approved</option>
@@ -1489,15 +1481,14 @@ const AdminPanel = () => {
                             <select
                               value={sponsor.status}
                               onChange={(e) => handleSponsorStatusChange(sponsor.id, e.target.value as SponsorRegistration["status"])}
-                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${
-                                sponsor.status === "Partnership Active" 
-                                  ? "bg-primary/10 border-primary/30 text-primary" 
-                                  : sponsor.status === "Contacted" 
-                                    ? "bg-electric/10 border-electric/30 text-electric" 
-                                    : sponsor.status === "New" 
-                                      ? "bg-accent/10 border-accent/30 text-accent" 
+                              className={`text-xs font-bold rounded-lg px-2.5 py-1 border focus:outline-none cursor-pointer ${sponsor.status === "Partnership Active"
+                                  ? "bg-primary/10 border-primary/30 text-primary"
+                                  : sponsor.status === "Contacted"
+                                    ? "bg-electric/10 border-electric/30 text-electric"
+                                    : sponsor.status === "New"
+                                      ? "bg-accent/10 border-accent/30 text-accent"
                                       : "bg-muted border-border/50 text-muted-foreground"
-                              }`}
+                                }`}
                             >
                               <option value="New" className="bg-card text-foreground">New</option>
                               <option value="Contacted" className="bg-card text-foreground">Contacted</option>
@@ -1550,7 +1541,7 @@ const AdminPanel = () => {
                       }, {} as Record<string, typeof filteredGameFees>);
 
                       const toggleTournament = (slug: string) => {
-                        setExpandedTournaments(prev => 
+                        setExpandedTournaments(prev =>
                           prev.includes(slug) ? prev.filter(t => t !== slug) : [...prev, slug]
                         );
                       };
@@ -1559,7 +1550,7 @@ const AdminPanel = () => {
                         Object.entries(groupedFees).map(([slug, fees]) => (
                           <Fragment key={slug}>
                             {/* Tournament Header Row */}
-                            <tr 
+                            <tr
                               className="bg-secondary/20 hover:bg-secondary/40 cursor-pointer border-b border-border/50"
                               onClick={() => toggleTournament(slug)}
                             >
@@ -1579,7 +1570,7 @@ const AdminPanel = () => {
                                 </div>
                               </td>
                             </tr>
-                            
+
                             {/* Expanded Fee Rows */}
                             {expandedTournaments.includes(slug) && fees.map((fee) => (
                               <tr key={fee.id} className="hover:bg-secondary/10 transition-colors bg-background/30">
@@ -1658,7 +1649,7 @@ const AdminPanel = () => {
                       Switch between payment methods and update credentials. Changes take effect instantly.
                     </p>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Method Selector */}
                     <div className="space-y-6">
@@ -1666,29 +1657,27 @@ const AdminPanel = () => {
                         <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
                           Active Payment Method
                         </label>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <button
                             type="button"
                             onClick={() => setPaymentConfig(prev => ({ ...prev, useRazorpay: true }))}
-                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${
-                              paymentConfig.useRazorpay 
-                                ? 'border-primary bg-primary/5 text-primary glow-primary-border' 
+                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${paymentConfig.useRazorpay
+                                ? 'border-primary bg-primary/5 text-primary glow-primary-border'
                                 : 'border-border/60 bg-secondary/10 hover:border-border text-muted-foreground hover:text-foreground'
-                            }`}
+                              }`}
                           >
                             <span className="font-display font-bold text-sm uppercase">Razorpay Gateway</span>
                             <span className="text-[10px] opacity-75 mt-1 text-center">Credit Card, Net Banking, UPI</span>
                           </button>
-                          
+
                           <button
                             type="button"
                             onClick={() => setPaymentConfig(prev => ({ ...prev, useRazorpay: false }))}
-                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${
-                              !paymentConfig.useRazorpay 
-                                ? 'border-primary bg-primary/5 text-primary glow-primary-border' 
+                            className={`flex flex-col items-center justify-center p-5 rounded-xl border-2 transition-all cursor-pointer ${!paymentConfig.useRazorpay
+                                ? 'border-primary bg-primary/5 text-primary glow-primary-border'
                                 : 'border-border/60 bg-secondary/10 hover:border-border text-muted-foreground hover:text-foreground'
-                            }`}
+                              }`}
                           >
                             <span className="font-display font-bold text-sm uppercase">UPI QR Code</span>
                             <span className="text-[10px] opacity-75 mt-1 text-center">Direct scan & receipt upload</span>
@@ -1700,7 +1689,7 @@ const AdminPanel = () => {
                       {paymentConfig.useRazorpay ? (
                         <div className="space-y-4 pt-2">
                           <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">Razorpay Credentials</h4>
-                          
+
                           <div className="space-y-2">
                             <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                               Razorpay Key ID
@@ -1731,7 +1720,7 @@ const AdminPanel = () => {
                       ) : (
                         <div className="space-y-4 pt-2">
                           <h4 className="font-display font-bold text-xs uppercase tracking-wider text-foreground">UPI QR Settings</h4>
-                          
+
                           <div className="space-y-2">
                             <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                               Merchant UPI ID
@@ -1748,7 +1737,7 @@ const AdminPanel = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* QR Code Upload Section */}
                     <div className="space-y-6 border-t md:border-t-0 md:border-l border-border/30 md:pl-8">
                       {!paymentConfig.useRazorpay && (
@@ -1812,7 +1801,7 @@ const AdminPanel = () => {
                           )}
                         </div>
                       )}
-                      
+
                       {paymentConfig.useRazorpay && (
                         <div className="flex flex-col items-center justify-center h-full min-h-[220px] text-center p-6 border border-primary/20 rounded-2xl bg-primary/5">
                           <Sparkles className="w-10 h-10 text-primary mb-3 glow-primary" />
@@ -1824,7 +1813,7 @@ const AdminPanel = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Save Button */}
                   <div className="pt-6 border-t border-border/50 flex justify-end">
                     <button
@@ -1926,58 +1915,58 @@ const AdminPanel = () => {
                       <div className="space-y-4 pt-6 border-t border-border/50">
                         <div className="flex justify-between items-center mb-4">
                           <h4 className="font-display font-bold text-md uppercase text-primary">Registered Participants ({gameParticipants.length})</h4>
-                          <button 
+                          <button
                             onClick={() => setIsAddingParticipant(true)}
                             className="px-4 py-2 bg-primary text-primary-foreground font-bold tracking-wider rounded text-xs glow-primary hover:brightness-110 transition-all"
                           >
                             + ADD PLAYER
                           </button>
                         </div>
-                        
+
                         {isAddingParticipant && (
                           <div className="bg-secondary/20 p-4 rounded-xl border border-border/50 space-y-4 mb-4">
                             <h5 className="font-bold text-sm uppercase text-foreground">Add Manual Participant</h5>
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                              <input 
-                                type="text" 
-                                placeholder="Player Name" 
-                                value={manualPlayerName} 
-                                onChange={e => setManualPlayerName(e.target.value)} 
-                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
+                              <input
+                                type="text"
+                                placeholder="Player Name"
+                                value={manualPlayerName}
+                                onChange={e => setManualPlayerName(e.target.value)}
+                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                               />
-                              <input 
-                                type="text" 
-                                placeholder="Phone (Optional)" 
-                                value={manualPlayerPhone} 
-                                onChange={e => setManualPlayerPhone(e.target.value)} 
-                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
+                              <input
+                                type="text"
+                                placeholder="Phone (Optional)"
+                                value={manualPlayerPhone}
+                                onChange={e => setManualPlayerPhone(e.target.value)}
+                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                               />
-                                <input 
-                                  type="text" 
-                                  placeholder="Partner Name (If Doubles)" 
-                                  value={manualPartnerName} 
-                                  onChange={e => setManualPartnerName(e.target.value)} 
-                                  className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
-                                />
-                                <select
-                                  value={manualPaymentStatus}
-                                  onChange={e => setManualPaymentStatus(e.target.value)}
-                                  className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-                                >
-                                  <option value="Paid">Paid</option>
-                                  <option value="Pending">Pending</option>
-                                  <option value="Refunded">Refunded</option>
-                                </select>
-                              </div>
-                              <div className="flex gap-2">
-                              <button 
-                                onClick={handleAddManualParticipant} 
+                              <input
+                                type="text"
+                                placeholder="Partner Name (If Doubles)"
+                                value={manualPartnerName}
+                                onChange={e => setManualPartnerName(e.target.value)}
+                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                              />
+                              <select
+                                value={manualPaymentStatus}
+                                onChange={e => setManualPaymentStatus(e.target.value)}
+                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                              >
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Refunded">Refunded</option>
+                              </select>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={handleAddManualParticipant}
                                 disabled={isSavingParticipant || !manualPlayerName}
                                 className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded text-xs hover:brightness-110 transition-all disabled:opacity-50"
                               >
                                 {isSavingParticipant ? "Saving..." : "Save Participant"}
                               </button>
-                              <button 
+                              <button
                                 onClick={() => {
                                   setIsAddingParticipant(false);
                                   setManualPlayerName("");
@@ -2074,11 +2063,10 @@ const AdminPanel = () => {
                                         <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
                                         <td className="p-3 text-muted-foreground">{p.category}</td>
                                         <td className="p-3 text-center">
-                                          <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                            p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
-                                            p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
-                                            'bg-yellow-500/20 text-yellow-500'
-                                          }`}>
+                                          <span className={`px-2 py-1 rounded text-xs font-bold ${p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
+                                              p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
+                                                'bg-yellow-500/20 text-yellow-500'
+                                            }`}>
                                             {p.status || 'Pending'}
                                           </span>
                                         </td>
@@ -2086,7 +2074,7 @@ const AdminPanel = () => {
                                           {p.points}
                                         </td>
                                         <td className="p-3 flex justify-center gap-3">
-                                          <button 
+                                          <button
                                             onClick={() => {
                                               setEditingParticipantId(p.id);
                                               setEditParticipantName(p.playerName);
@@ -2100,7 +2088,7 @@ const AdminPanel = () => {
                                           >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                           </button>
-                                          <button 
+                                          <button
                                             onClick={() => handleDeletePlayer(p.id)}
                                             className="text-muted-foreground hover:text-destructive transition-colors"
                                             title="Delete Player"
@@ -2156,10 +2144,10 @@ const AdminPanel = () => {
                             return null;
                           })()}
                           <div className="flex items-center gap-3 border-l border-border/50 pl-6">
-                            <input 
-                              type="number" 
-                              min="1" 
-                              value={matchCountToGenerate} 
+                            <input
+                              type="number"
+                              min="1"
+                              value={matchCountToGenerate}
                               onChange={e => setMatchCountToGenerate(parseInt(e.target.value) || 1)}
                               className="w-20 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all text-center"
                             />
@@ -2174,7 +2162,7 @@ const AdminPanel = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="space-y-4">
                       {(() => {
                         const groupedByTournament = filteredScheduledGames.reduce((acc, game) => {
@@ -2186,7 +2174,7 @@ const AdminPanel = () => {
                         }, {} as Record<string, Record<string, typeof filteredScheduledGames>>);
 
                         const toggleGameTournament = (t: string) => {
-                          setExpandedGameTournaments(prev => 
+                          setExpandedGameTournaments(prev =>
                             prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]
                           );
                         };
@@ -2194,7 +2182,7 @@ const AdminPanel = () => {
                         return Object.keys(groupedByTournament).length > 0 ? (
                           Object.entries(groupedByTournament).map(([tournamentName, matchGroups]) => (
                             <div key={tournamentName} className="glass-card border border-border/50 rounded-xl overflow-hidden">
-                              <div 
+                              <div
                                 className="bg-secondary/20 hover:bg-secondary/40 p-4 cursor-pointer flex items-center gap-3 transition-colors border-b border-border/10"
                                 onClick={() => toggleGameTournament(tournamentName)}
                               >
@@ -2207,7 +2195,7 @@ const AdminPanel = () => {
                                   {tournamentName}
                                 </span>
                               </div>
-                              
+
                               {expandedGameTournaments.includes(tournamentName) && (
                                 <div className="p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => (
@@ -2241,14 +2229,14 @@ const AdminPanel = () => {
                                         </div>
                                       </div>
                                       <div className="space-y-3 pl-2 border-l-2 border-primary/20">
-                                        {games.filter(g => g.homePlayer && g.homePlayer !== "TBD").map((game, index) => (
+                                        {games.filter(g => (g.homePlayer && g.homePlayer !== "TBD") || editingGame?.id === g.id).map((game, index) => (
                                           <div key={game.id} className="p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
                                             {editingGame?.id === game.id ? (
-                                              <GameForm 
-                                                game={editingGame} 
-                                                setGame={setEditingGame} 
-                                                onSave={handleSaveGame} 
-                                                onCancel={() => setEditingGame(null)} 
+                                              <GameForm
+                                                game={editingGame}
+                                                setGame={setEditingGame}
+                                                onSave={handleSaveGame}
+                                                onCancel={() => setEditingGame(null)}
                                                 onDelete={() => handleDeleteGame(game.id)}
                                                 isSaving={isSavingGame}
                                                 participants={gameParticipants}
@@ -2263,8 +2251,8 @@ const AdminPanel = () => {
                                                     <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
                                                       <span className={game.winner === game.homePlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                         {game.homePlayer} {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
-                                                      </span> 
-                                                      <span className="text-muted-foreground font-body text-sm mx-3">vs</span> 
+                                                      </span>
+                                                      <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
                                                       <span className={game.winner === game.awayPlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                         {game.awayPlayer} {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
                                                       </span>
@@ -2295,15 +2283,15 @@ const AdminPanel = () => {
                           ))
                         ) : null;
                       })()}
-                      
+
                       {editingGame && !editingGame.id && (
                         <div className="glass-card p-6 border border-primary/50 rounded-xl bg-primary/5">
                           <p className="text-sm font-semibold text-primary mb-4">New Match</p>
-                          <GameForm 
-                            game={editingGame} 
-                            setGame={setEditingGame} 
-                            onSave={handleSaveGame} 
-                            onCancel={() => setEditingGame(null)} 
+                          <GameForm
+                            game={editingGame}
+                            setGame={setEditingGame}
+                            onSave={handleSaveGame}
+                            onCancel={() => setEditingGame(null)}
                             isSaving={isSavingGame}
                             participants={gameParticipants}
                           />
@@ -2344,7 +2332,7 @@ const AdminPanel = () => {
                 ✕
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto flex-1 flex flex-col items-center bg-background/50">
               {selectedPlayer.screenshotUrl ? (
                 <img
@@ -2355,7 +2343,7 @@ const AdminPanel = () => {
               ) : (
                 <div className="py-12 text-muted-foreground text-sm">No screenshot available.</div>
               )}
-              
+
               <div className="w-full mt-6 p-4 rounded-lg bg-secondary/20 border border-border/50 text-xs space-y-1.5 text-left">
                 <p><span className="text-muted-foreground font-semibold">Age Group & Event:</span> {selectedPlayer.ageCategory} • {selectedPlayer.category}</p>
                 <p><span className="text-muted-foreground font-semibold">Phone:</span> {selectedPlayer.phone}</p>
@@ -2364,7 +2352,7 @@ const AdminPanel = () => {
                 <p><span className="text-muted-foreground font-semibold">Current Status:</span> <strong className={selectedPlayer.status === 'Paid' ? 'text-primary' : 'text-accent'}>{selectedPlayer.status}</strong></p>
               </div>
             </div>
-            
+
             <div className="p-6 border-t border-border flex flex-col sm:flex-row gap-3 bg-secondary/15">
               {selectedPlayer.status !== "Paid" && (
                 <button
