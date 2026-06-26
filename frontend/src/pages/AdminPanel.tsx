@@ -2389,7 +2389,7 @@ const AdminPanel = () => {
                                             </button>
                                           </div>
                                         </div>
-                                        <div className="space-y-6 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2 pb-2">
+                                        <div className="space-y-6 mt-3 pb-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2446,10 +2446,10 @@ const AdminPanel = () => {
                                                         <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
                                                       </div>
                                                     </div>
-                                                    <div className="flex flex-row justify-between w-full mt-3 sm:mt-0 sm:w-auto">
+                                                    <div className="flex flex-row justify-between sm:justify-end items-center w-full mt-4 sm:mt-0 sm:w-auto gap-4 sm:gap-6 shrink-0">
                                                       <button
                                                         onClick={() => setEditingGame(game)}
-                                                        className="text-primary hover:underline text-sm font-semibold cursor-pointer"
+                                                        className="text-primary hover:underline text-sm font-semibold cursor-pointer whitespace-nowrap"
                                                       >
                                                         {game.homePlayer === "TBD" ? "+ Add Fix" : "Edit"}
                                                       </button>
@@ -2460,7 +2460,7 @@ const AdminPanel = () => {
                                                             setTempHomeScore(game.homeScore || 0);
                                                             setTempAwayScore(game.awayScore || 0);
                                                           }}
-                                                          className="text-accent hover:underline text-sm font-semibold cursor-pointer"
+                                                          className="text-accent hover:underline text-sm font-semibold cursor-pointer whitespace-nowrap"
                                                         >
                                                           Enter Score
                                                         </button>
