@@ -306,28 +306,47 @@ const AdminPanel = () => {
     }
   };
 
-  // Load all data
   const loadData = async () => {
     try {
       const pData = await getPlayerRegistrations();
-      const tData = await getTournamentApplications();
-      const sData = await getSponsorRegistrations();
-      const fData = await getGameFees();
-      const gData = await getScheduledGames();
       setPlayers(pData);
-      setTournaments(tData);
-      setSponsors(sData);
-      setGameFees(fData);
-      setScheduledGames(gData);
-
-      try {
-        const configData = await getPaymentConfig();
-        setPaymentConfig(configData);
-      } catch (configErr) {
-        console.error("Error loading payment configuration:", configErr);
-      }
     } catch (error) {
-      console.error("Error loading data from TiDB:", error);
+      console.error("Error loading players:", error);
+    }
+
+    try {
+      const tData = await getTournamentApplications();
+      setTournaments(tData);
+    } catch (error) {
+      console.error("Error loading tournaments:", error);
+    }
+
+    try {
+      const sData = await getSponsorRegistrations();
+      setSponsors(sData);
+    } catch (error) {
+      console.error("Error loading sponsors:", error);
+    }
+
+    try {
+      const fData = await getGameFees();
+      setGameFees(fData);
+    } catch (error) {
+      console.error("Error loading game fees:", error);
+    }
+
+    try {
+      const gData = await getScheduledGames();
+      setScheduledGames(gData);
+    } catch (error) {
+      console.error("Error loading scheduled games:", error);
+    }
+
+    try {
+      const configData = await getPaymentConfig();
+      setPaymentConfig(configData);
+    } catch (configErr) {
+      console.error("Error loading payment configuration:", configErr);
     }
   };
 
