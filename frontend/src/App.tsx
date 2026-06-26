@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import ChatBot from "./components/ChatBot";
+import Matches from "./pages/Matches";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/sponsor" element={<SponsorRegistration />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/matches" element={<Matches />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

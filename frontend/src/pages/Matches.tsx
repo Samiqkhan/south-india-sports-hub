@@ -1,0 +1,314 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ChevronDown, ChevronRight, Trophy, Users } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  getPlayerRegistrations,
+  getScheduledGames,
+  PlayerRegistration,
+  ScheduledGame
+} from "@/lib/storage";
+import { tournaments as staticTournaments } from "@/data/tournaments";
+
+const Matches = () => {
+  const { toast } = useToast();
+  
+  const [players, setPlayers] = useState<PlayerRegistration[]>([]);
+  const [scheduledGames, setScheduledGames] = useState<ScheduledGame[]>([]);
+  const [selectedGameTournament, setSelectedGameTournament] = useState<string>("");
+  const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>("");
+  const [selectedGameCategory, setSelectedGameCategory] = useState<string>("");
+  const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [pData, gData] = await Promise.all([
+          getPlayerRegistrations(),
+          getScheduledGames()
+        ]);
+        setPlayers(pData);
+        setScheduledGames(gData);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load matches data.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, [toast]);
+
+  const gameTournaments = Array.from(new Set(players.map(p => p.tournamentTitle).filter(Boolean))).sort();
+  
+  const gameAgeCategoriesForTournament = selectedGameTournament 
+    ? Array.from(new Set(players.filter(p => p.tournamentTitle === selectedGameTournament).map(p => p.ageCategory).filter(Boolean))).sort()
+    : [];
+
+  const gameCategoriesForTournament = (selectedGameTournament && selectedGameAgeCategory)
+    ? Array.from(new Set(players.filter(p => p.tournamentTitle === selectedGameTournament && p.ageCategory === selectedGameAgeCategory).map(p => p.category).filter(Boolean))).sort()
+    : [];
+
+  // Match the logic from Admin Panel
+  const gameParticipants = players.filter(p => 
+    p.tournamentTitle === selectedGameTournament && 
+    p.ageCategory === selectedGameAgeCategory &&
+    p.category === selectedGameCategory &&
+    p.email === "manual@example.com"
+  );
+  
+  const filteredScheduledGames = scheduledGames.filter(g => {
+    if (selectedGameTournament && g.tournament !== selectedGameTournament) return false;
+    if (selectedGameAgeCategory && g.ageCategory !== selectedGameAgeCategory) return false;
+    if (selectedGameCategory && g.category !== selectedGameCategory) return false;
+    return true;
+  });
+
+  return (
+    <div className="min-h-screen bg-background overflow-x-hidden w-full flex flex-col">
+      <Navbar />
+      
+      <main className="flex-grow pt-28 pb-16 px-4 md:px-8">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-8"
+          >
+            <div className="text-center space-y-4 mb-12">
+              <h1 className="font-display text-3xl md:text-5xl font-bold uppercase tracking-wide">
+                Matches <span className="gradient-text">& Leaderboard</span>
+              </h1>
+              <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
+                View registered participants, match schedules, and current point standings.
+              </p>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground glass-card border border-border/50 rounded-xl">
+                <p>Loading data...</p>
+              </div>
+            ) : (
+              <div className="glass-card p-6 md:p-8 rounded-xl border border-border/50 space-y-8">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1 space-y-2">
+                    <label className="block text-sm font-bold text-foreground">Select Tournament</label>
+                    <select
+                      value={selectedGameTournament}
+                      onChange={(e) => {
+                        setSelectedGameTournament(e.target.value);
+                        setSelectedGameAgeCategory("");
+                        setSelectedGameCategory(""); 
+                      }}
+                      className="w-full bg-secondary/30 border border-border rounded p-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    >
+                      <option value="">-- Choose a Tournament --</option>
+                      {gameTournaments.map((tTitle) => (
+                        <option key={tTitle} value={tTitle}>{tTitle}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <label className="block text-sm font-bold text-foreground uppercase tracking-wide">Age Category</label>
+                    <select
+                      value={selectedGameAgeCategory}
+                      onChange={(e) => {
+                        setSelectedGameAgeCategory(e.target.value);
+                        setSelectedGameCategory(""); 
+                      }}
+                      disabled={!selectedGameTournament}
+                      className="w-full bg-secondary/30 border border-border rounded p-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      <option value="">Select Age</option>
+                      {gameAgeCategoriesForTournament.map((age: string) => (
+                        <option key={age} value={age}>{age}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <label className="block text-sm font-bold text-foreground uppercase tracking-wide">Event Type</label>
+                    <select
+                      value={selectedGameCategory}
+                      onChange={(e) => setSelectedGameCategory(e.target.value)}
+                      disabled={!selectedGameAgeCategory}
+                      className="w-full bg-secondary/30 border border-border rounded p-2.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      <option value="">Select Type</option>
+                      {gameCategoriesForTournament.map((c: string) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {selectedGameTournament && selectedGameAgeCategory && selectedGameCategory ? (
+                  <div className="space-y-12 pt-6 border-t border-border/50">
+                    
+                    {/* Participants Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Users className="text-primary w-5 h-5" />
+                        <h4 className="font-display font-bold text-lg uppercase text-primary">
+                          Registered Participants ({gameParticipants.length})
+                        </h4>
+                      </div>
+                      
+                      <div className="overflow-x-auto rounded-xl border border-border/50">
+                        <table className="w-full text-left border-collapse bg-background">
+                          <thead>
+                            <tr className="border-b border-border/50 bg-secondary/20 text-muted-foreground text-xs uppercase tracking-wider">
+                              <th className="p-3 font-semibold">Name</th>
+                              <th className="p-3 font-semibold">Phone</th>
+                              <th className="p-3 font-semibold">Category</th>
+                              <th className="p-3 font-semibold">Event Type</th>
+                              <th className="p-3 font-semibold text-center">Payment Status</th>
+                              <th className="p-3 font-semibold text-center">Points</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-sm">
+                            {gameParticipants.map(p => (
+                              <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
+                                <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
+                                <td className="p-3 text-muted-foreground">{p.phone}</td>
+                                <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
+                                <td className="p-3 text-muted-foreground">{p.category}</td>
+                                <td className="p-3 text-center">
+                                  <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                    p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
+                                    p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
+                                    'bg-yellow-500/20 text-yellow-500'
+                                  }`}>
+                                    {p.status || 'Pending'}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-bold text-primary text-center">
+                                  {(() => {
+                                    const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
+                                    let points = 0;
+                                    filteredScheduledGames.forEach(g => {
+                                      if (g.winner === playerName) points += 1;
+                                      else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
+                                    });
+                                    return points;
+                                  })()}
+                                </td>
+                              </tr>
+                            ))}
+                            {gameParticipants.length === 0 && (
+                              <tr>
+                                <td colSpan={6} className="p-6 text-center text-muted-foreground">
+                                  No participants found for this category.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Matches Section */}
+                    <div className="space-y-4 pt-6 border-t border-border/50">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Trophy className="text-primary w-5 h-5" />
+                        <h4 className="font-display font-bold text-lg uppercase text-primary">
+                          Fixed Matches ({filteredScheduledGames.length})
+                        </h4>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {(() => {
+                          const groupedByTournament = filteredScheduledGames.reduce((acc, game) => {
+                            if (!acc[game.tournament]) acc[game.tournament] = {};
+                            const matchName = game.round || "Unassigned Match";
+                            if (!acc[game.tournament][matchName]) acc[game.tournament][matchName] = [];
+                            acc[game.tournament][matchName].push(game);
+                            return acc;
+                          }, {} as Record<string, Record<string, typeof filteredScheduledGames>>);
+
+                          const toggleGameTournament = (t: string) => {
+                            setExpandedGameTournaments(prev => 
+                              prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]
+                            );
+                          };
+
+                          return Object.keys(groupedByTournament).length > 0 ? (
+                            Object.entries(groupedByTournament).map(([tournamentName, matchGroups]) => (
+                              <div key={tournamentName} className="glass-card border border-border/50 rounded-xl overflow-hidden">
+                                <div 
+                                  className="bg-secondary/20 hover:bg-secondary/40 p-4 cursor-pointer flex items-center gap-3 transition-colors border-b border-border/10"
+                                  onClick={() => toggleGameTournament(tournamentName)}
+                                >
+                                  {expandedGameTournaments.includes(tournamentName) ? (
+                                    <ChevronDown className="w-5 h-5 text-primary" />
+                                  ) : (
+                                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                                  )}
+                                  <span className="font-display font-bold uppercase tracking-wider text-sm text-foreground">
+                                    {tournamentName}
+                                  </span>
+                                </div>
+                                
+                                {expandedGameTournaments.includes(tournamentName) && (
+                                  <div className="p-4 space-y-6 bg-background/30">
+                                    {Object.entries(matchGroups).map(([matchName, games]) => (
+                                      <div key={matchName} className="space-y-3">
+                                        <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                          {games.map((g, idx) => (
+                                            <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 border border-border flex flex-col justify-between">
+                                              <div className="flex justify-between items-center text-sm font-bold">
+                                                <span className={g.winner === g.homePlayer ? "text-primary" : "text-foreground"}>{g.homePlayer}</span>
+                                                <span className="text-muted-foreground text-xs mx-2 border px-2 py-0.5 rounded-full border-border">VS</span>
+                                                <span className={g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}>{g.awayPlayer}</span>
+                                              </div>
+                                              
+                                              <div className="mt-4 pt-3 border-t border-border/50 flex justify-between items-center">
+                                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Winner</span>
+                                                <span className={`text-xs font-extrabold uppercase ${g.winner && g.winner !== "Not Played" && g.winner !== "Draw" ? "text-electric" : "text-muted-foreground"}`}>
+                                                  {g.winner || "Not Played"}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground border border-dashed border-border/50 rounded-xl">
+                              No matches fixed yet.
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground glass-card border border-border/50 rounded-xl">
+                    <p>Please select a Tournament, Age Category, and Event Type to view participants and matches.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Matches;
