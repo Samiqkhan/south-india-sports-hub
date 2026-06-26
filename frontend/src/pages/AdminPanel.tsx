@@ -2281,11 +2281,15 @@ const AdminPanel = () => {
                                                       <div className="flex items-center gap-6">
                                                         <div className="text-foreground font-display font-bold text-lg flex items-center flex-wrap">
                                                           <span className={game.winner === game.homePlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.homePlayer} {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                            {game.homePlayer} 
+                                                            {game.winner === game.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
                                                           <span className="text-muted-foreground font-body text-sm mx-3">vs</span>
                                                           <span className={game.winner === game.awayPlayer ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
-                                                            {game.awayPlayer} {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                            {game.awayPlayer} 
+                                                            {game.winner === game.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
                                                         </div>
                                                       </div>

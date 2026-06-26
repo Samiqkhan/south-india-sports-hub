@@ -318,9 +318,17 @@ const Matches = () => {
                                                     <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                   </div>
                                                   <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
-                                                    <span className={`flex-1 text-left ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>{g.homePlayer}</span>
+                                                    <span className={`flex-1 text-left flex items-center flex-wrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
+                                                      {g.homePlayer} 
+                                                      {g.winner === g.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold ml-1">( DRAW )</span>}
+                                                    </span>
                                                     <span className="text-muted-foreground text-[10px] sm:text-xs border px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-border bg-background/50 flex-shrink-0">VS</span>
-                                                    <span className={`flex-1 text-right ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>{g.awayPlayer}</span>
+                                                    <span className={`flex-1 text-right flex items-center justify-end flex-wrap gap-1 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>
+                                                      {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold mr-1">( DRAW )</span>}
+                                                      {g.winner === g.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                      {g.awayPlayer}
+                                                    </span>
                                                   </div>
                                                   
                                                   <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-5 -mb-3 sm:-mb-5 px-3 sm:px-5 py-2 sm:py-3 rounded-b-lg">
