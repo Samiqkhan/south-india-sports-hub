@@ -281,7 +281,7 @@ const Matches = () => {
                                 </div>
                                 
                                 {expandedGameTournaments.includes(tournamentName) && (
-                                  <div className="p-2 sm:p-4 space-y-4 sm:space-y-6 bg-background/30">
+                                  <div className="p-3 sm:p-4 space-y-4 sm:space-y-6 bg-background/30">
                                     {Object.entries(matchGroups).map(([matchName, games]) => {
                                       const validGames = games.filter(g => g.homePlayer && g.homePlayer !== "TBD" && g.homePlayer !== "GROUP_PLACEHOLDER");
                                       if (validGames.length === 0) return null;
@@ -292,7 +292,7 @@ const Matches = () => {
                                       return (
                                         <div key={matchName} className="space-y-3">
                                           <div 
-                                            className="flex items-center gap-2 cursor-pointer bg-secondary/10 hover:bg-secondary/20 p-2 rounded-lg transition-colors border border-border/10"
+                                            className="flex items-center gap-2 cursor-pointer bg-secondary/10 hover:bg-secondary/20 p-3 sm:p-4 rounded-lg transition-colors border border-border/10"
                                             onClick={() => {
                                               setExpandedMatchNames(prev => 
                                                 prev.includes(matchKey) ? prev.filter(k => k !== matchKey) : [...prev, matchKey]
@@ -311,9 +311,9 @@ const Matches = () => {
                                           </div>
                                           
                                           {isMatchExpanded && (
-                                            <div className="grid grid-cols-1 gap-4 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-2">
+                                            <div className="grid grid-cols-1 gap-4 pl-3 sm:pl-6 border-l-2 border-primary/20 ml-2 mt-3">
                                               {validGames.map((g, idx) => (
-                                                <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-3 sm:p-5 border border-border flex flex-col justify-between w-full">
+                                                <div key={g.id || idx} className="bg-secondary/30 rounded-lg p-4 sm:p-5 border border-border flex flex-col justify-between w-full">
                                                   <div className="mb-3 sm:mb-4 pb-2 border-b border-border/20">
                                                     <p className="text-sm font-semibold text-primary uppercase tracking-wider">Fix {idx + 1}</p>
                                                   </div>
