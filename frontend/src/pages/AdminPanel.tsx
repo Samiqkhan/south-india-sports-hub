@@ -2464,29 +2464,36 @@ const AdminPanel = () => {
                                                           )}
                                                         </p>
                                                       </div>
-                                                      <div className="flex w-full mt-2 sm:mt-0 pr-2 md:max-w-lg lg:max-w-xl">
-                                                        <div className="text-foreground font-display font-bold text-base sm:text-lg flex justify-between items-center w-full flex-nowrap gap-2">
-                                                          <span className={`flex-1 text-left flex items-center gap-1 ${game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary" : ""}`}>
-                                                            <span className="truncate">{game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer}</span> 
-                                                            {game.winner && game.homeScore !== undefined && <span className="ml-1 text-sm bg-secondary px-1.5 py-0.5 rounded border border-border font-mono shrink-0">{game.homeScore}</span>}
-                                                            {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0" />}
-                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold ml-1 shrink-0">(DRAW)</span>}
-                                                          </span>
-                                                          <span className="text-muted-foreground font-body text-xs sm:text-sm shrink-0">vs</span>
-                                                          <span className={`flex-1 text-right flex justify-end items-center gap-1 ${game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary" : ""}`}>
-                                                            {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold mr-1 shrink-0">(DRAW)</span>}
-                                                            {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0 mr-1" />}
-                                                            {game.winner && game.awayScore !== undefined && <span className="mr-1 text-sm bg-secondary px-1.5 py-0.5 rounded border border-border font-mono shrink-0">{game.awayScore}</span>}
-                                                            <span className="truncate">{game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer}</span> 
-                                                          </span>
+                                                      <div className="text-foreground font-display font-bold text-base sm:text-lg flex justify-between items-center w-full flex-nowrap gap-2">
+                                                            <span className={`flex-1 text-left flex items-center gap-1 ${game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary" : ""}`}>
+                                                              <span className="truncate">{game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer}</span> 
+                                                              {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0" />}
+                                                              {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold ml-1 shrink-0">(DRAW)</span>}
+                                                            </span>
+                                                            <span className="text-muted-foreground font-body text-xs sm:text-sm shrink-0">vs</span>
+                                                            <span className={`flex-1 text-right flex justify-end items-center gap-1 ${game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary" : ""}`}>
+                                                              {game.winner === "Draw" && <span className="text-muted-foreground text-[10px] font-semibold mr-1 shrink-0">(DRAW)</span>}
+                                                              {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary shrink-0 mr-1" />}
+                                                              <span className="truncate">{game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer}</span> 
+                                                            </span>
+                                                          </div>
                                                         </div>
-                                                      </div>
-                                                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-2">
-                                                        <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
-                                                      </div>
-                                                    </div>
-                                                    <div className="flex flex-row justify-between sm:justify-end items-center w-full mt-4 sm:mt-0 sm:w-auto gap-4 sm:gap-6 shrink-0">
-                                                      <button
+                                                        
+                                                        {(game.homeScore !== undefined || game.awayScore !== undefined) && (
+                                                          <div className="flex justify-center items-center mt-3 sm:mt-4">
+                                                            <div className="flex items-center gap-4 bg-background/50 px-6 py-2 rounded-lg border border-border/50">
+                                                              <span className="text-2xl sm:text-3xl font-mono font-black text-foreground">{game.homeScore !== undefined ? game.homeScore : 0}</span>
+                                                              <span className="text-sm font-bold text-muted-foreground">-</span>
+                                                              <span className="text-2xl sm:text-3xl font-mono font-black text-foreground">{game.awayScore !== undefined ? game.awayScore : 0}</span>
+                                                            </div>
+                                                          </div>
+                                                        )}
+                                                        
+                                                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground mt-2">
+                                                          <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
+                                                        </div>
+                                                      <div className="flex flex-row justify-between sm:justify-end items-center w-full mt-4 sm:mt-0 sm:w-auto gap-4 sm:gap-6 shrink-0">
+                                                        <button
                                                         onClick={() => setEditingGame(game)}
                                                         className="text-primary hover:underline text-sm font-semibold cursor-pointer whitespace-nowrap"
                                                       >

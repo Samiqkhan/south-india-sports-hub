@@ -49,6 +49,19 @@ const Matches = () => {
     loadData();
   }, []);
 
+  // Poll for live score updates every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const gData = await getScheduledGames();
+        setScheduledGames(gData);
+      } catch (e) {
+        console.error("Live update failed", e);
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("sisa_matchesTournament", selectedGameTournament);
   }, [selectedGameTournament]);
@@ -252,7 +265,6 @@ const Matches = () => {
                                                   <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2 md:max-w-lg lg:max-w-xl md:mx-auto w-full">
                                                     <span className={`flex-1 text-left flex items-center flex-nowrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
                                                       <span className="truncate">{g.homePlayer}</span> 
-                                                      {g.winner && g.homeScore !== undefined && <span className="ml-1 sm:ml-2 text-sm bg-secondary px-1.5 sm:px-2 py-0.5 rounded border border-border font-mono shrink-0">{g.homeScore}</span>}
                                                       {g.winner === g.homePlayer && <Trophy className="w-4 h-4 text-primary shrink-0" />}
                                                       {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold ml-1 shrink-0">( DRAW )</span>}
                                                     </span>
@@ -260,10 +272,19 @@ const Matches = () => {
                                                     <span className={`flex-1 text-right flex items-center justify-end flex-nowrap gap-1 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>
                                                       {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold mr-1 shrink-0">( DRAW )</span>}
                                                       {g.winner === g.awayPlayer && <Trophy className="w-4 h-4 text-primary shrink-0" />}
-                                                      {g.winner && g.awayScore !== undefined && <span className="mr-1 sm:mr-2 text-sm bg-secondary px-1.5 sm:px-2 py-0.5 rounded border border-border font-mono shrink-0">{g.awayScore}</span>}
                                                       <span className="truncate">{g.awayPlayer}</span>
                                                     </span>
                                                   </div>
+                                                  
+                                                  {(g.homeScore !== undefined || g.awayScore !== undefined) && (
+                                                    <div className="flex justify-center items-center mt-4 sm:mt-5">
+                                                      <div className="flex items-center gap-4 bg-background/50 px-6 py-2 rounded-lg border border-border/50">
+                                                        <span className="text-2xl sm:text-3xl font-mono font-black text-foreground">{g.homeScore !== undefined ? g.homeScore : 0}</span>
+                                                        <span className="text-sm font-bold text-muted-foreground">-</span>
+                                                        <span className="text-2xl sm:text-3xl font-mono font-black text-foreground">{g.awayScore !== undefined ? g.awayScore : 0}</span>
+                                                      </div>
+                                                    </div>
+                                                  )}
                                                   
                                                   <div className="mt-4 sm:mt-5 pt-3 border-t border-border/50 flex justify-between items-center bg-background/20 -mx-3 sm:-mx-4 -mb-3 sm:-mb-4 px-3 sm:px-4 py-2 sm:py-3 rounded-b-lg">
                                                     <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-semibold">Winner</span>
