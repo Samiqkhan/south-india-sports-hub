@@ -10,6 +10,7 @@ import SponsorRegistration from "./pages/SponsorRegistration";
 import AdminPanel from "./pages/AdminPanel";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import PlayersList from "./pages/PlayersList";
 import ChatBot from "./components/ChatBot";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/tournament/:slug" element={<TournamentDetail />} />
+          <Route path="/players" element={<PlayersList />} />
           <Route path="/apply" element={<ApplyTournament />} />
           <Route path="/sponsor" element={<SponsorRegistration />} />
           <Route path="/admin" element={<AdminPanel />} />
