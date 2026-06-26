@@ -89,6 +89,16 @@ const Matches = () => {
     return true;
   });
 
+  const gameParticipantsWithPoints = gameParticipants.map(p => {
+    const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
+    let points = 0;
+    filteredScheduledGames.forEach(g => {
+      if (g.winner === playerName) points += 1;
+      else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
+    });
+    return { ...p, points };
+  }).sort((a, b) => b.points - a.points);
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden w-full flex flex-col">
       <Navbar />
@@ -206,21 +216,13 @@ const Matches = () => {
                               </tr>
                             </thead>
                             <tbody className="text-[10px] sm:text-xs md:text-sm">
-                              {gameParticipants.map(p => (
+                              {gameParticipantsWithPoints.map(p => (
                                 <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
                                   <td className="px-1 md:px-2 py-2 md:py-3 font-medium text-foreground break-words">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
                                   <td className="px-1 md:px-2 py-2 md:py-3 text-muted-foreground break-words">{p.ageCategory}</td>
                                   <td className="px-1 md:px-2 py-2 md:py-3 text-muted-foreground break-words">{p.category}</td>
                                   <td className="px-1 md:px-2 py-2 md:py-3 font-bold text-primary text-center">
-                                    {(() => {
-                                      const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
-                                      let points = 0;
-                                      filteredScheduledGames.forEach(g => {
-                                        if (g.winner === playerName) points += 1;
-                                        else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
-                                      });
-                                      return points;
-                                    })()}
+                                    {p.points}
                                   </td>
                                 </tr>
                               ))}

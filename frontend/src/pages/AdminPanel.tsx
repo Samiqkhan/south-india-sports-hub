@@ -843,6 +843,16 @@ const AdminPanel = () => {
     return true;
   });
 
+  const gameParticipantsWithPoints = gameParticipants.map(p => {
+    const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
+    let points = 0;
+    filteredScheduledGames.forEach(g => {
+      if (g.winner === playerName) points += 1;
+      else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
+    });
+    return { ...p, points };
+  }).sort((a, b) => b.points - a.points);
+
   const formatDate = (isoString: string) => {
     try {
       return new Date(isoString).toLocaleDateString("en-IN", {
@@ -1997,109 +2007,112 @@ const AdminPanel = () => {
                               </tr>
                             </thead>
                             <tbody className="text-sm">
-                              {gameParticipants.map(p => (
-                                <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
-                                  {editingParticipantId === p.id ? (
-                                    <>
-                                      <td className="p-3">
-                                        <input type="text" value={editParticipantName} onChange={e => setEditParticipantName(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
-                                      </td>
-                                      <td className="p-3">
-                                        <input type="text" value={editParticipantPhone} onChange={e => setEditParticipantPhone(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
-                                      </td>
-                                      <td className="p-3">
-                                        <select
-                                          value={editParticipantCategory}
-                                          onChange={e => {
-                                            setEditParticipantCategory(e.target.value);
-                                            setEditParticipantEventType("");
-                                          }}
-                                          className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
-                                        >
-                                          <option value="">Select Category</option>
-                                          {gameAgeCategoriesForTournament.map(age => (
-                                            <option key={age} value={age}>{age}</option>
-                                          ))}
-                                        </select>
-                                      </td>
-                                      <td className="p-3">
-                                        <select
-                                          value={editParticipantEventType}
-                                          onChange={e => setEditParticipantEventType(e.target.value)}
-                                          className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
-                                        >
-                                          <option value="">Select Event Type</option>
-                                          {editParticipantEventTypes.map(type => (
-                                            <option key={type} value={type}>{type}</option>
-                                          ))}
-                                        </select>
-                                      </td>
-                                      <td className="p-3 text-center">
-                                        <select value={editParticipantStatus} onChange={e => setEditParticipantStatus(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none">
-                                          <option value="Paid">Paid</option>
-                                          <option value="Pending">Pending</option>
-                                          <option value="Refunded">Refunded</option>
-                                        </select>
-                                      </td>
-                                      <td className="p-3 text-center text-muted-foreground">-</td>
-                                      <td className="p-3 flex justify-center gap-2">
-                                        <button onClick={handleUpdateParticipant} className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:brightness-110">Save</button>
-                                        <button onClick={() => setEditingParticipantId(null)} className="px-2 py-1 bg-secondary text-foreground text-xs rounded hover:brightness-110">Cancel</button>
-                                      </td>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
-                                      <td className="p-3 text-muted-foreground">{p.phone}</td>
-                                      <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
-                                      <td className="p-3 text-muted-foreground">{p.category}</td>
-                                      <td className="p-3 text-center">
-                                        <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                          p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
-                                          p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
-                                          'bg-yellow-500/20 text-yellow-500'
-                                        }`}>
-                                          {p.status || 'Pending'}
-                                        </span>
-                                      </td>
-                                      <td className="p-3 font-bold text-primary text-center">
-                                        {(() => {
-                                          const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
-                                          let points = 0;
-                                          filteredScheduledGames.forEach(g => {
-                                            if (g.winner === playerName) points += 1;
-                                            else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
-                                          });
-                                          return points;
-                                        })()}
-                                      </td>
-                                      <td className="p-3 flex justify-center gap-3">
-                                        <button 
-                                          onClick={() => {
-                                            setEditingParticipantId(p.id);
-                                            setEditParticipantName(p.playerName);
-                                            setEditParticipantPhone(p.phone);
-                                            setEditParticipantCategory(p.ageCategory);
-                                            setEditParticipantEventType(p.category);
-                                            setEditParticipantStatus(p.status || "Paid");
-                                          }}
-                                          className="text-muted-foreground hover:text-primary transition-colors"
-                                          title="Edit Player"
-                                        >
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                        </button>
-                                        <button 
-                                          onClick={() => handleDeletePlayer(p.id)}
-                                          className="text-muted-foreground hover:text-destructive transition-colors"
-                                          title="Delete Player"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </button>
-                                      </td>
-                                    </>
-                                  )}
-                                </tr>
-                              ))}
+                              {(() => {
+                                const gameParticipantsWithPoints = gameParticipants.map(p => {
+                                  const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
+                                  let points = 0;
+                                  filteredScheduledGames.forEach(g => {
+                                    if (g.winner === playerName) points += 1;
+                                    else if (g.winner === "Draw" && (g.homePlayer === playerName || g.awayPlayer === playerName)) points += 0.5;
+                                  });
+                                  return { ...p, points };
+                                }).sort((a, b) => b.points - a.points);
+                                return gameParticipantsWithPoints.map(p => (
+                                  <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
+                                    {editingParticipantId === p.id ? (
+                                      <>
+                                        <td className="p-3">
+                                          <input type="text" value={editParticipantName} onChange={e => setEditParticipantName(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                        </td>
+                                        <td className="p-3">
+                                          <input type="text" value={editParticipantPhone} onChange={e => setEditParticipantPhone(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                        </td>
+                                        <td className="p-3">
+                                          <select
+                                            value={editParticipantCategory}
+                                            onChange={e => {
+                                              setEditParticipantCategory(e.target.value);
+                                              setEditParticipantEventType("");
+                                            }}
+                                            className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
+                                          >
+                                            <option value="">Select Category</option>
+                                            {gameAgeCategoriesForTournament.map(age => (
+                                              <option key={age} value={age}>{age}</option>
+                                            ))}
+                                          </select>
+                                        </td>
+                                        <td className="p-3">
+                                          <select
+                                            value={editParticipantEventType}
+                                            onChange={e => setEditParticipantEventType(e.target.value)}
+                                            className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
+                                          >
+                                            <option value="">Select Event Type</option>
+                                            {editParticipantEventTypes.map(type => (
+                                              <option key={type} value={type}>{type}</option>
+                                            ))}
+                                          </select>
+                                        </td>
+                                        <td className="p-3 text-center">
+                                          <select value={editParticipantStatus} onChange={e => setEditParticipantStatus(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none">
+                                            <option value="Paid">Paid</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Refunded">Refunded</option>
+                                          </select>
+                                        </td>
+                                        <td className="p-3 text-center text-muted-foreground">-</td>
+                                        <td className="p-3 flex justify-center gap-2">
+                                          <button onClick={handleUpdateParticipant} className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:brightness-110">Save</button>
+                                          <button onClick={() => setEditingParticipantId(null)} className="px-2 py-1 bg-secondary text-foreground text-xs rounded hover:brightness-110">Cancel</button>
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <td className="p-3 font-medium text-foreground">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
+                                        <td className="p-3 text-muted-foreground">{p.phone}</td>
+                                        <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
+                                        <td className="p-3 text-muted-foreground">{p.category}</td>
+                                        <td className="p-3 text-center">
+                                          <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                            p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
+                                            p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
+                                            'bg-yellow-500/20 text-yellow-500'
+                                          }`}>
+                                            {p.status || 'Pending'}
+                                          </span>
+                                        </td>
+                                        <td className="p-3 font-bold text-primary text-center">
+                                          {p.points}
+                                        </td>
+                                        <td className="p-3 flex justify-center gap-3">
+                                          <button 
+                                            onClick={() => {
+                                              setEditingParticipantId(p.id);
+                                              setEditParticipantName(p.playerName);
+                                              setEditParticipantPhone(p.phone);
+                                              setEditParticipantCategory(p.ageCategory);
+                                              setEditParticipantEventType(p.category);
+                                              setEditParticipantStatus(p.status || "Paid");
+                                            }}
+                                            className="text-muted-foreground hover:text-primary transition-colors"
+                                            title="Edit Player"
+                                          >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                          </button>
+                                          <button 
+                                            onClick={() => handleDeletePlayer(p.id)}
+                                            className="text-muted-foreground hover:text-destructive transition-colors"
+                                            title="Delete Player"
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </button>
+                                        </td>
+                                      </>
+                                    )}
+                                  </tr>
+                                ));
+                              })()}
                               {gameParticipants.length === 0 && (
                                 <tr>
                                   <td colSpan={7} className="p-4 text-center text-muted-foreground">No participants found for this category.</td>
