@@ -191,6 +191,7 @@ const AdminPanel = () => {
   const [manualPlayerName, setManualPlayerName] = useState("");
   const [manualPlayerPhone, setManualPlayerPhone] = useState("");
   const [manualPartnerName, setManualPartnerName] = useState("");
+  const [manualPaymentStatus, setManualPaymentStatus] = useState("Paid");
   const [isSavingFee, setIsSavingFee] = useState(false);
   const [expandedTournaments, setExpandedTournaments] = useState<string[]>([]);
   const [expandedGameTournaments, setExpandedGameTournaments] = useState<string[]>([]);
@@ -373,7 +374,7 @@ const AdminPanel = () => {
         partnerName: manualPartnerName || "",
         tournamentTitle: selectedGameTournament,
         amountPaid: "0",
-        status: "Approved"
+        status: manualPaymentStatus
       });
       const data = await getPlayerRegistrations();
       setPlayers(data);
@@ -381,6 +382,7 @@ const AdminPanel = () => {
       setManualPlayerName("");
       setManualPlayerPhone("");
       setManualPartnerName("");
+      setManualPaymentStatus("Paid");
       toast({ title: "Success", description: "Participant added manually" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "Failed to add participant", variant: "destructive" });
@@ -763,7 +765,8 @@ const AdminPanel = () => {
   const gameParticipants = players.filter(p => 
     p.tournamentTitle === selectedGameTournament && 
     p.ageCategory === selectedGameAgeCategory &&
-    p.category === selectedGameCategory
+    p.category === selectedGameCategory &&
+    p.email === "manual@example.com"
   );
   
   const filteredScheduledGames = scheduledGames.filter(g => {
@@ -1857,7 +1860,7 @@ const AdminPanel = () => {
                         {isAddingParticipant && (
                           <div className="bg-secondary/20 p-4 rounded-xl border border-border/50 space-y-4 mb-4">
                             <h5 className="font-bold text-sm uppercase text-foreground">Add Manual Participant</h5>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                               <input 
                                 type="text" 
                                 placeholder="Player Name" 
@@ -1872,15 +1875,24 @@ const AdminPanel = () => {
                                 onChange={e => setManualPlayerPhone(e.target.value)} 
                                 className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
                               />
-                              <input 
-                                type="text" 
-                                placeholder="Partner Name (If Doubles)" 
-                                value={manualPartnerName} 
-                                onChange={e => setManualPartnerName(e.target.value)} 
-                                className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
-                              />
-                            </div>
-                            <div className="flex gap-2">
+                                <input 
+                                  type="text" 
+                                  placeholder="Partner Name (If Doubles)" 
+                                  value={manualPartnerName} 
+                                  onChange={e => setManualPartnerName(e.target.value)} 
+                                  className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all" 
+                                />
+                                <select
+                                  value={manualPaymentStatus}
+                                  onChange={e => setManualPaymentStatus(e.target.value)}
+                                  className="w-full bg-secondary/50 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                                >
+                                  <option value="Paid">Paid</option>
+                                  <option value="Pending">Pending</option>
+                                  <option value="Refunded">Refunded</option>
+                                </select>
+                              </div>
+                              <div className="flex gap-2">
                               <button 
                                 onClick={handleAddManualParticipant} 
                                 disabled={isSavingParticipant || !manualPlayerName}
@@ -1894,6 +1906,7 @@ const AdminPanel = () => {
                                   setManualPlayerName("");
                                   setManualPlayerPhone("");
                                   setManualPartnerName("");
+                                  setManualPaymentStatus("Paid");
                                 }}
                                 className="px-4 py-2 bg-secondary text-foreground font-bold rounded text-xs hover:brightness-110 transition-all"
                               >
