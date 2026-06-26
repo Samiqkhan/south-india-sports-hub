@@ -6,7 +6,6 @@ import { Menu, X } from "lucide-react";
 const navLinks = [
   { label: "About", href: "/#about" },
   { label: "Tournament", href: "/#tournament" },
-  { label: "Players", href: "/players" },
   { label: "Gallery", href: "/#gallery" },
   { label: "Contact", href: "/#contact" },
 ];
@@ -27,9 +26,8 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
+        }`}
     >
       {/* Announcement Banner */}
       {isHome && (
@@ -65,7 +63,7 @@ const Navbar = () => {
             </a>
           ))}
           <div className="flex items-center gap-3">
-            
+
             <Link
               to="/apply"
               className="px-5 py-2 bg-primary text-primary-foreground font-semibold rounded-lg text-sm uppercase tracking-wider glow-primary hover:brightness-110 transition-all"
