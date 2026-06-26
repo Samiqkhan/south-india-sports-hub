@@ -217,6 +217,7 @@ const AdminPanel = () => {
   const [selectedGameTournament, setSelectedGameTournament] = useState<string>(() => localStorage.getItem("sisa_adminTournament") || "");
   const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_adminAge") || "");
   const [selectedGameCategory, setSelectedGameCategory] = useState<string>(() => localStorage.getItem("sisa_adminCategory") || "");
+  const [expandedMatchNames, setExpandedMatchNames] = useState<string[]>([]);
   const [editingFeeId, setEditingFeeId] = useState<string | null>(null);
   const [editFeeValue, setEditFeeValue] = useState("");
 
@@ -535,6 +536,17 @@ const AdminPanel = () => {
       toast({ title: "Error", description: error.message || "Failed to update participant", variant: "destructive" });
     } finally {
       setIsSavingParticipant(false);
+    }
+  };
+
+  const handleToggleArrival = async (participantId: string, currentArrived: boolean) => {
+    try {
+      const updated = await updatePlayerRegistration(participantId, {
+        arrived: !currentArrived
+      });
+      setPlayers(updated);
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Failed to update arrival status", variant: "destructive" });
     }
   };
 
@@ -2105,6 +2117,7 @@ const AdminPanel = () => {
                                 <th className="p-3 font-semibold">Phone</th>
                                 <th className="p-3 font-semibold">Category</th>
                                 <th className="p-3 font-semibold">Event Type</th>
+                                <th className="p-3 font-semibold text-center">Arrival Status</th>
                                 <th className="p-3 font-semibold text-center">Payment Status</th>
                                 <th className="p-3 font-semibold text-center">Actions</th>
                               </tr>
@@ -2158,6 +2171,14 @@ const AdminPanel = () => {
                                           </select>
                                         </td>
                                         <td className="p-3 text-center">
+                                          <input 
+                                            type="checkbox" 
+                                            checked={p.arrived || false} 
+                                            onChange={() => handleToggleArrival(p.id, p.arrived || false)}
+                                            className="w-4 h-4 rounded border-border text-primary focus:ring-primary bg-secondary/50"
+                                          />
+                                        </td>
+                                        <td className="p-3 text-center">
                                           <select value={editParticipantStatus} onChange={e => setEditParticipantStatus(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none">
                                             <option value="Paid">Paid</option>
                                             <option value="Pending">Pending</option>
@@ -2175,6 +2196,14 @@ const AdminPanel = () => {
                                         <td className="p-3 text-muted-foreground">{p.phone}</td>
                                         <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
                                         <td className="p-3 text-muted-foreground">{p.category}</td>
+                                        <td className="p-3 text-center">
+                                          <input 
+                                            type="checkbox" 
+                                            checked={p.arrived || false} 
+                                            onChange={() => handleToggleArrival(p.id, p.arrived || false)}
+                                            className="w-4 h-4 rounded border-border text-primary focus:ring-primary bg-secondary/50"
+                                          />
+                                        </td>
                                         <td className="p-3 text-center">
                                           <span className={`px-2 py-1 rounded text-xs font-bold ${p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
                                               p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
@@ -2343,19 +2372,29 @@ const AdminPanel = () => {
 
                               <div className="p-3 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
-                                    const matchKey = `${tournamentName}-${matchName}`;
                                     const visibleGames = games.filter(g => g.homePlayer !== "GROUP_PLACEHOLDER" || editingGame?.id === g.id);
 
                                     return (
                                       <div key={matchName} className="space-y-3">
-                                        <div className="flex flex-wrap justify-between items-center gap-4 sm:gap-0 bg-secondary/10 p-2 sm:p-3 rounded-lg border border-border/10">
+                                        <div className="flex flex-wrap justify-between items-center gap-4 sm:gap-0 bg-secondary/10 p-2 sm:p-3 rounded-lg border border-border/10 hover:bg-secondary/20 transition-colors cursor-pointer"
+                                             onClick={() => {
+                                                setExpandedMatchNames(prev => 
+                                                  prev.includes(matchName) ? prev.filter(k => k !== matchName) : [...prev, matchName]
+                                                );
+                                             }}
+                                        >
                                           <div className="flex items-center gap-2 flex-1">
+                                            {expandedMatchNames.includes(matchName) ? (
+                                              <ChevronDown className="w-4 h-4 text-primary" />
+                                            ) : (
+                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                            )}
                                             <h5 className="font-bold text-primary text-sm uppercase">{matchName}</h5>
                                             <span className="ml-2 text-xs font-semibold text-muted-foreground bg-background px-2 py-0.5 rounded-full border border-border/50">
                                               {visibleGames.length} {visibleGames.length === 1 ? 'Fix' : 'Fixes'}
                                             </span>
                                           </div>
-                                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto ml-1 sm:ml-0">
+                                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto ml-1 sm:ml-0" onClick={e => e.stopPropagation()}>
                                             <div className="flex items-center gap-2 border-r border-border/50 pr-2 sm:pr-4 mr-1 sm:mr-2">
                                               <input
                                                 type="number"
@@ -2389,8 +2428,9 @@ const AdminPanel = () => {
                                             </button>
                                           </div>
                                         </div>
-                                        <div className="space-y-6 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2 pb-2">
-                                            {visibleGames.map((game, index) => {
+                                        {expandedMatchNames.includes(matchName) && (
+                                          <div className="space-y-6 pl-1 sm:pl-6 border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2 pb-2">
+                                              {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
 
@@ -2472,7 +2512,9 @@ const AdminPanel = () => {
                                                 </div>
                                               );
                                             })}
-                                            {matchName.startsWith("POOL ") && (
+                                          </div>
+                                        )}
+                                        {expandedMatchNames.includes(matchName) && matchName.startsWith("POOL ") && (
                                               <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/10">
                                                 <span className="text-xs font-bold text-muted-foreground self-center uppercase tracking-wider mr-2">Add Stage:</span>
                                                 {["Quarter Final"].map(stage => {

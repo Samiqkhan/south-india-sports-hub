@@ -13,6 +13,7 @@ export interface PlayerRegistration {
   status: 'Paid' | 'Pending' | 'Refunded';
   date: string;
   screenshotUrl?: string;
+  arrived?: boolean;
 }
 
 export interface TournamentApplication {
