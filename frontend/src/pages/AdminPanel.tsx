@@ -813,6 +813,10 @@ const AdminPanel = () => {
     ? Array.from(new Set(gameFees.filter(f => f.tournamentSlug === selectedTournamentSlug && f.ageCategory === selectedGameAgeCategory).map(f => f.category).filter(Boolean))).sort()
     : [];
 
+  const editParticipantEventTypes = (selectedTournamentSlug && editParticipantCategory)
+    ? Array.from(new Set(gameFees.filter(f => f.tournamentSlug === selectedTournamentSlug && f.ageCategory === editParticipantCategory).map(f => f.category).filter(Boolean))).sort()
+    : [];
+
   const gameParticipants = players.filter(p => 
     p.tournamentTitle === selectedGameTournament && 
     p.ageCategory === selectedGameAgeCategory &&
@@ -1992,10 +1996,31 @@ const AdminPanel = () => {
                                         <input type="text" value={editParticipantPhone} onChange={e => setEditParticipantPhone(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
                                       </td>
                                       <td className="p-3">
-                                        <input type="text" value={editParticipantCategory} onChange={e => setEditParticipantCategory(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                        <select
+                                          value={editParticipantCategory}
+                                          onChange={e => {
+                                            setEditParticipantCategory(e.target.value);
+                                            setEditParticipantEventType("");
+                                          }}
+                                          className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
+                                        >
+                                          <option value="">Select Category</option>
+                                          {gameAgeCategoriesForTournament.map(age => (
+                                            <option key={age} value={age}>{age}</option>
+                                          ))}
+                                        </select>
                                       </td>
                                       <td className="p-3">
-                                        <input type="text" value={editParticipantEventType} onChange={e => setEditParticipantEventType(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none" />
+                                        <select
+                                          value={editParticipantEventType}
+                                          onChange={e => setEditParticipantEventType(e.target.value)}
+                                          className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none"
+                                        >
+                                          <option value="">Select Event Type</option>
+                                          {editParticipantEventTypes.map(type => (
+                                            <option key={type} value={type}>{type}</option>
+                                          ))}
+                                        </select>
                                       </td>
                                       <td className="p-3 text-center">
                                         <select value={editParticipantStatus} onChange={e => setEditParticipantStatus(e.target.value)} className="w-full bg-secondary/50 border border-border rounded p-1 text-sm text-foreground focus:outline-none">
