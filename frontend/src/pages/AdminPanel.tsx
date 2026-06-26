@@ -1042,7 +1042,7 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background text-foreground font-body overflow-x-hidden w-full">
       <Navbar />
 
-      <section className="pt-36 md:pt-28 pb-16 px-4 md:px-8">
+      <section className="pt-36 md:pt-28 pb-16 px-1 sm:px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -1947,7 +1947,7 @@ const AdminPanel = () => {
               )}
 
               {activeTab === "games" && (
-                <div className="p-3 sm:p-6 md:p-8 space-y-8 bg-background/50">
+                <div className="p-1 sm:p-6 md:p-8 space-y-8 bg-background/50">
                   <div className="flex flex-col gap-1 pb-4 border-b border-border/50">
                     <h3 className="font-display font-bold text-lg uppercase">Match Scheduling</h3>
                     <p className="text-muted-foreground text-xs">
@@ -2336,7 +2336,7 @@ const AdminPanel = () => {
                               </div>
 
                               {expandedGameTournaments.includes(tournamentName) && (
-                                <div className="p-2 sm:p-4 space-y-6 bg-background/30">
+                                <div className="p-1 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
                                     const isMatchExpanded = expandedMatchNames.includes(matchKey);
@@ -2344,7 +2344,7 @@ const AdminPanel = () => {
 
                                     return (
                                       <div key={matchName} className="space-y-3">
-                                        <div className="flex justify-between items-center bg-secondary/10 hover:bg-secondary/20 p-2 rounded-lg transition-colors border border-border/10">
+                                        <div className="flex justify-between items-center bg-secondary/10 hover:bg-secondary/20 p-1.5 sm:p-2 rounded-lg transition-colors border border-border/10">
                                           <div 
                                             className="flex items-center gap-2 cursor-pointer flex-1"
                                             onClick={() => {
@@ -2425,7 +2425,7 @@ const AdminPanel = () => {
                                           </div>
                                         </div>
                                         {isMatchExpanded && (
-                                          <div className="space-y-3 pl-1 sm:pl-6 border-l sm:border-l-2 border-primary/20 ml-1 sm:ml-2 mt-2">
+                                          <div className="space-y-3 pl-0.5 sm:pl-6 border-l sm:border-l-2 border-primary/20 ml-0.5 sm:ml-2 mt-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2439,7 +2439,7 @@ const AdminPanel = () => {
                                                       <div className="h-px bg-border/50 flex-1"></div>
                                                     </div>
                                                   )}
-                                                  <div className="p-2 sm:p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                                                  <div className="p-1.5 sm:p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
                                                 {editingGame?.id === game.id ? (
                                                   <GameForm
                                                     game={editingGame}
