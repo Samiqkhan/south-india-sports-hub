@@ -85,8 +85,9 @@ const GameForm = ({ game, setGame, onSave, onCancel, onDelete, isSaving, partici
                   const poolMatch = game.round?.match(/^Pool ([A-Z])/i);
                   if (poolMatch) {
                     const p = poolMatch[1].toUpperCase();
+                    const matchType = game.round === `Pool ${p}` ? `Pool ${p} - League Matches` : game.round;
                     return (
-                      <option value={`Pool ${p} - League Matches`}>Pool {p} - League Matches</option>
+                      <option value={matchType}>{matchType}</option>
                     );
                   }
                   return Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)).flatMap(pool => [
