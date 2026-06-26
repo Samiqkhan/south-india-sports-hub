@@ -2340,7 +2340,7 @@ const AdminPanel = () => {
                               </div>
 
                               {expandedGameTournaments.includes(tournamentName) && (
-                                <div className="p-1 sm:p-4 space-y-6 bg-background/30">
+                                <div className="p-3 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
                                     const isMatchExpanded = expandedMatchNames.includes(matchKey);
@@ -2409,7 +2409,7 @@ const AdminPanel = () => {
                                           </div>
                                         </div>
                                         {isMatchExpanded && (
-                                          <div className="space-y-3 pl-0.5 sm:pl-6 border-l sm:border-l-2 border-primary/20 ml-0.5 sm:ml-2 mt-2">
+                                          <div className="space-y-3 pl-2 sm:pl-6 border-l-2 border-primary/20 ml-2 sm:ml-2 mt-2">
                                             {visibleGames.map((game, index) => {
                                               const prevGame = index > 0 ? visibleGames[index - 1] : null;
                                               const isNewSection = !prevGame || prevGame.round !== game.round;
@@ -2423,7 +2423,7 @@ const AdminPanel = () => {
                                                       <div className="h-px bg-border/50 flex-1"></div>
                                                     </div>
                                                   )}
-                                                  <div className="p-1.5 sm:p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                                                  <div className="p-3 sm:p-4 border border-border/30 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
                                                 {editingGame?.id === game.id ? (
                                                   <GameForm
                                                     game={editingGame}
