@@ -63,6 +63,8 @@ export interface ScheduledGame {
   awayPlayer: string;
   round?: string;
   winner?: string;
+  homeScore?: number;
+  awayScore?: number;
   gamesData?: GameScore[];
   createdAt?: string;
 }

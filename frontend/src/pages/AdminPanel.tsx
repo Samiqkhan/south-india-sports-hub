@@ -194,6 +194,10 @@ const AdminPanel = () => {
   const [gameFees, setGameFees] = useState<GameFee[]>([]);
   const [scheduledGames, setScheduledGames] = useState<ScheduledGame[]>([]);
   const [editingGame, setEditingGame] = useState<Partial<ScheduledGame> | null>(null);
+  const [scoringGame, setScoringGame] = useState<ScheduledGame | null>(null);
+  const [tempHomeScore, setTempHomeScore] = useState<number>(0);
+  const [tempAwayScore, setTempAwayScore] = useState<number>(0);
+  const [isFinishingMatch, setIsFinishingMatch] = useState(false);
   const [isSavingGame, setIsSavingGame] = useState(false);
   const [selectedGameTournament, setSelectedGameTournament] = useState<string>(() => localStorage.getItem("sisa_adminTournament") || "");
   const [selectedGameAgeCategory, setSelectedGameAgeCategory] = useState<string>(() => localStorage.getItem("sisa_adminAge") || "");
@@ -2392,27 +2396,7 @@ const AdminPanel = () => {
                                                 Generate
                                               </button>
                                             </div>
-                                            <button
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                const placeholder = games.find(g => g.homePlayer === "GROUP_PLACEHOLDER" || g.homePlayer === "TBD");
-                                                setEditingGame({
-                                                  id: placeholder?.id,
-                                                  tournament: selectedGameTournament,
-                                                  ageCategory: selectedGameAgeCategory,
-                                                  category: selectedGameCategory,
-                                                  homePlayer: "",
-                                                  awayPlayer: "",
-                                                  round: matchName
-                                                });
-                                                if (!isMatchExpanded) {
-                                                  setExpandedMatchNames(prev => [...prev, matchKey]);
-                                                }
-                                              }}
-                                              className="text-xs text-primary font-bold hover:underline"
-                                            >
-                                              + Add Fix
-                                            </button>
+
                                             <button
                                               onClick={(e) => {
                                                 e.stopPropagation();
@@ -2465,12 +2449,14 @@ const AdminPanel = () => {
                                                         <div className="text-foreground font-display font-bold text-base sm:text-lg flex items-center flex-wrap">
                                                           <span className={game.winner === game.homePlayer && game.homePlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                             {game.homePlayer === "TBD" ? "To Be Decided" : game.homePlayer} 
+                                                            {game.winner && game.homeScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{game.homeScore}</span>}
                                                             {game.winner === game.homePlayer && game.homePlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
                                                             {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
                                                           <span className="text-muted-foreground font-body text-xs sm:text-sm mx-1 sm:mx-3 self-center">vs</span>
                                                           <span className={game.winner === game.awayPlayer && game.awayPlayer !== "TBD" ? "text-primary flex items-center gap-1" : "flex items-center gap-1"}>
                                                             {game.awayPlayer === "TBD" ? "To Be Decided" : game.awayPlayer} 
+                                                            {game.winner && game.awayScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{game.awayScore}</span>}
                                                             {game.winner === game.awayPlayer && game.awayPlayer !== "TBD" && <Trophy className="w-4 h-4 text-primary" />}
                                                             {game.winner === "Draw" && <span className="text-muted-foreground text-sm font-semibold ml-1">( DRAW )</span>}
                                                           </span>
@@ -2480,14 +2466,26 @@ const AdminPanel = () => {
                                                         <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {game.ageCategory} - {game.category}</span>
                                                       </div>
                                                     </div>
-                                                    <div className="flex gap-3">
+                                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                                       <button
                                                         onClick={() => setEditingGame(game)}
                                                         className="text-primary hover:underline text-sm font-semibold cursor-pointer"
                                                       >
                                                         {game.homePlayer === "TBD" ? "+ Add Fix" : "Edit"}
                                                       </button>
-                                                      </div>
+                                                      {game.homePlayer !== "TBD" && game.awayPlayer !== "TBD" && game.homePlayer !== "GROUP_PLACEHOLDER" && (
+                                                        <button
+                                                          onClick={() => {
+                                                            setScoringGame(game);
+                                                            setTempHomeScore(game.homeScore || 0);
+                                                            setTempAwayScore(game.awayScore || 0);
+                                                          }}
+                                                          className="text-accent hover:underline text-sm font-semibold cursor-pointer"
+                                                        >
+                                                          Enter Score
+                                                        </button>
+                                                      )}
+                                                    </div>
                                                     </div>
                                                   )}
                                                 </div>
@@ -2623,6 +2621,94 @@ const AdminPanel = () => {
                 className="flex-1 py-3 bg-secondary/30 text-foreground font-semibold rounded-lg text-xs uppercase tracking-wider hover:bg-secondary/50 transition-all border border-border/50 cursor-pointer"
               >
                 Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Scoring Modal */}
+      {scoringGame && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/85 backdrop-blur-sm">
+          <div className="glass-card max-w-lg w-full overflow-hidden border border-border flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-border flex justify-between items-center bg-secondary/15">
+              <div>
+                <h3 className="font-display font-bold uppercase text-lg text-foreground">
+                  Score Match
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 uppercase tracking-wider">
+                  {scoringGame.tournament} • {scoringGame.round}
+                </p>
+              </div>
+              <button
+                onClick={() => setScoringGame(null)}
+                className="text-muted-foreground hover:text-foreground text-sm font-bold w-8 h-8 rounded-full border border-border/50 hover:bg-secondary/30 flex items-center justify-center transition-all cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 flex flex-col gap-8 bg-background/50">
+              <div className="flex justify-between items-center text-center">
+                
+                {/* Home Player */}
+                <div className="flex flex-col items-center gap-3 w-[40%]">
+                  <span className="font-bold text-sm sm:text-base text-foreground break-words w-full">{scoringGame.homePlayer}</span>
+                  <div className="text-4xl font-display font-bold text-primary">{tempHomeScore}</div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setTempHomeScore(Math.max(0, tempHomeScore - 1))} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
+                    <button onClick={() => setTempHomeScore(tempHomeScore + 1)} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
+                  </div>
+                </div>
+
+                <div className="text-muted-foreground font-semibold text-sm">VS</div>
+
+                {/* Away Player */}
+                <div className="flex flex-col items-center gap-3 w-[40%]">
+                  <span className="font-bold text-sm sm:text-base text-foreground break-words w-full">{scoringGame.awayPlayer}</span>
+                  <div className="text-4xl font-display font-bold text-primary">{tempAwayScore}</div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setTempAwayScore(Math.max(0, tempAwayScore - 1))} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
+                    <button onClick={() => setTempAwayScore(tempAwayScore + 1)} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border flex flex-col gap-3 bg-secondary/15">
+              <button
+                disabled={isFinishingMatch}
+                onClick={async () => {
+                  setIsFinishingMatch(true);
+                  try {
+                    let winner = "Draw";
+                    if (tempHomeScore > tempAwayScore) winner = scoringGame.homePlayer;
+                    else if (tempAwayScore > tempHomeScore) winner = scoringGame.awayPlayer;
+
+                    const updatedGame = {
+                      ...scoringGame,
+                      homeScore: tempHomeScore,
+                      awayScore: tempAwayScore,
+                      winner
+                    };
+                    await updateScheduledGame(scoringGame.id, updatedGame as ScheduledGame);
+                    const gData = await getScheduledGames();
+                    setScheduledGames(gData);
+                    setScoringGame(null);
+                    toast({
+                      title: "Score Recorded",
+                      description: `Winner: ${winner}`,
+                    });
+                  } catch (e: any) {
+                    toast({ title: "Error", description: e.message, variant: "destructive" });
+                  } finally {
+                    setIsFinishingMatch(false);
+                  }
+                }}
+                className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg text-xs uppercase tracking-wider glow-primary hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isFinishingMatch ? "Saving..." : "Finish Match"}
               </button>
             </div>
           </div>

@@ -207,6 +207,20 @@ const initDb = async () => {
     }
 
     try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN homeScore INT DEFAULT 0');
+      console.log("Migration: Added homeScore column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE scheduled_games ADD COLUMN awayScore INT DEFAULT 0');
+      console.log("Migration: Added awayScore column to scheduled_games table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
       await pool.query('ALTER TABLE game_fees ADD COLUMN isPublished TINYINT(1) DEFAULT 0');
       console.log("Migration: Added isPublished column to game_fees table successfully.");
     } catch (e) {
@@ -640,7 +654,7 @@ app.get('/api/games', requireDb, async (req, res) => {
 });
 
 app.post('/api/games', requireDb, async (req, res) => {
-  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData } = req.body;
+  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData, homeScore, awayScore } = req.body;
   const id = `game-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const createdAt = new Date().toISOString();
   const gamesDataStr = JSON.stringify(gamesData || []);
@@ -648,11 +662,11 @@ app.post('/api/games', requireDb, async (req, res) => {
   try {
     await pool.query(`
       INSERT INTO scheduled_games 
-      (id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, createdAt) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', createdAt]);
+      (id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, createdAt, homeScore, awayScore) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', createdAt, homeScore || 0, awayScore || 0]);
     
-    res.status(201).json({ id, tournament, category, ageCategory, homePlayer, awayPlayer, round: round || '', winner: winner || '', createdAt });
+    res.status(201).json({ id, tournament, category, ageCategory, homePlayer, awayPlayer, round: round || '', winner: winner || '', homeScore: homeScore || 0, awayScore: awayScore || 0, createdAt });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -660,15 +674,15 @@ app.post('/api/games', requireDb, async (req, res) => {
 
 app.put('/api/games/:id', requireDb, async (req, res) => {
   const { id } = req.params;
-  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData } = req.body;
+  const { tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, gamesData, homeScore, awayScore } = req.body;
   const gamesDataStr = JSON.stringify(gamesData || []);
   try {
     await pool.query(`
       UPDATE scheduled_games 
-      SET tournament = ?, category = ?, ageCategory = ?, homePlayer = ?, awayPlayer = ?, round = ?, winner = ?
+      SET tournament = ?, category = ?, ageCategory = ?, homePlayer = ?, awayPlayer = ?, round = ?, winner = ?, homeScore = ?, awayScore = ?
       WHERE id = ?
-    `, [tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', id]);
-    res.json({ success: true, id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner });
+    `, [tournament || '', category || '', ageCategory || '', homePlayer, awayPlayer, round || '', winner || '', homeScore || 0, awayScore || 0, id]);
+    res.json({ success: true, id, tournament, category, ageCategory, homePlayer, awayPlayer, round, winner, homeScore, awayScore });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

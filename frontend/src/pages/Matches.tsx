@@ -320,6 +320,7 @@ const Matches = () => {
                                                   <div className="flex justify-between items-center text-sm sm:text-base md:text-lg font-bold gap-2">
                                                     <span className={`flex-1 text-left flex items-center flex-wrap gap-1 ${g.winner === g.homePlayer ? "text-primary" : "text-foreground"}`}>
                                                       {g.homePlayer} 
+                                                      {g.winner && g.homeScore !== undefined && <span className="ml-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{g.homeScore}</span>}
                                                       {g.winner === g.homePlayer && <Trophy className="w-4 h-4 text-primary" />}
                                                       {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold ml-1">( DRAW )</span>}
                                                     </span>
@@ -327,6 +328,7 @@ const Matches = () => {
                                                     <span className={`flex-1 text-right flex items-center justify-end flex-wrap gap-1 ${g.winner === g.awayPlayer ? "text-primary" : "text-foreground"}`}>
                                                       {g.winner === "Draw" && <span className="text-muted-foreground text-xs sm:text-sm font-semibold mr-1">( DRAW )</span>}
                                                       {g.winner === g.awayPlayer && <Trophy className="w-4 h-4 text-primary" />}
+                                                      {g.winner && g.awayScore !== undefined && <span className="mr-2 text-sm bg-secondary px-2 py-0.5 rounded border border-border font-mono">{g.awayScore}</span>}
                                                       {g.awayPlayer}
                                                     </span>
                                                   </div>
