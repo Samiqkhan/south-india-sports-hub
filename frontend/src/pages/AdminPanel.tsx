@@ -2091,7 +2091,6 @@ const AdminPanel = () => {
                                 <th className="p-3 font-semibold">Category</th>
                                 <th className="p-3 font-semibold">Event Type</th>
                                 <th className="p-3 font-semibold text-center">Payment Status</th>
-                                <th className="p-3 font-semibold text-center">Points</th>
                                 <th className="p-3 font-semibold text-center">Actions</th>
                               </tr>
                             </thead>
@@ -2150,7 +2149,6 @@ const AdminPanel = () => {
                                             <option value="Refunded">Refunded</option>
                                           </select>
                                         </td>
-                                        <td className="p-3 text-center text-muted-foreground">-</td>
                                         <td className="p-3 flex justify-center gap-2">
                                           <button onClick={handleUpdateParticipant} className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:brightness-110">Save</button>
                                           <button onClick={() => setEditingParticipantId(null)} className="px-2 py-1 bg-secondary text-foreground text-xs rounded hover:brightness-110">Cancel</button>
@@ -2169,9 +2167,6 @@ const AdminPanel = () => {
                                             }`}>
                                             {p.status || 'Pending'}
                                           </span>
-                                        </td>
-                                        <td className="p-3 font-bold text-primary text-center">
-                                          {p.points}
                                         </td>
                                         <td className="p-3 flex justify-center gap-3">
                                           <button

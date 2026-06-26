@@ -180,65 +180,6 @@ const Matches = () => {
 
                 {selectedGameTournament && selectedGameAgeCategory && selectedGameCategory ? (
                   <div className="pt-6 border-t border-border/50 space-y-6">
-                    
-                    {/* Toggle */}
-                    <div className="flex bg-secondary/20 p-1 rounded-lg w-full max-w-md mx-auto">
-                      <button
-                        onClick={() => setActiveTab('participants')}
-                        className={`flex-1 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-md transition-colors ${activeTab === 'participants' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}
-                      >
-                        Score Board
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('matches')}
-                        className={`flex-1 py-2 text-xs sm:text-sm font-bold uppercase tracking-wider rounded-md transition-colors ${activeTab === 'matches' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'}`}
-                      >
-                        Fixed Matches
-                      </button>
-                    </div>
-
-                    {activeTab === 'participants' ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Users className="text-primary w-5 h-5" />
-                          <h4 className="font-display font-bold text-lg uppercase text-primary">
-                            Registered Participants ({gameParticipants.length})
-                          </h4>
-                        </div>
-                        
-                        <div className="rounded-xl border border-border/50">
-                          <table className="w-full text-left border-collapse bg-background table-fixed">
-                            <thead>
-                              <tr className="border-b border-border/50 bg-secondary/20 text-muted-foreground text-[9px] sm:text-[10px] md:text-xs uppercase tracking-wider">
-                                <th className="px-1 md:px-2 py-2 md:py-3 font-semibold w-[40%]">Name</th>
-                                <th className="px-1 md:px-2 py-2 md:py-3 font-semibold w-[25%]">Category</th>
-                                <th className="px-1 md:px-2 py-2 md:py-3 font-semibold w-[20%]">Event</th>
-                                <th className="px-1 md:px-2 py-2 md:py-3 font-semibold text-center w-[15%]">Points</th>
-                              </tr>
-                            </thead>
-                            <tbody className="text-[10px] sm:text-xs md:text-sm">
-                              {gameParticipantsWithPoints.map(p => (
-                                <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
-                                  <td className="px-1 md:px-2 py-2 md:py-3 font-medium text-foreground break-words">{p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName}</td>
-                                  <td className="px-1 md:px-2 py-2 md:py-3 text-muted-foreground break-words">{p.ageCategory}</td>
-                                  <td className="px-1 md:px-2 py-2 md:py-3 text-muted-foreground break-words">{p.category}</td>
-                                  <td className="px-1 md:px-2 py-2 md:py-3 font-bold text-primary text-center">
-                                    {p.points}
-                                  </td>
-                                </tr>
-                              ))}
-                              {gameParticipants.length === 0 && (
-                                <tr>
-                                  <td colSpan={4} className="p-4 md:p-6 text-center text-muted-foreground">
-                                    No participants found for this category.
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    ) : (
                       <div className="space-y-4">
                         <div className="flex items-center gap-3 mb-4">
                           <Trophy className="text-primary w-5 h-5" />
@@ -358,7 +299,6 @@ const Matches = () => {
                         })()}
                       </div>
                     </div>
-                    )}
                   </div>
                 ) : (
                   <div className="text-center py-12 text-muted-foreground glass-card border border-border/50 rounded-xl">
