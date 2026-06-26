@@ -170,7 +170,6 @@ const Matches = () => {
                               <th className="p-3 font-semibold">Phone</th>
                               <th className="p-3 font-semibold">Category</th>
                               <th className="p-3 font-semibold">Event Type</th>
-                              <th className="p-3 font-semibold text-center">Payment Status</th>
                               <th className="p-3 font-semibold text-center">Points</th>
                             </tr>
                           </thead>
@@ -181,15 +180,6 @@ const Matches = () => {
                                 <td className="p-3 text-muted-foreground">{p.phone}</td>
                                 <td className="p-3 text-muted-foreground">{p.ageCategory}</td>
                                 <td className="p-3 text-muted-foreground">{p.category}</td>
-                                <td className="p-3 text-center">
-                                  <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                    p.status === 'Paid' ? 'bg-green-500/20 text-green-500' :
-                                    p.status === 'Refunded' ? 'bg-red-500/20 text-red-500' :
-                                    'bg-yellow-500/20 text-yellow-500'
-                                  }`}>
-                                    {p.status || 'Pending'}
-                                  </span>
-                                </td>
                                 <td className="p-3 font-bold text-primary text-center">
                                   {(() => {
                                     const playerName = p.partnerName ? `${p.playerName} & ${p.partnerName}` : p.playerName;
@@ -205,7 +195,7 @@ const Matches = () => {
                             ))}
                             {gameParticipants.length === 0 && (
                               <tr>
-                                <td colSpan={6} className="p-6 text-center text-muted-foreground">
+                                <td colSpan={5} className="p-6 text-center text-muted-foreground">
                                   No participants found for this category.
                                 </td>
                               </tr>
