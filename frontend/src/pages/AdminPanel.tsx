@@ -2267,7 +2267,7 @@ const AdminPanel = () => {
                                                     onClick={() => setEditingGame(game)}
                                                     className="text-primary hover:underline text-sm font-semibold cursor-pointer"
                                                   >
-                                                    {game.homePlayer === "TBD" || game.awayPlayer === "TBD" ? "Schedule Game" : "Edit"}
+                                                    Edit
                                                   </button>
                                                 </div>
                                               </div>
