@@ -2335,22 +2335,13 @@ const AdminPanel = () => {
                         return Object.keys(groupedByTournament).length > 0 ? (
                           Object.entries(groupedByTournament).map(([tournamentName, matchGroups]) => (
                             <div key={tournamentName} className="glass-card border border-border/50 rounded-xl overflow-hidden">
-                              <div
-                                className="bg-secondary/20 hover:bg-secondary/40 p-4 cursor-pointer flex items-center gap-3 transition-colors border-b border-border/10"
-                                onClick={() => toggleGameTournament(tournamentName)}
-                              >
-                                {expandedGameTournaments.includes(tournamentName) ? (
-                                  <ChevronDown className="w-5 h-5 text-primary" />
-                                ) : (
-                                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                                )}
+                              <div className="bg-secondary/20 p-4 flex items-center gap-3 border-b border-border/10">
                                 <span className="font-display font-bold uppercase tracking-wider text-sm text-foreground">
                                   {tournamentName}
                                 </span>
                               </div>
 
-                              {expandedGameTournaments.includes(tournamentName) && (
-                                <div className="p-3 sm:p-4 space-y-6 bg-background/30">
+                              <div className="p-3 sm:p-4 space-y-6 bg-background/30">
                                   {Object.entries(matchGroups).map(([matchName, games]) => {
                                     const matchKey = `${tournamentName}-${matchName}`;
                                     const isMatchExpanded = expandedMatchNames.includes(matchKey);
@@ -2538,12 +2529,9 @@ const AdminPanel = () => {
                                     );
                                   })}
                                   </div>
-                                )}
                               </div>
                             ))
                           ) : null;
-                        })()}
-
                       {editingGame && !editingGame.id && (
                         <div className="glass-card p-6 border border-primary/50 rounded-xl bg-primary/5">
                           <p className="text-sm font-semibold text-primary mb-4">New Match</p>
