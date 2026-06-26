@@ -74,6 +74,10 @@
     scroll-behavior: smooth;
     @apply overflow-x-hidden w-full;
   }
+
+  option {
+    @apply bg-background text-foreground;
+  }
 }
 
 @layer components {
