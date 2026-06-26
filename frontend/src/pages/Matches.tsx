@@ -45,7 +45,7 @@ const Matches = () => {
       }
     };
     loadData();
-  }, [toast]);
+  }, []);
 
   const gameTournaments = Array.from(new Set(players.map(p => p.tournamentTitle).filter(Boolean))).sort();
   
