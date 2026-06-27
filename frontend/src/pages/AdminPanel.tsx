@@ -243,7 +243,7 @@ const AdminPanel = () => {
   const [matchCountToGenerate, setMatchCountToGenerate] = useState(1);
   const [isGeneratingMatches, setIsGeneratingMatches] = useState(false);
   const [tournamentFormat, setTournamentFormat] = useState<"League" | "Knockout">("League");
-  const [leagueGenerateStage, setLeagueGenerateStage] = useState<"New Pool" | "Semi Finals" | "Final">("New Pool");
+  const [leagueGenerateStage, setLeagueGenerateStage] = useState<"New Pool" | "Quarter Final" | "Semi Final" | "Final">("New Pool");
   const [numberOfPools, setNumberOfPools] = useState<number>(1);
   const [groupMatchCounts, setGroupMatchCounts] = useState<Record<string, number>>({});
   const [isGeneratingGroupMatches, setIsGeneratingGroupMatches] = useState(false);
@@ -2332,7 +2332,8 @@ const AdminPanel = () => {
                                       className="w-32 bg-secondary/30 border border-border rounded p-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                                     >
                                       <option value="New Pool">New Pool</option>
-                                      <option value="Semi Finals">Semi Finals</option>
+                                      <option value="Quarter Final">Quarter Final</option>
+                                      <option value="Semi Final">Semi Final</option>
                                       <option value="Final">Final</option>
                                     </select>
                                     {leagueGenerateStage === "New Pool" && (
@@ -2552,36 +2553,6 @@ const AdminPanel = () => {
                                             })}
                                           </div>
                                         )}
-                                        {expandedMatchNames.includes(matchName) && matchName.startsWith("POOL ") && (
-                                              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/10">
-                                                <span className="text-xs font-bold text-muted-foreground self-center uppercase tracking-wider mr-2">Add Stage:</span>
-                                                {["Quarter Final"].map(stage => {
-                                                  const prefix = matchName.includes(" - ") ? matchName.split(" - ")[0] : matchName;
-                                                  const newRoundName = `${prefix} - ${stage}`;
-                                                  return (
-                                                    <button
-                                                      key={stage}
-                                                      onClick={async (e) => {
-                                                        e.stopPropagation();
-                                                        await addScheduledGame({
-                                                          tournament: selectedGameTournament,
-                                                          category: selectedGameCategory,
-                                                          ageCategory: selectedGameAgeCategory,
-                                                          homePlayer: "TBD",
-                                                          awayPlayer: "TBD",
-                                                          round: newRoundName
-                                                        });
-                                                        const gData = await getScheduledGames();
-                                                        setScheduledGames(gData);
-                                                      }}
-                                                      className="text-xs px-3 py-1.5 bg-secondary/30 text-foreground hover:bg-secondary/60 hover:text-primary rounded font-semibold transition-all border border-border/50"
-                                                    >
-                                                      + {stage}
-                                                    </button>
-                                                  );
-                                                })}
-                                              </div>
-                                            )}
                                           </div>
                                       );
                                     })}
