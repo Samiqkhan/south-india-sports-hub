@@ -106,13 +106,21 @@ const initDb = async () => {
         amountPaid VARCHAR(50) NOT NULL,
         status VARCHAR(50) NOT NULL DEFAULT 'Pending',
         date VARCHAR(50) NOT NULL,
-        screenshotUrl LONGTEXT
+        screenshotUrl LONGTEXT,
+        arrived BOOLEAN DEFAULT FALSE
       )
     `);
 
     try {
       await pool.query('ALTER TABLE player_registrations ADD COLUMN screenshotUrl LONGTEXT');
       console.log("Migration: Added screenshotUrl column to player_registrations table successfully.");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+
+    try {
+      await pool.query('ALTER TABLE player_registrations ADD COLUMN arrived BOOLEAN DEFAULT FALSE');
+      console.log("Migration: Added arrived column to player_registrations table successfully.");
     } catch (e) {
       // Column already exists, ignore
     }
@@ -369,14 +377,30 @@ app.put('/api/players/:id/status', requireDb, async (req, res) => {
 
 app.put('/api/players/:id', requireDb, async (req, res) => {
   const { id } = req.params;
-  const { playerName, phone, ageCategory, category, status } = req.body;
+  
+  const allowedFields = ['playerName', 'phone', 'email', 'state', 'city', 'ageCategory', 'category', 'partnerName', 'tournamentTitle', 'amountPaid', 'status', 'screenshotUrl', 'arrived'];
+  const updates = [];
+  const values = [];
+  
+  for (const field of allowedFields) {
+    if (req.body[field] !== undefined) {
+      updates.push(`${field} = ?`);
+      values.push(req.body[field]);
+    }
+  }
+
+  if (updates.length === 0) {
+    return res.status(400).json({ error: "No fields to update" });
+  }
+
   try {
+    values.push(id);
     await pool.query(`
       UPDATE player_registrations 
-      SET playerName = ?, phone = ?, ageCategory = ?, category = ?, status = ?
+      SET ${updates.join(', ')}
       WHERE id = ?
-    `, [playerName, phone, ageCategory, category, status, id]);
-    res.json({ success: true, id, playerName, phone, ageCategory, category, status });
+    `, values);
+    res.json({ success: true, id, ...req.body });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
