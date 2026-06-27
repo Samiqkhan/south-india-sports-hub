@@ -540,11 +540,18 @@ const AdminPanel = () => {
 
   const handleToggleArrival = async (participantId: string, currentArrived: boolean) => {
     try {
+      // Optimistic UI Update: instantly check/uncheck the box for a snappy experience
+      setPlayers(prev => prev.map(p => 
+        p.id === participantId ? { ...p, arrived: !currentArrived } : p
+      ));
+
       const updated = await updatePlayerRegistration(participantId, {
         arrived: !currentArrived
       });
-      setPlayers(updated);
+      // Maintain the reverse sorting applied during initial loadData to prevent the table from flipping
+      setPlayers([...updated].reverse());
     } catch (error: any) {
+      loadData(); // Revert optimistic update on failure
       toast({ title: "Error", description: error.message || "Failed to update arrival status", variant: "destructive" });
     }
   };
