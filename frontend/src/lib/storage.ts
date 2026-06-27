@@ -105,30 +105,29 @@ export const addPlayerRegistration = async (player: Omit<PlayerRegistration, 'id
   return await res.json();
 };
 
-export const deletePlayerRegistration = async (id: string): Promise<PlayerRegistration[]> => {
+export const deletePlayerRegistration = async (id: string): Promise<void> => {
   const res = await fetch(`${API_BASE}/players/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error("Failed to delete player from database");
-  return await getPlayerRegistrations();
 };
 
-export const updatePlayerRegistration = async (id: string, data: Partial<PlayerRegistration>): Promise<PlayerRegistration[]> => {
+export const updatePlayerRegistration = async (id: string, data: Partial<PlayerRegistration>): Promise<PlayerRegistration> => {
   const res = await fetch(`${API_BASE}/players/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error("Failed to update player in database");
-  return await getPlayerRegistrations();
+  return await res.json();
 };
 
-export const updatePlayerStatus = async (id: string, status: PlayerRegistration['status']): Promise<PlayerRegistration[]> => {
+export const updatePlayerStatus = async (id: string, status: PlayerRegistration['status']): Promise<PlayerRegistration> => {
   const res = await fetch(`${API_BASE}/players/${id}/status`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
   });
   if (!res.ok) throw new Error("Failed to update player status in database");
-  return await getPlayerRegistrations();
+  return await res.json();
 };
 
 // 2. Tournament Applications APIs
@@ -148,20 +147,19 @@ export const addTournamentApplication = async (app: Omit<TournamentApplication, 
   return await res.json();
 };
 
-export const deleteTournamentApplication = async (id: string): Promise<TournamentApplication[]> => {
+export const deleteTournamentApplication = async (id: string): Promise<void> => {
   const res = await fetch(`${API_BASE}/tournaments/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error("Failed to delete tournament application from database");
-  return await getTournamentApplications();
 };
 
-export const updateTournamentStatus = async (id: string, status: TournamentApplication['status']): Promise<TournamentApplication[]> => {
+export const updateTournamentStatus = async (id: string, status: TournamentApplication['status']): Promise<TournamentApplication> => {
   const res = await fetch(`${API_BASE}/tournaments/${id}/status`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
   });
   if (!res.ok) throw new Error("Failed to update tournament status in database");
-  return await getTournamentApplications();
+  return await res.json();
 };
 
 // 3. Sponsor Registrations APIs
@@ -181,20 +179,19 @@ export const addSponsorRegistration = async (sponsor: Omit<SponsorRegistration, 
   return await res.json();
 };
 
-export const deleteSponsorRegistration = async (id: string): Promise<SponsorRegistration[]> => {
+export const deleteSponsorRegistration = async (id: string): Promise<void> => {
   const res = await fetch(`${API_BASE}/sponsors/${id}`, { method: 'DELETE' });
   if (!res.ok) throw new Error("Failed to delete sponsor from database");
-  return await getSponsorRegistrations();
 };
 
-export const updateSponsorStatus = async (id: string, status: SponsorRegistration['status']): Promise<SponsorRegistration[]> => {
+export const updateSponsorStatus = async (id: string, status: SponsorRegistration['status']): Promise<SponsorRegistration> => {
   const res = await fetch(`${API_BASE}/sponsors/${id}/status`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
   });
   if (!res.ok) throw new Error("Failed to update sponsor status in database");
-  return await getSponsorRegistrations();
+  return await res.json();
 };
 
 // 4. Utility Database Operations
@@ -283,14 +280,14 @@ export const getGameFees = async (): Promise<GameFee[]> => {
   return await res.json();
 };
 
-export const updateGameFee = async (id: string, fee?: string, isPublished?: boolean): Promise<GameFee[]> => {
+export const updateGameFee = async (id: string, fee?: string, isPublished?: boolean): Promise<GameFee> => {
   const res = await fetch(`${API_BASE}/game-fees/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ fee, isPublished })
   });
   if (!res.ok) throw new Error("Failed to update game fee in database");
-  return await getGameFees();
+  return await res.json();
 };
 
 export interface PaymentConfig {

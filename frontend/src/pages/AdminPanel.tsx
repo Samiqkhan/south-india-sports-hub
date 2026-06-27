@@ -253,7 +253,7 @@ const AdminPanel = () => {
     setIsGeneratingGroupMatches(true);
     try {
       for (let i = 0; i < count; i++) {
-        await addScheduledGame({
+        const newGame = await addScheduledGame({
           tournament,
           category,
           ageCategory,
@@ -261,9 +261,8 @@ const AdminPanel = () => {
           awayPlayer: "TBD",
           round
         });
+        if (newGame) setScheduledGames(prev => [...prev, newGame]);
       }
-      const gData = await getScheduledGames();
-      setScheduledGames(gData);
       setGroupMatchCounts(prev => ({ ...prev, [round]: 1 }));
       toast({
         title: "Matches Generated",
@@ -296,7 +295,7 @@ const AdminPanel = () => {
             
             for (const pool of pools) {
               // Generate League Matches Placeholder
-              await addScheduledGame({
+              const newGame = await addScheduledGame({
                 tournament: selectedGameTournament,
                 category: selectedGameCategory,
                 ageCategory: selectedGameAgeCategory,
@@ -304,10 +303,11 @@ const AdminPanel = () => {
                 awayPlayer: "GROUP_PLACEHOLDER",
                 round: `Pool ${pool} - League Matches`
               });
+              if (newGame) setScheduledGames(prev => [...prev, newGame]);
             }
           } else {
             // Semi Finals or Final
-            await addScheduledGame({
+            const newGame = await addScheduledGame({
               tournament: selectedGameTournament,
               category: selectedGameCategory,
               ageCategory: selectedGameAgeCategory,
@@ -315,10 +315,11 @@ const AdminPanel = () => {
               awayPlayer: "GROUP_PLACEHOLDER",
               round: leagueGenerateStage
             });
+            if (newGame) setScheduledGames(prev => [...prev, newGame]);
           }
         } else if (tournamentFormat === "Knockout") {
           // Standard placeholder for Knockout matches
-          await addScheduledGame({
+          const newGame = await addScheduledGame({
             tournament: selectedGameTournament,
             category: selectedGameCategory,
             ageCategory: selectedGameAgeCategory,
@@ -326,6 +327,7 @@ const AdminPanel = () => {
             awayPlayer: "GROUP_PLACEHOLDER",
             round: "Knockout Stage"
           });
+          if (newGame) setScheduledGames(prev => [...prev, newGame]);
         }
       } else {
         const existingMatchNumbers = scheduledGames
@@ -336,7 +338,7 @@ const AdminPanel = () => {
 
         for (let i = 1; i <= matchCountToGenerate; i++) {
           const matchNum = maxExistingMatch + i;
-          await addScheduledGame({
+          const newGame = await addScheduledGame({
             tournament: selectedGameTournament,
             category: selectedGameCategory,
             ageCategory: selectedGameAgeCategory,
@@ -344,11 +346,10 @@ const AdminPanel = () => {
             awayPlayer: "TBD",
             round: `Match ${matchNum}`
           });
+          if (newGame) setScheduledGames(prev => [...prev, newGame]);
         }
       }
 
-      const gData = await getScheduledGames();
-      setScheduledGames(gData);
       setMatchCountToGenerate(1);
 
       toast({
@@ -374,10 +375,9 @@ const AdminPanel = () => {
 
     try {
       const isCurrentlyPublished = !!selectedFee.isPublished;
-      await updateGameFee(selectedFee.id, selectedFee.fee, !isCurrentlyPublished);
+      const updated = await updateGameFee(selectedFee.id, selectedFee.fee, !isCurrentlyPublished);
 
-      const newFees = await getGameFees();
-      setGameFees(newFees);
+      setGameFees(prev => prev.map(f => f.id === selectedFee.id ? { ...f, ...updated } : f));
 
       toast({
         title: "Visibility Updated",
@@ -514,7 +514,7 @@ const AdminPanel = () => {
     }
     setIsSavingParticipant(true);
     try {
-      await addPlayerRegistration({
+      const newPlayer = await addPlayerRegistration({
         playerName: manualPlayerName,
         phone: manualPlayerPhone || "N/A",
         email: "manual@example.com",
@@ -527,8 +527,9 @@ const AdminPanel = () => {
         amountPaid: "0",
         status: manualPaymentStatus
       });
-      const data = await getPlayerRegistrations();
-      setPlayers(data);
+      if (newPlayer) {
+        setPlayers(prev => [newPlayer, ...prev]);
+      }
       setIsAddingParticipant(false);
       setManualPlayerName("");
       setManualPlayerPhone("");
@@ -553,7 +554,7 @@ const AdminPanel = () => {
         category: editParticipantEventType,
         status: editParticipantStatus as any
       });
-      setPlayers(updated);
+      setPlayers(prev => prev.map(p => p.id === editingParticipantId ? { ...p, ...updated } : p));
       setEditingParticipantId(null);
       toast({ title: "Success", description: "Participant updated successfully" });
     } catch (error: any) {
@@ -570,11 +571,9 @@ const AdminPanel = () => {
         p.id === participantId ? { ...p, arrived: !currentArrived } : p
       ));
 
-      const updated = await updatePlayerRegistration(participantId, {
+      await updatePlayerRegistration(participantId, {
         arrived: !currentArrived
       });
-      // Maintain the reverse sorting applied during initial loadData to prevent the table from flipping
-      setPlayers([...updated].reverse());
     } catch (error: any) {
       loadData(); // Revert optimistic update on failure
       toast({ title: "Error", description: error.message || "Failed to update arrival status", variant: "destructive" });
@@ -590,15 +589,15 @@ const AdminPanel = () => {
     setIsSavingGame(true);
     try {
       if (gameToSave.id) {
-        await updateScheduledGame(gameToSave.id, gameToSave as ScheduledGame);
+        const updated = await updateScheduledGame(gameToSave.id, gameToSave as ScheduledGame);
+        setScheduledGames(prev => prev.map(g => g.id === gameToSave.id ? { ...g, ...updated } : g));
         toast({ title: "Match Updated", description: "The match has been updated successfully." });
       } else {
-        await addScheduledGame(gameToSave as Omit<ScheduledGame, 'id' | 'createdAt'>);
+        const newGame = await addScheduledGame(gameToSave as Omit<ScheduledGame, 'id' | 'createdAt'>);
+        if (newGame) setScheduledGames(prev => [...prev, newGame]);
         toast({ title: "Match Created", description: "The new match has been scheduled." });
       }
       setEditingGame(null);
-      const gData = await getScheduledGames();
-      setScheduledGames(gData);
     } catch (error) {
       console.error(error);
       toast({ title: "Save Failed", description: "Could not save the match.", variant: "destructive" });
@@ -611,8 +610,7 @@ const AdminPanel = () => {
     if (window.confirm("Are you sure you want to delete this game?")) {
       try {
         await deleteScheduledGame(id);
-        const gData = await getScheduledGames();
-        setScheduledGames(gData);
+        setScheduledGames(prev => prev.filter(g => g.id !== id));
         toast({ title: "Game Deleted", description: "The scheduled game has been removed." });
       } catch (error) {
         console.error(error);
@@ -628,8 +626,7 @@ const AdminPanel = () => {
         for (const game of gamesToDelete) {
           await deleteScheduledGame(game.id);
         }
-        const gData = await getScheduledGames();
-        setScheduledGames(gData);
+        setScheduledGames(prev => prev.filter(g => !gamesToDelete.some(del => del.id === g.id)));
         toast({ title: "Match Deleted", description: "The match entry has been removed." });
       } catch (error) {
         console.error(error);
@@ -642,8 +639,8 @@ const AdminPanel = () => {
   const handleDeletePlayer = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this player registration?")) {
       try {
-        const updated = await deletePlayerRegistration(id);
-        setPlayers(updated);
+        await deletePlayerRegistration(id);
+        setPlayers(prev => prev.filter(p => p.id !== id));
         toast({
           title: "Registration Deleted",
           description: "The player registration record has been removed.",
@@ -662,8 +659,8 @@ const AdminPanel = () => {
   const handleDeleteTournament = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this tournament application?")) {
       try {
-        const updated = await deleteTournamentApplication(id);
-        setTournaments(updated);
+        await deleteTournamentApplication(id);
+        setTournaments(prev => prev.filter(t => t.id !== id));
         toast({
           title: "Application Deleted",
           description: "The tournament application record has been removed.",
@@ -682,8 +679,8 @@ const AdminPanel = () => {
   const handleDeleteSponsor = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this sponsor registration?")) {
       try {
-        const updated = await deleteSponsorRegistration(id);
-        setSponsors(updated);
+        await deleteSponsorRegistration(id);
+        setSponsors(prev => prev.filter(s => s.id !== id));
         toast({
           title: "Registration Deleted",
           description: "The sponsor registration record has been removed.",
@@ -703,7 +700,7 @@ const AdminPanel = () => {
   const handlePlayerStatusChange = async (id: string, status: PlayerRegistration["status"]) => {
     try {
       const updated = await updatePlayerStatus(id, status);
-      setPlayers(updated);
+      setPlayers(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p));
       toast({
         title: "Status Updated",
         description: `Player registration status changed to ${status}.`,
@@ -721,7 +718,7 @@ const AdminPanel = () => {
   const handleTournamentStatusChange = async (id: string, status: TournamentApplication["status"]) => {
     try {
       const updated = await updateTournamentStatus(id, status);
-      setTournaments(updated);
+      setTournaments(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t));
       toast({
         title: "Status Updated",
         description: `Tournament application status changed to ${status}.`,
@@ -739,7 +736,7 @@ const AdminPanel = () => {
   const handleSponsorStatusChange = async (id: string, status: SponsorRegistration["status"]) => {
     try {
       const updated = await updateSponsorStatus(id, status);
-      setSponsors(updated);
+      setSponsors(prev => prev.map(s => s.id === id ? { ...s, ...updated } : s));
       toast({
         title: "Status Updated",
         description: `Sponsor status changed to ${status}.`,
@@ -762,7 +759,7 @@ const AdminPanel = () => {
         formattedFee = "₹" + formattedFee;
       }
       const updated = await updateGameFee(id, formattedFee);
-      setGameFees(updated);
+      setGameFees(prev => prev.map(f => f.id === id ? { ...f, ...updated } : f));
       setEditingFeeId(null);
       toast({
         title: "Pricing Updated",
@@ -2789,3 +2786,4 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
+
