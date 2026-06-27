@@ -415,6 +415,31 @@ const AdminPanel = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
 
+  const handleLiveScoreUpdate = async (gameId: string, newHomeScore: number, newAwayScore: number) => {
+    // Optimistic UI update for the background "fixed matches" list
+    setScheduledGames(prev => prev.map(g => 
+      g.id === gameId ? { ...g, homeScore: newHomeScore, awayScore: newAwayScore } : g
+    ));
+
+    // Update temp state for the modal
+    setTempHomeScore(newHomeScore);
+    setTempAwayScore(newAwayScore);
+
+    // Save to database in the background so spectators see it live
+    if (scoringGame) {
+      try {
+        const updatedGame = {
+          ...scoringGame,
+          homeScore: newHomeScore,
+          awayScore: newAwayScore
+        };
+        await updateScheduledGame(gameId, updatedGame as ScheduledGame);
+      } catch (error) {
+        console.error("Failed to live update score:", error);
+      }
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (
@@ -2687,8 +2712,14 @@ const AdminPanel = () => {
                   <span className="font-bold text-sm sm:text-base text-foreground break-words w-full">{scoringGame.homePlayer}</span>
                   <div className="text-4xl font-display font-bold text-primary">{tempHomeScore}</div>
                   <div className="flex gap-2">
-                    <button onClick={() => setTempHomeScore(Math.max(0, tempHomeScore - 1))} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
-                    <button onClick={() => setTempHomeScore(tempHomeScore + 1)} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
+                    <button onClick={() => {
+                      const newScore = Math.max(0, tempHomeScore - 1);
+                      handleLiveScoreUpdate(scoringGame.id, newScore, tempAwayScore);
+                    }} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
+                    <button onClick={() => {
+                      const newScore = tempHomeScore + 1;
+                      handleLiveScoreUpdate(scoringGame.id, newScore, tempAwayScore);
+                    }} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
                   </div>
                 </div>
 
@@ -2699,8 +2730,14 @@ const AdminPanel = () => {
                   <span className="font-bold text-sm sm:text-base text-foreground break-words w-full">{scoringGame.awayPlayer}</span>
                   <div className="text-4xl font-display font-bold text-primary">{tempAwayScore}</div>
                   <div className="flex gap-2">
-                    <button onClick={() => setTempAwayScore(Math.max(0, tempAwayScore - 1))} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
-                    <button onClick={() => setTempAwayScore(tempAwayScore + 1)} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
+                    <button onClick={() => {
+                      const newScore = Math.max(0, tempAwayScore - 1);
+                      handleLiveScoreUpdate(scoringGame.id, tempHomeScore, newScore);
+                    }} className="w-10 h-10 rounded-full bg-secondary text-foreground text-xl font-bold flex items-center justify-center border border-border hover:bg-secondary/60 cursor-pointer">-</button>
+                    <button onClick={() => {
+                      const newScore = tempAwayScore + 1;
+                      handleLiveScoreUpdate(scoringGame.id, tempHomeScore, newScore);
+                    }} className="w-10 h-10 rounded-full bg-primary/20 text-primary text-xl font-bold flex items-center justify-center border border-primary/50 hover:bg-primary/40 cursor-pointer">+</button>
                   </div>
                 </div>
 
