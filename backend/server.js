@@ -36,7 +36,7 @@ function parseDatabaseUrl(urlStr) {
 
 let pool;
 
-const connectAndMigrate = async () => {
+const connectAndMigrate = async (retries = 5) => {
   try {
     const dbConfig = parseDatabaseUrl(process.env.DATABASE_URL);
     const targetDatabase = dbConfig.database === 'sys' ? 'sih_db' : dbConfig.database;
@@ -77,6 +77,12 @@ const connectAndMigrate = async () => {
     await initDb();
   } catch (err) {
     console.error("Database connection or migration failed:", err.message);
+    if (retries > 0) {
+      console.log(`Retrying database connection in 5 seconds... (${retries} retries left)`);
+      setTimeout(() => connectAndMigrate(retries - 1), 5000);
+    } else {
+      console.error("Database connection failed permanently after maximum retries.");
+    }
   }
 };
 
